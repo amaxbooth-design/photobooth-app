@@ -80,12 +80,10 @@
   <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
     <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth</h1>
     <p class="text-gray-600 mb-8">Gestion des réservations</p>
-    <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-xl mb-4 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
-    <div class="flex items-center justify-center mb-4">
-      <label class="flex items-center cursor-pointer">
-        <input type="checkbox" id="showPassword" class="w-4 h-4 mr-2" onchange="togglePassword()">
-        <span class="text-sm text-gray-600">Afficher le mot de passe</span>
-      </label>
+    <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-xl mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
+    <div class="flex items-center mb-4">
+      <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer" onchange="togglePassword()">
+      <label for="showPassword" class="text-base text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
     </div>
     <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
     <p class="mt-6 text-sm text-gray-500">💡 Contactez votre fournisseur pour le mot de passe</p>
