@@ -371,12 +371,16 @@ L'équipe Photobooth</textarea>
 
   async function maj(id, champ, val) {
     try {
-      await fetch(URL, {
+      const response = await fetch(URL, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           action: 'update',
           reservation: { id, [champ]: val ? 'Oui' : 'Non' }
-        })
+        }),
+        mode: 'no-cors'
       });
       
       // Attendre un peu avant de recharger pour que la mise à jour soit effective
@@ -425,11 +429,17 @@ L'équipe Photobooth</textarea>
       try {
         await fetch(URL, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             action: 'delete',
             reservationId: id
-          })
+          }),
+          mode: 'no-cors'
         });
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
         load();
         Swal.fire('Supprimé !', 'La réservation a été supprimée', 'success');
       } catch (err) {
