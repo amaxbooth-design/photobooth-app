@@ -237,6 +237,7 @@ L'équipe Photobooth</textarea>
   // 🔧 CONFIGURATION À PERSONNALISER POUR CHAQUE CLIENT
   const URL = "https://script.google.com/macros/s/AKfycbyODO1Iq9LBkldQ95kksW9zzK-V9ltfSNr5kG_Vc6-vHivgDJd29bEZnf3LTZCwLfxnzg/exec";
   const PASSWORD = "admin1234";
+  const CLIENT_ID = "CLIENT_001"; // ⚠️ ID UNIQUE pour chaque client (ex: CLIENT_001, CLIENT_002, etc.)
 
   function togglePassword() {
     const passwordInput = document.getElementById('password');
@@ -301,7 +302,7 @@ L'équipe Photobooth</textarea>
 
   async function load() {
     try {
-      const r = await fetch(URL);
+      const r = await fetch(URL + '?clientId=' + CLIENT_ID);
       const j = await r.json();
       const data = j.data || [];
       
@@ -388,6 +389,7 @@ L'équipe Photobooth</textarea>
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          clientId: CLIENT_ID,
           action: 'update',
           reservation: { id, [champ]: val ? 'Oui' : 'Non' }
         }),
@@ -457,10 +459,15 @@ L'équipe Photobooth</textarea>
       try {
         await fetch(URL, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
+            clientId: CLIENT_ID,
             action: 'delete',
-            reservationId: id
-          })
+            id: id
+          }),
+          mode: 'no-cors'
         });
         load();
         Swal.fire('Supprimé !', 'La réservation a été supprimée', 'success');
@@ -505,6 +512,7 @@ L'équipe Photobooth</textarea>
     
     try {
       const payload = {
+        clientId: CLIENT_ID,
         action: edit ? 'update' : 'add',
         reservation: resa
       };
