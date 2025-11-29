@@ -235,8 +235,8 @@ L'équipe Photobooth</textarea>
 
 <script>
   // 🔧 CONFIGURATION À PERSONNALISER POUR CHAQUE CLIENT
-  const URL = "https://script.google.com/macros/s/VOTRE_URL_ICI/exec";
-  const PASSWORD = "motdepasse123"; // ⚠️ À changer pour chaque client
+  const URL = "https://script.google.com/macros/s/AKfycbyODO1Iq9LBkldQ95kksW9zzK-V9ltfSNr5kG_Vc6-vHivgDJd29bEZnf3LTZCwLfxnzg/exec";
+  const PASSWORD = "admin1234";
 
   function togglePassword() {
     const passwordInput = document.getElementById('password');
@@ -256,7 +256,7 @@ L'équipe Photobooth</textarea>
     }
   }
 
-  // Connexion avec touche Entrée
+  // Connexion avec touche Entrée + Auto-remplir date restitution
   document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('password').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
