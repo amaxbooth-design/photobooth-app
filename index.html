@@ -375,8 +375,10 @@ L'équipe Photobooth</textarea>
   }
 
   async function maj(id, champ, val) {
-    // Bloquer temporairement la checkbox pour éviter les double-clics
     const checkbox = event.target;
+    const row = checkbox.closest('tr');
+    
+    // Garder la checkbox cochée visuellement
     checkbox.disabled = true;
     
     try {
@@ -392,16 +394,29 @@ L'équipe Photobooth</textarea>
         mode: 'no-cors'
       });
       
-      // Attendre 2 secondes avant de recharger
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      await load();
+      // Mettre à jour visuellement la couleur de la ligne IMMÉDIATEMENT
+      const checkboxSigne = row.querySelector('.checkbox-signe');
+      const checkboxAcompte = row.querySelector('.checkbox-acompte');
+      
+      if (checkboxSigne && checkboxAcompte && checkboxSigne.checked && checkboxAcompte.checked) {
+        row.classList.remove('notpaid');
+        row.classList.add('paid');
+      } else {
+        row.classList.remove('paid');
+        row.classList.add('notpaid');
+      }
+      
+      // Réactiver la checkbox
+      checkbox.disabled = false;
+      
+      // Recharger après 3 secondes pour synchroniser avec Google Sheets
+      setTimeout(() => load(), 3000);
+      
     } catch (err) {
       console.error('Erreur mise à jour:', err);
-      // En cas d'erreur, remettre la checkbox à son état initial
       checkbox.checked = !val;
-      Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
-    } finally {
       checkbox.disabled = false;
+      Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
     }
   }
 
