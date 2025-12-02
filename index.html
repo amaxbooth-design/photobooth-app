@@ -221,6 +221,18 @@ function login() {
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('userName').textContent = currentClientName;
   
+  // Charger l'email sauvegardé pour ce client
+  const savedEmail = localStorage.getItem('emailClient_' + currentClientId);
+  if (savedEmail) {
+    document.getElementById('emailClient').value = savedEmail;
+  }
+  
+  // Charger le sujet et corps du mail sauvegardés
+  const savedSubject = localStorage.getItem('sujet_' + currentClientId);
+  const savedBody = localStorage.getItem('corps_' + currentClientId);
+  if (savedSubject) document.getElementById('sujet').value = savedSubject;
+  if (savedBody) document.getElementById('corps').value = savedBody;
+  
   load();
 }
 
@@ -240,6 +252,26 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('enlevement').addEventListener('change', function() {
     if (this.value && !document.getElementById('restitution').value) {
       document.getElementById('restitution').value = this.value;
+    }
+  });
+  
+  // Sauvegarder l'email client quand il change
+  document.getElementById('emailClient').addEventListener('change', function() {
+    if (currentClientId) {
+      localStorage.setItem('emailClient_' + currentClientId, this.value);
+    }
+  });
+  
+  // Sauvegarder le sujet et le corps du mail
+  document.getElementById('sujet').addEventListener('change', function() {
+    if (currentClientId) {
+      localStorage.setItem('sujet_' + currentClientId, this.value);
+    }
+  });
+  
+  document.getElementById('corps').addEventListener('change', function() {
+    if (currentClientId) {
+      localStorage.setItem('corps_' + currentClientId, this.value);
     }
   });
 });
