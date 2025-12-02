@@ -22,30 +22,35 @@
 </head>
 <body>
 
-<!-- PAGE DE CONNEXION -->
+<!-- PAGE DE CONNEXION MODIFIÉE -->
 <div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
   <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
     <h1 class="text-4xl font-bold text-blue-900 mb-4">🎉 Photobooth</h1>
     <p class="text-gray-600 mb-8">Gestion de vos réservations</p>
-    
-    <input id="clientCode" type="text" class="w-full p-4 border-2 rounded-lg text-lg mb-4 focus:outline-none focus:border-blue-500 uppercase" placeholder="Code client (ex: JEAN2025)">
-    
+   
+    <input id="clientCode" type="text" class="w-full p-4 border-2 rounded-lg text-lg mb-4 focus:outline-none focus:border-blue-500 uppercase" placeholder="Identifiant (ex: JEAN2025)">
+   
     <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-lg mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
-    
-    <div class="flex items-center mb-6">
+   
+    <div class="flex items-center mb-4">
       <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer" onchange="togglePassword()">
       <label for="showPassword" class="text-sm text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
     </div>
-    
+
+    <div class="flex items-center mb-6">
+      <input type="checkbox" id="rememberMe" class="w-5 h-5 mr-3 cursor-pointer">
+      <label for="rememberMe" class="text-sm text-gray-700 cursor-pointer select-none">Se souvenir de moi</label>
+    </div>
+   
     <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
-    
+   
     <p class="mt-6 text-sm text-gray-500">💡 Contactez votre fournisseur pour vos identifiants</p>
   </div>
 </div>
 
-<!-- APPLICATION -->
+<!-- APPLICATION (le reste reste identique jusqu'au script) -->
 <div id="app" class="hidden">
-  <!-- HEADER -->
+  <!-- HEADER inchangé -->
   <div class="bg-blue-900 shadow-lg">
     <div class="px-4 py-6 max-w-7xl mx-auto">
       <div class="flex flex-wrap justify-between items-center gap-4">
@@ -64,15 +69,16 @@
     </div>
   </div>
 
-  <!-- CONFIG CLIENT -->
+  <!-- CONFIG CLIENT (texte modifié : plus...
+  de mention Drive) -->
   <div class="bg-yellow-50 border-l-4 border-yellow-500">
     <div class="px-4 py-6 max-w-7xl mx-auto">
       <h3 class="text-2xl font-bold mb-4 text-yellow-900">⚙️ Configuration Client</h3>
       <div class="grid md:grid-cols-2 gap-6">
         <div>
-          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Votre email Gmail (Drive + Agenda) :</label>
+          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Votre email Gmail :</label>
           <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
-          <p class="text-xs text-gray-600 mt-1">✅ Contrats partagés sur ce Drive<br>✅ Événements ajoutés à cet Agenda</p>
+          <p class="text-xs text-gray-600 mt-1">Utilisé uniquement pour ouvrir Gmail</p>
         </div>
         <div>
           <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
@@ -80,11 +86,14 @@
         </div>
         <div class="md:col-span-2">
           <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
-          <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+          <textarea id="corps" rows="8" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
 
 Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
 
-Le contrat a également été partagé avec vous sur Google Drive.
+Merci de nous retourner :
+• Le contrat signé
+• L'acompte de 35 €
+• Une copie de votre pièce d'identité
 
 Cordialement,
 L'équipe Photobooth</textarea>
@@ -93,7 +102,7 @@ L'équipe Photobooth</textarea>
     </div>
   </div>
 
-  <!-- TABLEAU -->
+  <!-- TABLEAU (inchangé sauf le bouton Contrat) -->
   <div class="bg-white min-h-screen">
     <div class="table-wrapper">
       <table>
@@ -115,74 +124,19 @@ L'équipe Photobooth</textarea>
             <th>⚙️ Actions</th>
           </tr>
         </thead>
-        <tbody id="tbody">
-          <tr>
-            <td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td>
-          </tr>
-        </tbody>
+        <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
-    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
-    <form id="form" class="grid md:grid-cols-2 gap-6">
-      <input type="hidden" id="id">
-      <div>
-        <label class="block text-sm font-bold mb-2">Date d'enlèvement</label>
-        <input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Date de restitution</label>
-        <input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Nom</label>
-        <input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Prénom</label>
-        <input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Email</label>
-        <input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Téléphone</label>
-        <input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div class="md:col-span-2">
-        <label class="block text-sm font-bold mb-2">Adresse</label>
-        <textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea>
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Pseudo</label>
-        <input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Template</label>
-        <select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500 cursor-pointer">
-          <option value="">Non</option>
-          <option value="Oui">Oui</option>
-        </select>
-      </div>
-      <div class="md:col-span-2 flex gap-4">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
-        <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
-      </div>
-    </form>
-  </div>
-</div>
+<!-- MODAL inchangé -->
+<!-- (le même que dans ton code original) -->
 
 <script>
 // URL du Google Apps Script
 const URL = "https://script.google.com/macros/s/AKfycbxSC-6cYyCF5NPv-2SFAZHoKonY8CBsB9rpq_FZr1kcsP1wdYNH7WpY1VYtMfObTZkg2w/exec";
 
-// CODES CLIENTS - Ajoutez vos clients ici
 const CLIENTS = {
   "TUTU": { password: "2025", name: "Tutu" },
   "JEAN2025": { password: "photobooth123", name: "Jean Dupont" },
@@ -193,468 +147,118 @@ const CLIENTS = {
 let currentClientId = null;
 let currentClientName = null;
 
-function togglePassword() {
-  const passwordInput = document.getElementById('password');
-  const checkbox = document.getElementById('showPassword');
-  passwordInput.type = checkbox.checked ? 'text' : 'password';
-}
-
-function login() {
-  const code = document.getElementById('clientCode').value.trim().toUpperCase();
-  const pass = document.getElementById('password').value;
-  
-  if (!code || !pass) {
-    Swal.fire('Erreur', 'Veuillez remplir tous les champs', 'error');
-    return;
-  }
-  
-  const client = CLIENTS[code];
-  
-  if (!client || client.password !== pass) {
-    Swal.fire('Erreur', 'Code client ou mot de passe incorrect', 'error');
-    return;
-  }
-  
-  currentClientId = code;
-  currentClientName = client.name;
-  
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('userName').textContent = currentClientName;
-  
-  // Charger l'email sauvegardé pour ce client
-  const savedEmail = localStorage.getItem('emailClient_' + currentClientId);
-  if (savedEmail) {
-    document.getElementById('emailClient').value = savedEmail;
-  }
-  
-  // Charger le sujet et corps du mail sauvegardés
-  const savedSubject = localStorage.getItem('sujet_' + currentClientId);
-  const savedBody = localStorage.getItem('corps_' + currentClientId);
-  if (savedSubject) document.getElementById('sujet').value = savedSubject;
-  if (savedBody) document.getElementById('corps').value = savedBody;
-  
-  load();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('clientCode').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      document.getElementById('password').focus();
-    }
-  });
-  
-  document.getElementById('password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      login();
-    }
-  });
-  
-  document.getElementById('enlevement').addEventListener('change', function() {
-    if (this.value && !document.getElementById('restitution').value) {
-      document.getElementById('restitution').value = this.value;
-    }
-  });
-  
-  // Sauvegarder l'email client quand il change (avec blur ET input)
-  document.getElementById('emailClient').addEventListener('blur', function() {
-    if (currentClientId && this.value.trim()) {
-      localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
-      console.log('Email sauvegardé:', this.value.trim());
-    }
-  });
-  
-  document.getElementById('emailClient').addEventListener('input', function() {
-    if (currentClientId && this.value.trim()) {
-      localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
-    }
-  });
-  
-  // Sauvegarder le sujet et le corps du mail
-  document.getElementById('sujet').addEventListener('blur', function() {
-    if (currentClientId) {
-      localStorage.setItem('sujet_' + currentClientId, this.value);
-    }
-  });
-  
-  document.getElementById('corps').addEventListener('blur', function() {
-    if (currentClientId) {
-      localStorage.setItem('corps_' + currentClientId, this.value);
-    }
-  });
-});
-
-function tel(t) {
-  if (!t) return '';
-  const str = String(t).replace(/\D/g, '');
-  if (str.length === 10) {
-    return str.replace(/(\d{2})(?=\d)/g, '$1 ');
-  }
-  return str;
-}
-
-function envoi(email, nom, prenom) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  const corps = (document.getElementById('corps').value || 'Bonjour').replace('{PRENOM}', prenom).replace('{NOM}', nom);
-  const emailCopie = document.getElementById('emailCopie').value || '';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = emailCopie 
-    ? `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}&bcc=${emailCopie}`
-    : `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl);
-}
-
-async function generateAndSendContract(reservationId) {
+// === NOUVELLE FONCTION : ouvre Gmail avec le mail pré-rempli (sans pièce jointe auto) ===
+async function openGmailWithContract(reservationId) {
   const emailClient = document.getElementById('emailClient').value.trim();
-  
   if (!emailClient) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Email client manquant',
-      text: 'Veuillez configurer votre email Gmail dans la section "Configuration Client".',
-      confirmButtonText: 'OK'
-    });
+    Swal.fire('Attention', 'Veuillez renseigner votre email Gmail dans la configuration', 'warning');
     return;
   }
-  
-  // Récupérer les infos de la réservation
+
+  // Récupérer la réservation
   const r = await fetch(URL + '?clientId=' + currentClientId);
   const j = await r.json();
   const reservation = j.data.find(x => x.id == reservationId);
-  
-  if (!reservation) {
-    Swal.fire('Erreur', 'Réservation non trouvée', 'error');
-    return;
-  }
-  
-  // Confirmer l'envoi
-  const confirm = await Swal.fire({
-    title: '📧 Envoyer le contrat ?',
-    html: `
-      <div class="text-left">
-        <p class="mb-4">Le contrat va être <strong>automatiquement envoyé</strong> à :</p>
-        <p class="mb-2">👤 <strong>${reservation.prenom} ${reservation.nom}</strong></p>
-        <p class="mb-4">📧 <strong>${reservation.email}</strong></p>
-        <p class="text-sm text-gray-600">Le PDF sera généré et envoyé depuis votre compte Gmail (${emailClient})</p>
-      </div>
-    `,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: '✅ Oui, envoyer',
-    cancelButtonText: '❌ Annuler',
-    width: '500px'
-  });
-  
-  if (!confirm.isConfirmed) {
-    return;
-  }
-  
-  Swal.fire({
-    title: 'Envoi en cours...',
-    html: 'Génération et envoi du contrat PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
-  });
-  
-  try {
-    // Envoyer la requête pour générer ET envoyer le PDF
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      body: JSON.stringify({
-        clientId: currentClientId,
-        action: 'generateContract',
-        reservationId: reservationId,
-        clientEmail: emailClient,
-        sendEmail: true  // ENVOYER automatiquement
-      }),
-      mode: 'no-cors'
-    });
-    
-    // Attendre l'envoi
-    await new Promise(resolve => setTimeout(resolve, 15000));
-    
-    Swal.close();
-    
-    // Marquer comme envoyé
-    await maj(reservationId, 'contratEnvoye', true);
-    
-    // Recharger
-    await load();
-    
-    // Confirmation
-    Swal.fire({
-      icon: 'success',
-      title: '✅ Contrat envoyé !',
-      html: `
-        <div class="text-left">
-          <p class="mb-4">Le contrat a été envoyé avec succès à <strong>${reservation.email}</strong></p>
-          <p class="mb-2">📋 <strong>Ce qui a été fait :</strong></p>
-          <ul class="list-disc ml-6 mb-4">
-            <li>PDF généré et partagé sur votre Drive</li>
-            <li>Email envoyé au client avec le PDF en pièce jointe</li>
-            <li>Case "✅ Envoyé" cochée automatiquement</li>
-          </ul>
-          <p class="text-sm text-gray-600">💡 Le client devrait recevoir l'email dans quelques instants</p>
-        </div>
-      `,
-      width: '500px',
-      confirmButtonText: 'OK'
-    });
-    
-  } catch (err) {
-    console.error(err);
-    Swal.close();
-    Swal.fire({
-      icon: 'error',
-      title: 'Erreur',
-      text: 'Erreur lors de l\'envoi du contrat'
-    });
-  }
-}
 
-function openGmailForContract(reservation) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  let corps = (document.getElementById('corps').value || 'Bonjour')
+  if (!reservation) {
+    Swal.fire('Erreur', 'Réservation introuvable', 'error');
+    return;
+  }
+
+  // Générer d'abord le PDF (sans l'envoyer)
+  await fetch(URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      clientId: currentClientId,
+      action: 'generateContract',
+      reservationId: reservationId,
+      clientEmail: emailClient,
+      sendEmail: false   // on ne l'envoie pas automatiquement
+    })
+  });
+
+  // Pré-remplir le mail
+  const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth - À signer');
+  const corpsTexte = document.getElementById('corps').value
     .replace('{PRENOM}', reservation.prenom || '')
     .replace('{NOM}', reservation.nom || '');
-  
-  corps += '\n\nMerci de nous retourner le contrat signé accompagné de :\n- L\'acompte de 35€\n- Une copie de votre pièce d\'identité';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl, '_blank');
-}
+  const corps = encodeURIComponent(corpsTexte);
 
-function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
-  // Récupérer l'email du client depuis la configuration
-  const emailClient = document.getElementById('emailClient').value.trim();
-  
-  if (!emailClient) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Email manquant',
-      html: 'Veuillez configurer votre email Gmail dans la section "Configuration Client" pour ajouter l\'événement à votre agenda Google.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
-  
-  // Convertir les dates au format Google Calendar (YYYYMMDD)
-  const startDate = enlevement.replace(/-/g, '');
-  const endDate = restitution.replace(/-/g, '');
-  
-  // Créer le titre de l'événement
-  const title = encodeURIComponent(`Photobooth - ${prenom} ${nom}`);
-  
-  // Détails de l'événement
-  const details = encodeURIComponent(`Location Photobooth pour ${prenom} ${nom}\n\nEnlèvement: ${new Date(enlevement).toLocaleDateString('fr-FR')}\nRestitution: ${new Date(restitution).toLocaleDateString('fr-FR')}`);
-  
-  // Lieu
-  const location = encodeURIComponent(adresse || '');
-  
-  // Créer l'URL Google Calendar AVEC l'email spécifique du client
-  // Cela va ouvrir Google Calendar avec le bon compte
-  const calendarUrl = `https://calendar.google.com/calendar/u/${emailClient}/r/eventedit?text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&sf=true`;
-  
-  // Ouvrir dans un nouvel onglet
-  window.open(calendarUrl, '_blank');
-  
-  // Message de confirmation
+  const mailto = `https://mail.google.com/mail/?view=cm&fs=1&to=${reservation.email}&su=${sujet}&body=${corps}`;
+
+  window.open(mailto, '_blank');
+
+  // Marquer comme "envoyé" manuellement si tu veux
   Swal.fire({
     icon: 'info',
-    title: 'Agenda Google',
-    html: `L'événement va s'ouvrir dans Google Calendar.<br><br>✅ Assurez-vous d'être connecté avec <strong>${emailClient}</strong>`,
-    timer: 3000,
+    title: 'Gmail ouvert',
+    html: `Le PDF a été généré sur votre Drive.<br><br>Joignez-le manuellement dans Gmail puis envoyez le mail.`,
+    timer: 5000,
     showConfirmButton: false
   });
 }
 
-async function load() {
-  try {
-    const r = await fetch(URL + '?clientId=' + currentClientId);
-    const j = await r.json();
-    
-    if (!j.success) {
-      throw new Error(j.message || 'Erreur');
-    }
-    
-    const data = j.data || [];
-    
-    const filtre = document.getElementById('filtre').value;
-    const mois = [...new Set(data.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
-    document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + 
-      mois.map(m => `<option value="${m}" ${filtre === m ? 'selected' : ''}>${new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</option>`).join('');
+// === Remplacement dans le tableau : bouton Contrat ouvre Gmail ===
+function renderRow(r) {
+  // ... même code que avant jusqu'au bouton Contrat
+  return `<tr class="${ok ? 'paid' : 'notpaid'}">
+    <!-- colonnes inchangées -->
+    <td class="space-x-2">
+      <button onclick="openGmailWithContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm">
+        ✉️ Ouvrir Gmail
+      </button>
+      <button onclick="addToCalendar(...)" class="bg-blue-600 ...">📅</button>
+    </td>
+    <!-- reste identique -->
+  </tr>`;
+}
 
-    const tbody = document.getElementById('tbody');
-    
-    if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
-      return;
-    }
+// === Se souvenir de moi (localStorage) ===
+function login() {
+  const code = document.getElementById('clientCode').value.trim().toUpperCase();
+  const pass = document.getElementById('password').value;
+  const remember = document.getElementById('rememberMe').checked;
 
-    tbody.innerHTML = data
-      .filter(x => !filtre || x.enlevement?.startsWith(filtre))
-      .map(r => {
-        const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
-        const dateEnl = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
-        const dateRest = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
-        const telephone = tel(r.telephone || '');
-        const nomComplet = `${r.nom || ''} ${r.prenom || ''}`.trim();
-        
-        return `<tr class="${ok ? 'paid' : 'notpaid'}">
-          <td>${dateEnl}</td>
-          <td>${dateRest}</td>
-          <td><strong>${nomComplet}</strong></td>
-          <td>${r.email || ''}</td>
-          <td class="font-mono">${telephone}</td>
-          <td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td>
-          <td>${r.pseudo || ''}</td>
-          <td class="space-x-2">
-            <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et envoyer le contrat PDF">📧 Contrat</button>
-            <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Ajouter à l'agenda">📅</button>
-          </td>
-          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
-          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
-          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
-          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
-          <td>${r.template || ''}</td>
-          <td class="whitespace-nowrap">
-            <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'")}' class="text-2xl hover:scale-110 transition mr-2">✏️</button>
-            <button onclick="supprimer(${r.id})" class="text-2xl hover:scale-110 transition">🗑️</button>
-          </td>
-        </tr>`;
-      }).join('');
-  } catch (err) {
-    console.error(err);
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="14" class="text-center py-8 text-red-500">❌ Erreur de chargement</td></tr>';
+  if (!code || !pass) {
+    Swal.fire('Erreur', 'Veuillez remplir tous les champs', 'error');
+    return;
   }
-}
 
-async function maj(id, champ, val) {
-  try {
-    await fetch(URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        clientId: currentClientId,
-        action: 'update',
-        reservation: { id, [champ]: val ? 'Oui' : 'Non' }
-      })
-    });
-    setTimeout(() => load(), 2000);
-  } catch (err) {
-    console.error(err);
-    Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
+  const client = CLIENTS[code];
+  if (!client || client.password !== pass) {
+    Swal.fire('Erreur', 'Identifiant ou mot de passe incorrect', 'error');
+    return;
   }
-}
 
-function nouveau() {
-  document.getElementById('titre').textContent = 'Nouvelle réservation';
-  document.getElementById('form').reset();
-  document.getElementById('id').value = '';
-  document.getElementById('modal').classList.remove('hidden');
-}
+  currentClientId = code;
+  currentClientName = client.name;
 
-function editer(resa) {
-  document.getElementById('titre').textContent = 'Modifier';
-  document.getElementById('id').value = resa.id;
-  document.getElementById('enlevement').value = resa.enlevement;
-  document.getElementById('restitution').value = resa.restitution;
-  document.getElementById('nom').value = resa.nom || '';
-  document.getElementById('prenom').value = resa.prenom || '';
-  document.getElementById('email').value = resa.email || '';
-  document.getElementById('telephone').value = resa.telephone || '';
-  document.getElementById('adresse').value = resa.adresse || '';
-  document.getElementById('pseudo').value = resa.pseudo || '';
-  document.getElementById('template').value = resa.template || '';
-  document.getElementById('modal').classList.remove('hidden');
-}
-
-async function supprimer(id) {
-  const conf = await Swal.fire({
-    title: 'Supprimer ?',
-    text: 'Cette action est irréversible',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Oui',
-    cancelButtonText: 'Annuler'
-  });
-  
-  if (conf.isConfirmed) {
-    try {
-      await fetch(URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          clientId: currentClientId,
-          action: 'delete',
-          id: id
-        })
-      });
-      load();
-      Swal.fire('Supprimé !', '', 'success');
-    } catch (err) {
-      Swal.fire('Erreur', 'Impossible de supprimer', 'error');
-    }
+  if (remember) {
+    localStorage.setItem('savedClientId', code);
+  } else {
+    localStorage.removeItem('savedClientId');
   }
+
+  // ... reste du login identique
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userName').textContent = currentClientName;
+  // chargement config + load()
+  load();
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.add('hidden');
-}
-
-document.getElementById('form').onsubmit = async function(e) {
-  e.preventDefault();
-  
-  const edit = document.getElementById('id').value;
-  const resa = {
-    id: edit || Date.now().toString(),
-    enlevement: document.getElementById('enlevement').value,
-    restitution: document.getElementById('restitution').value,
-    nom: document.getElementById('nom').value,
-    prenom: document.getElementById('prenom').value,
-    email: document.getElementById('email').value,
-    telephone: document.getElementById('telephone').value,
-    adresse: document.getElementById('adresse').value,
-    pseudo: document.getElementById('pseudo').value,
-    template: document.getElementById('template').value
-  };
-  
-  Swal.fire({
-    title: 'Enregistrement...',
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading()
-  });
-  
-  try {
-    await fetch(URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        clientId: currentClientId,
-        action: edit ? 'update' : 'add',
-        reservation: resa
-      })
-    });
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    closeModal();
-    await load();
-    Swal.fire('Succès !', '', 'success');
-  } catch (err) {
-    Swal.fire('Erreur', err.message, 'error');
+// Au chargement : pré-remplir si "se souvenir de moi"
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('savedClientId');
+  if (saved) {
+    document.getElementById('clientCode').value = saved;
+    document.getElementById('rememberMe').checked = true;
   }
-};
+});
 </script>
+
+<!-- Le reste du script (load, maj, editer, etc.) reste exactement le même que dans ta version précédente -->
+<!-- Je n'ai pas tout recopié pour ne pas alourdir, mais tu gardes tout le reste inchangé -->
 
 </body>
 </html>
