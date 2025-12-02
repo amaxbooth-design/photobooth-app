@@ -107,6 +107,7 @@ L'équipe Photobooth</textarea>
             <th>📍 Adresse</th>
             <th>🎭 Pseudo</th>
             <th>✉️ Contrat</th>
+            <th>📤 Envoyé</th>
             <th>✅ Signé</th>
             <th>💰 Acompte</th>
             <th>🔒 Caution</th>
@@ -116,7 +117,7 @@ L'équipe Photobooth</textarea>
         </thead>
         <tbody id="tbody">
           <tr>
-            <td colspan="13" class="text-center py-8 text-gray-500">Chargement...</td>
+            <td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td>
           </tr>
         </tbody>
       </table>
@@ -322,7 +323,7 @@ async function generateAndSendContract(reservationId) {
   
   Swal.fire({
     title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération et l\'envoi du PDF<br><small>Cela peut prendre 10-20 secondes...</small>',
+    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 10-20 secondes...</small>',
     allowOutsideClick: false,
     didOpen: () => {
       Swal.showLoading();
@@ -330,7 +331,7 @@ async function generateAndSendContract(reservationId) {
   });
   
   try {
-    // Envoyer la requête
+    // Envoyer la requête pour générer le PDF (SANS l'envoyer par email)
     await fetch(URL, {
       method: 'POST',
       headers: {
@@ -340,21 +341,32 @@ async function generateAndSendContract(reservationId) {
         clientId: currentClientId,
         action: 'generateContract',
         reservationId: reservationId,
-        clientEmail: emailClient
+        clientEmail: emailClient,
+        sendEmail: false  // NE PAS envoyer l'email automatiquement
       }),
       mode: 'no-cors'
     });
     
-    // Attendre 5 secondes pour que le script s'exécute
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Attendre 8 secondes pour que le PDF soit généré
+    await new Promise(resolve => setTimeout(resolve, 8000));
     
-    // Afficher un message de succès
-    Swal.fire({
-      icon: 'success',
-      title: 'Contrat en cours d\'envoi !',
-      html: `Le contrat PDF est en cours de génération et d'envoi.<br><br>Le client devrait recevoir l'email dans quelques instants.<br><br>Le contrat sera aussi partagé sur votre Google Drive (${emailClient}).`,
-      confirmButtonText: 'OK'
-    });
+    Swal.close();
+    
+    // Récupérer les infos de la réservation
+    const r = await fetch(URL + '?clientId=' + currentClientId);
+    const j = await r.json();
+    const reservation = j.data.find(x => x.id == reservationId);
+    
+    if (reservation) {
+      // Ouvrir Gmail avec le contrat pré-rempli
+      await openGmailWithContract(reservation);
+      
+      // Marquer le contrat comme envoyé
+      await maj(reservationId, 'contratEnvoye', true);
+      
+      // Recharger la page
+      setTimeout(() => load(), 1000);
+    }
     
   } catch (err) {
     console.error(err);
@@ -364,6 +376,24 @@ async function generateAndSendContract(reservationId) {
       text: 'Erreur de connexion au serveur'
     });
   }
+}
+
+async function openGmailWithContract(reservation) {
+  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
+  let corps = (document.getElementById('corps').value || 'Bonjour')
+    .replace('{PRENOM}', reservation.prenom || '')
+    .replace('{NOM}', reservation.nom || '');
+  
+  // Ajouter le lien vers le contrat PDF sur Drive
+  const contractName = "Contrat_" + (reservation.prenom || "") + "_" + (reservation.nom || "") + "_" + new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
+  corps += '\n\n📁 Lien vers votre contrat PDF sur Google Drive :\nhttps://drive.google.com/drive/folders/search?q=' + encodeURIComponent(contractName);
+  
+  const s = encodeURIComponent(sujet);
+  const b = encodeURIComponent(corps);
+  
+  const mailtoUrl = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${s}&body=${b}`;
+  
+  window.open(mailtoUrl, '_blank');
 }
 
 function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
@@ -429,7 +459,7 @@ async function load() {
     const tbody = document.getElementById('tbody');
     
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
       return;
     }
 
@@ -454,6 +484,7 @@ async function load() {
             <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et envoyer le contrat PDF">📧 Contrat</button>
             <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Ajouter à l'agenda">📅</button>
           </td>
+          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
@@ -466,7 +497,7 @@ async function load() {
       }).join('');
   } catch (err) {
     console.error(err);
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="13" class="text-center py-8 text-red-500">❌ Erreur de chargement</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="14" class="text-center py-8 text-red-500">❌ Erreur de chargement</td></tr>';
   }
 }
 
