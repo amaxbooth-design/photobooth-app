@@ -267,7 +267,7 @@ function envoi(email, nom, prenom) {
 async function generateAndSendContract(reservationId) {
   Swal.fire({
     title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération et l\'envoi du PDF',
+    html: 'Veuillez patienter pendant la génération et l\'envoi du PDF<br><small>Cela peut prendre 10-20 secondes...</small>',
     allowOutsideClick: false,
     didOpen: () => {
       Swal.showLoading();
@@ -275,34 +275,31 @@ async function generateAndSendContract(reservationId) {
   });
   
   try {
-    const response = await fetch(URL, {
+    // Envoyer la requête
+    await fetch(URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain'
       },
       body: JSON.stringify({
         clientId: currentClientId,
         action: 'generateContract',
         reservationId: reservationId
-      })
+      }),
+      mode: 'no-cors'
     });
     
-    const result = await response.json();
+    // Attendre 5 secondes pour que le script s'exécute
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
-    if (result.success) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Contrat envoyé !',
-        html: 'Le contrat PDF a été généré et envoyé par email au client.<br><br>Une copie a été sauvegardée dans votre Google Drive.',
-        confirmButtonText: 'OK'
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: result.message || 'Impossible de générer le contrat'
-      });
-    }
+    // Afficher un message de succès
+    Swal.fire({
+      icon: 'success',
+      title: 'Contrat en cours d\'envoi !',
+      html: 'Le contrat PDF est en cours de génération et d\'envoi.<br><br>Le client devrait recevoir l\'email dans quelques instants.<br><br>Une copie sera sauvegardée dans votre Google Drive (dossier "Photobooth - Contrats").',
+      confirmButtonText: 'OK'
+    });
+    
   } catch (err) {
     console.error(err);
     Swal.fire({
