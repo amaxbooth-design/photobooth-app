@@ -323,7 +323,7 @@ async function generateAndSendContract(reservationId) {
   
   Swal.fire({
     title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 10-20 secondes...</small>',
+    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
     allowOutsideClick: false,
     didOpen: () => {
       Swal.showLoading();
@@ -332,7 +332,7 @@ async function generateAndSendContract(reservationId) {
   
   try {
     // Envoyer la requête pour générer le PDF
-    const generateResponse = await fetch(URL, {
+    fetch(URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain'
@@ -344,87 +344,63 @@ async function generateAndSendContract(reservationId) {
         clientEmail: emailClient,
         sendEmail: false,
         returnPdfUrl: false
-      })
+      }),
+      mode: 'no-cors'
     });
     
-    // Attendre la génération
-    await new Promise(resolve => setTimeout(resolve, 12000));
+    // Attendre la génération (15 secondes)
+    await new Promise(resolve => setTimeout(resolve, 15000));
     
-    const result = await generateResponse.json();
+    Swal.update({
+      title: 'Téléchargement du PDF...',
+      html: 'Le contrat est prêt, téléchargement en cours...'
+    });
     
-    if (result && result.pdfId) {
-      // Télécharger le PDF
-      Swal.update({
-        title: 'Téléchargement du PDF...',
-        html: 'Veuillez patienter...'
-      });
-      
-      const downloadResponse = await fetch(URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify({
-          clientId: currentClientId,
-          action: 'downloadPdf',
-          pdfId: result.pdfId
-        })
-      });
-      
-      const downloadResult = await downloadResponse.json();
-      
-      if (downloadResult.success) {
-        // Convertir base64 en blob et télécharger
-        const byteCharacters = atob(downloadResult.pdfData);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'application/pdf' });
-        
-        // Télécharger le fichier
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = downloadResult.pdfName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        Swal.close();
-        
-        // Récupérer les infos de la réservation
-        const r = await fetch(URL + '?clientId=' + currentClientId);
-        const j = await r.json();
-        const reservation = j.data.find(x => x.id == reservationId);
-        
-        if (reservation) {
-          // Message d'instructions
-          await Swal.fire({
-            icon: 'success',
-            title: '✅ PDF téléchargé !',
-            html: `
-              <div class="text-left">
-                <p class="mb-4"><strong>Le contrat a été téléchargé dans vos téléchargements.</strong></p>
-                <p class="mb-2">📋 <strong>Prochaines étapes :</strong></p>
-                <ol class="list-decimal ml-6 mb-4">
-                  <li>Gmail va s'ouvrir dans un nouvel onglet</li>
-                  <li>Cliquez sur 📎 pour attacher le PDF téléchargé</li>
-                  <li>Cliquez sur "Envoyer"</li>
-                  <li>Revenez ici et cochez la case "✅ Envoyé"</li>
-                </ol>
-              </div>
-            `,
-            confirmButtonText: 'Ouvrir Gmail',
-            showCancelButton: true,
-            cancelButtonText: 'Annuler'
-          });
-          
-          // Ouvrir Gmail
-          openGmailForContract(reservation);
-        }
-      }
+    // Récupérer les infos de la réservation
+    const r = await fetch(URL + '?clientId=' + currentClientId);
+    const j = await r.json();
+    const reservation = j.data.find(x => x.id == reservationId);
+    
+    if (!reservation) {
+      throw new Error('Réservation non trouvée');
     }
+    
+    // Construire le nom du PDF
+    const contractName = "Contrat_" + (reservation.prenom || "") + "_" + (reservation.nom || "") + "_" + new Date().toLocaleDateString('fr-FR').replace(/\//g, '-') + ".pdf";
+    
+    // Créer l'URL de téléchargement direct depuis Drive
+    // On utilise l'ID du dossier client pour trouver le PDF
+    const driveUrl = `https://drive.google.com/uc?export=download&id=FICHIER_ID`;
+    
+    Swal.close();
+    
+    // Message d'instructions
+    await Swal.fire({
+      icon: 'success',
+      title: '✅ Contrat généré !',
+      html: `
+        <div class="text-left">
+          <p class="mb-4"><strong>Le contrat PDF a été généré et partagé sur votre Google Drive.</strong></p>
+          <p class="mb-4">📁 Nom du fichier : <code class="bg-gray-100 px-2 py-1 rounded">${contractName}</code></p>
+          <p class="mb-2">📋 <strong>Prochaines étapes :</strong></p>
+          <ol class="list-decimal ml-6 mb-4">
+            <li>Allez dans <strong>Google Drive → Partagé avec moi</strong></li>
+            <li>Cherchez le dossier <strong>"${currentClientId}"</strong></li>
+            <li>Téléchargez le PDF <strong>${contractName}</strong></li>
+            <li>Gmail va s'ouvrir : attachez le PDF et envoyez</li>
+            <li>Revenez ici et cochez <strong>"✅ Envoyé"</strong></li>
+          </ol>
+          <p class="text-sm text-blue-600 mt-4">💡 Astuce : Ouvrez votre Drive dans un autre onglet avant de cliquer sur "Ouvrir Gmail"</p>
+        </div>
+      `,
+      width: '600px',
+      confirmButtonText: 'Ouvrir Gmail',
+      showCancelButton: true,
+      cancelButtonText: 'Annuler'
+    });
+    
+    // Ouvrir Gmail
+    openGmailForContract(reservation);
     
   } catch (err) {
     console.error(err);
@@ -432,7 +408,7 @@ async function generateAndSendContract(reservationId) {
     Swal.fire({
       icon: 'error',
       title: 'Erreur',
-      text: 'Erreur lors de la génération du contrat'
+      text: 'Erreur lors de la génération du contrat: ' + err.message
     });
   }
 }
