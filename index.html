@@ -175,8 +175,8 @@ L'équipe Photobooth</textarea>
 </div>
 
 <script>
-// ⚠️ REMPLACEZ CETTE URL PAR LA VÔTRE ⚠️
-const URL = "https://script.google.com/macros/s/AKfycbxvsebsLSSUoFjpQHo40VdqXtiBT1SadNTl_GCagCsSjEHBeAbpSSyzSElVg05kJ8qEcA/exec";
+// URL du Google Apps Script
+const URL = "https://script.google.com/macros/s/AKfycbxSC-6cYyCF5NPv-2SFAZHoKonY8CBsB9rpq_FZr1kcsP1wdYNH7WpY1VYtMfObTZkg2w/exec";
 
 // CODES CLIENTS - Ajoutez vos clients ici
 const CLIENTS = {
@@ -264,6 +264,55 @@ function envoi(email, nom, prenom) {
   window.open(mailtoUrl);
 }
 
+async function generateAndSendContract(reservationId) {
+  Swal.fire({
+    title: 'Génération du contrat...',
+    html: 'Veuillez patienter pendant la génération et l\'envoi du PDF',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+  
+  try {
+    const response = await fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        clientId: currentClientId,
+        action: 'generateContract',
+        reservationId: reservationId
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Contrat envoyé !',
+        html: 'Le contrat PDF a été généré et envoyé par email au client.<br><br>Une copie a été sauvegardée dans votre Google Drive.',
+        confirmButtonText: 'OK'
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: result.message || 'Impossible de générer le contrat'
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Erreur',
+      text: 'Erreur de connexion au serveur'
+    });
+  }
+}
+
 function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
   // Convertir les dates au format Google Calendar (YYYYMMDD)
   const startDate = enlevement.replace(/-/g, '');
@@ -326,8 +375,8 @@ async function load() {
           <td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td>
           <td>${r.pseudo || ''}</td>
           <td class="space-x-2">
-            <button onclick="envoi('${(r.email || '').replace(/'/g, "\\'")}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}');" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm">📧</button>
-            <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm">📅</button>
+            <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et envoyer le contrat PDF">📧 Contrat</button>
+            <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Ajouter à l'agenda">📅</button>
           </td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
