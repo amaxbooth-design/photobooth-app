@@ -321,9 +321,41 @@ async function generateAndSendContract(reservationId) {
     return;
   }
   
+  // Récupérer les infos de la réservation
+  const r = await fetch(URL + '?clientId=' + currentClientId);
+  const j = await r.json();
+  const reservation = j.data.find(x => x.id == reservationId);
+  
+  if (!reservation) {
+    Swal.fire('Erreur', 'Réservation non trouvée', 'error');
+    return;
+  }
+  
+  // Confirmer l'envoi
+  const confirm = await Swal.fire({
+    title: '📧 Envoyer le contrat ?',
+    html: `
+      <div class="text-left">
+        <p class="mb-4">Le contrat va être <strong>automatiquement envoyé</strong> à :</p>
+        <p class="mb-2">👤 <strong>${reservation.prenom} ${reservation.nom}</strong></p>
+        <p class="mb-4">📧 <strong>${reservation.email}</strong></p>
+        <p class="text-sm text-gray-600">Le PDF sera généré et envoyé depuis votre compte Gmail (${emailClient})</p>
+      </div>
+    `,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '✅ Oui, envoyer',
+    cancelButtonText: '❌ Annuler',
+    width: '500px'
+  });
+  
+  if (!confirm.isConfirmed) {
+    return;
+  }
+  
   Swal.fire({
-    title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
+    title: 'Envoi en cours...',
+    html: 'Génération et envoi du contrat PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
     allowOutsideClick: false,
     didOpen: () => {
       Swal.showLoading();
@@ -331,7 +363,7 @@ async function generateAndSendContract(reservationId) {
   });
   
   try {
-    // Envoyer la requête pour générer le PDF
+    // Envoyer la requête pour générer ET envoyer le PDF
     fetch(URL, {
       method: 'POST',
       headers: {
@@ -342,65 +374,41 @@ async function generateAndSendContract(reservationId) {
         action: 'generateContract',
         reservationId: reservationId,
         clientEmail: emailClient,
-        sendEmail: false,
-        returnPdfUrl: false
+        sendEmail: true  // ENVOYER automatiquement
       }),
       mode: 'no-cors'
     });
     
-    // Attendre la génération (15 secondes)
+    // Attendre l'envoi
     await new Promise(resolve => setTimeout(resolve, 15000));
-    
-    Swal.update({
-      title: 'Téléchargement du PDF...',
-      html: 'Le contrat est prêt, téléchargement en cours...'
-    });
-    
-    // Récupérer les infos de la réservation
-    const r = await fetch(URL + '?clientId=' + currentClientId);
-    const j = await r.json();
-    const reservation = j.data.find(x => x.id == reservationId);
-    
-    if (!reservation) {
-      throw new Error('Réservation non trouvée');
-    }
-    
-    // Construire le nom du PDF
-    const contractName = "Contrat_" + (reservation.prenom || "") + "_" + (reservation.nom || "") + "_" + new Date().toLocaleDateString('fr-FR').replace(/\//g, '-') + ".pdf";
-    
-    // Créer l'URL de téléchargement direct depuis Drive
-    // On utilise l'ID du dossier client pour trouver le PDF
-    const driveUrl = `https://drive.google.com/uc?export=download&id=FICHIER_ID`;
     
     Swal.close();
     
-    // Message d'instructions
-    await Swal.fire({
+    // Marquer comme envoyé
+    await maj(reservationId, 'contratEnvoye', true);
+    
+    // Recharger
+    await load();
+    
+    // Confirmation
+    Swal.fire({
       icon: 'success',
-      title: '✅ Contrat généré !',
+      title: '✅ Contrat envoyé !',
       html: `
         <div class="text-left">
-          <p class="mb-4"><strong>Le contrat PDF a été généré et partagé sur votre Google Drive.</strong></p>
-          <p class="mb-4">📁 Nom du fichier : <code class="bg-gray-100 px-2 py-1 rounded">${contractName}</code></p>
-          <p class="mb-2">📋 <strong>Prochaines étapes :</strong></p>
-          <ol class="list-decimal ml-6 mb-4">
-            <li>Allez dans <strong>Google Drive → Partagé avec moi</strong></li>
-            <li>Cherchez le dossier <strong>"${currentClientId}"</strong></li>
-            <li>Téléchargez le PDF <strong>${contractName}</strong></li>
-            <li>Gmail va s'ouvrir : attachez le PDF et envoyez</li>
-            <li>Revenez ici et cochez <strong>"✅ Envoyé"</strong></li>
-          </ol>
-          <p class="text-sm text-blue-600 mt-4">💡 Astuce : Ouvrez votre Drive dans un autre onglet avant de cliquer sur "Ouvrir Gmail"</p>
+          <p class="mb-4">Le contrat a été envoyé avec succès à <strong>${reservation.email}</strong></p>
+          <p class="mb-2">📋 <strong>Ce qui a été fait :</strong></p>
+          <ul class="list-disc ml-6 mb-4">
+            <li>PDF généré et partagé sur votre Drive</li>
+            <li>Email envoyé au client avec le PDF en pièce jointe</li>
+            <li>Case "✅ Envoyé" cochée automatiquement</li>
+          </ul>
+          <p class="text-sm text-gray-600">💡 Le client devrait recevoir l'email dans quelques instants</p>
         </div>
       `,
-      width: '600px',
-      confirmButtonText: 'Ouvrir Gmail',
-      showCancelButton: true,
-      cancelButtonText: 'Annuler'
+      width: '500px',
+      confirmButtonText: 'OK'
     });
-    
-    // Ouvrir Gmail
-    openGmailForContract(reservation);
     
   } catch (err) {
     console.error(err);
@@ -408,7 +416,7 @@ async function generateAndSendContract(reservationId) {
     Swal.fire({
       icon: 'error',
       title: 'Erreur',
-      text: 'Erreur lors de la génération du contrat: ' + err.message
+      text: 'Erreur lors de l\'envoi du contrat'
     });
   }
 }
