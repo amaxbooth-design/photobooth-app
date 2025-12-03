@@ -1,229 +1,4 @@
-async function generateAndSendContract(reservationId) {
-  const emailClient = document.getElementById('emailClient').value.trim();
-  
-  if (!emailClient) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Email client manquant',
-      text: 'Veuillez configurer votre email Gmail dans la section "Configuration Client".',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
-  
-  Swal.fire({
-    title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
-  });
-  
-  try {
-    // Envoyer la requête pour générer le PDF avec téléchargement
-    const response = await fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      body: JSON.stringify({
-        clientId: currentClientId,
-        action: 'generateContract',
-        reservationId: reservationId,
-        clientEmail: emailClient,
-        sendEmail: false,
-        downloadPdf: true  // Demander le téléchargement
-      })
-    });
-    
-    // Attendre la génération
-    await new Promise(resolve => setTimeout(resolve, 15000));
-    
-    // Essayer de récupérer le résultat
-    let result = null;
-    try {
-      result = await response.json();
-    } catch (e) {
-      // Si erreur (no-cors), on continue quand même
-    }
-    
-    Swal.close();
-    
-    // Récupérer les infos de la réservation
-    const r = await fetch(URL + '?clientId=' + currentClientId);
-    const j = await r.json();
-    const reservation = j.data.find(x => x.id == reservationId);
-    
-    if (!reservation) {
-      throw new Error('Réservation non trouvée');
-    }
-    
-    // Si on a reçu le PDF en base64, le télécharger
-    if (result && result.success && result.pdfData) {
-      try {
-        const byteCharacters = atob(result.pdfData);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'application/pdf' });
-        
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = result.pdfName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-      } catch (err) {
-        console.error('Erreur téléchargement:', err);
-      }
-    }
-    
-    // Instructions
-    const instructions = await Swal.fire({
-      icon: 'success',
-      title: '✅ Contrat généré !',
-      html: `
-        <div class="text-left">
-          <p class="mb-4">Le contrat PDF devrait être <strong>téléchargé automatiquement</strong> dans votre dossier Téléchargements.</p>
-          
-          <p class="mb-2 font-bold">📋 Prochaines étapes :</p>
-          <ol class="list-decimal ml-6 mb-4 text-sm">
-            <li class="mb-2">Gmail va s'ouvrir avec l'email <strong>pré-rempli</strong></li>
-            <li class="mb-2">Cliquez sur <strong>📎 (trombone)</strong> pour attacher un fichier</li>
-            <li class="mb-2">Sélectionnez le PDF téléchargé : <strong>Contrat_${reservation.prenom}_${reservation.nom}_*.pdf</strong></li>
-            <li class="mb-2"><strong>Cliquez sur Envoyer</strong></li>
-            <li>Revenez ici et <strong>cochez "✅ Envoyé"</strong></li>
-          </ol>
-          
-          <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mt-4">
-            <p class="text-sm text-blue-800">💡 <strong>Le PDF est dans votre dossier Téléchargements</strong></p>
-          </div>
-        </div>
-      `,
-      width: '600px',
-      confirmButtonText: '📧 Ouvrir Gmail',
-      showCancelButton: true,
-      cancelButtonText: 'Annuler'
-    });
-    
-    if (instructions.isConfirmed) {
-      // Ouvrir Gmail avec le mail pré-rempli
-      openGmailForContract(reservation);
-    }
-    
-  } catch (err) {
-    console.error(err);
-    Swal.close();
-    Swal.fire({
-      icon: 'error',
-      title: 'Erreur',
-      text: 'Erreur lors de la génération du contrat: ' + err.message
-    });
-  }
-}
-
-function openGmailForContract(reservation) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  let corps = (document.getElementById('corps').value || 'Bonjour')
-    .replace('{PRENOM}', reservation.prenom || '')
-    .replace('{NOM}', reservation.nom || '');
-  
-  corps += '\n\n⚠️ IMPORTANT : Joindre le contrat PDF avant d\'envoyer !\n\nMerci de nous retourner le contrat signé accompagné de :\n- L\'acompte de 35€\n- Une copie de votre pièce d\'identité\n\nCordialement,\nL\'équipe Photobooth';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl, '_blank');
-}async function generateAndSendContract(reservationId) {
-  const emailClient = document.getElementById('emailClient').value.trim();
-  
-  if (!emailClient) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Email client manquant',
-      text: 'Veuillez configurer votre email Gmail dans la section "Configuration Client".',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
-  
-  // Récupérer les infos de la réservation
-  const r = await fetch(URL + '?clientId=' + currentClientId);
-  const j = await r.json();
-  const reservation = j.data.find(x => x.id == reservationId);
-  
-  if (!reservation) {
-    Swal.fire('Erreur', 'Réservation non trouvée', 'error');
-    return;
-  }
-  
-  // Confirmer l'envoi
-  const confirm = await Swal.fire({
-    title: '📧 Envoyer le contrat ?',
-    html: `
-      <div class="text-left">
-        <p class="mb-4">Le contrat sera <strong>automatiquement envoyé</strong> à :</p>
-        <p class="mb-2">👤 <strong>${reservation.prenom} ${reservation.nom}</strong></p>
-        <p class="mb-4">📧 <strong>${reservation.email}</strong></p>
-        <p class="text-sm text-gray-600">Le PDF sera joint automatiquement à l'email</p>
-      </div>
-    `,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: '✅ Oui, envoyer',
-    cancelButtonText: '❌ Annuler',
-    width: '500px'
-  });
-  
-  if (!confirm.isConfirmed) {
-    return;
-  }
-  
-  Swal.fire({
-    title: 'Envoi en cours...',
-    html: 'Génération et envoi du contrat PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
-  });
-  
-  try {
-    // Envoyer la requête pour générer ET envoyer le PDF automatiquement
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      body: JSON.stringify({
-        clientId: currentClientId,
-        action: 'generateContract',
-        reservationId: reservationId,
-        clientEmail: emailClient,
-        sendEmail: true,  // ENVOYER automatiquement
-        shareOnDrive: false  // NE PAS partager (pas de notifications)
-      }),
-      mode: 'no-cors'
-    });
-    
-    // Attendre l'envoi
-    await new Promise(resolve => setTimeout(resolve, 15000));
-    
-    Swal.close();
-    
-    // Confirmation avec instructions
-    Swal.fire({
-      icon: 'success',
-      title: '✅ Contrat envoyé !',
-      html: `
-        <div class="text-left">
-          <p class="mb-4">Le contrat a été envoy<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -308,13 +83,15 @@ function openGmailForContract(reservation) {
           <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
           <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
         </div>
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">Copie cachée (BCC) :</label>
+          <input id="emailCopie" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="optionnel@exemple.com">
+        </div>
         <div class="md:col-span-2">
           <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
           <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
 
 Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
-
-Le contrat a également été partagé avec vous sur Google Drive.
 
 Cordialement,
 L'équipe Photobooth</textarea>
@@ -412,7 +189,7 @@ L'équipe Photobooth</textarea>
 // URL du Google Apps Script
 const URL = "https://script.google.com/macros/s/AKfycbxSC-6cYyCF5NPv-2SFAZHoKonY8CBsB9rpq_FZr1kcsP1wdYNH7WpY1VYtMfObTZkg2w/exec";
 
-// CODES CLIENTS - Ajoutez vos clients ici
+// CODES CLIENTS
 const CLIENTS = {
   "TUTU": { password: "2025", name: "Tutu" },
   "JEAN2025": { password: "photobooth123", name: "Jean Dupont" },
@@ -438,18 +215,14 @@ function login() {
     Swal.fire('Erreur', 'Veuillez remplir tous les champs', 'error');
     return;
   }
-  
   const client = CLIENTS[code];
-  
   if (!client || client.password !== pass) {
     Swal.fire('Erreur', 'Identifiant ou mot de passe incorrect', 'error');
     return;
   }
-  
   currentClientId = code;
   currentClientName = client.name;
-  
-  // Sauvegarder les identifiants si "Se souvenir de moi" est coché
+
   if (rememberMe) {
     localStorage.setItem('rememberedClientId', code);
     localStorage.setItem('rememberedPassword', pass);
@@ -457,110 +230,69 @@ function login() {
     localStorage.removeItem('rememberedClientId');
     localStorage.removeItem('rememberedPassword');
   }
-  
+
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('userName').textContent = currentClientName;
-  
-  // Charger l'email sauvegardé pour ce client
+
   const savedEmail = localStorage.getItem('emailClient_' + currentClientId);
-  if (savedEmail) {
-    document.getElementById('emailClient').value = savedEmail;
-  }
-  
-  // Charger le sujet et corps du mail sauvegardés
+  if (savedEmail) document.getElementById('emailClient').value = savedEmail;
   const savedSubject = localStorage.getItem('sujet_' + currentClientId);
   const savedBody = localStorage.getItem('corps_' + currentClientId);
+  const savedBcc = localStorage.getItem('emailCopie_' + currentClientId);
   if (savedSubject) document.getElementById('sujet').value = savedSubject;
   if (savedBody) document.getElementById('corps').value = savedBody;
-  
+  if (savedBcc) document.getElementById('emailCopie').value = savedBcc;
+
   load();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Charger les identifiants sauvegardés
   const rememberedId = localStorage.getItem('rememberedClientId');
   const rememberedPass = localStorage.getItem('rememberedPassword');
-  
   if (rememberedId && rememberedPass) {
     document.getElementById('clientCode').value = rememberedId;
     document.getElementById('password').value = rememberedPass;
     document.getElementById('rememberMe').checked = true;
   }
-  
   document.getElementById('clientCode').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      document.getElementById('password').focus();
-    }
+    if (e.key === 'Enter') document.getElementById('password').focus();
   });
-  
   document.getElementById('password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      login();
-    }
+    if (e.key === 'Enter') login();
   });
-  
   document.getElementById('enlevement').addEventListener('change', function() {
     if (this.value && !document.getElementById('restitution').value) {
       document.getElementById('restitution').value = this.value;
     }
   });
-  
-  // Sauvegarder l'email client quand il change (avec blur ET input)
-  document.getElementById('emailClient').addEventListener('blur', function() {
-    if (currentClientId && this.value.trim()) {
-      localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
-      console.log('Email sauvegardé:', this.value.trim());
-    }
-  });
-  
+
   document.getElementById('emailClient').addEventListener('input', function() {
-    if (currentClientId && this.value.trim()) {
-      localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
-    }
+    if (currentClientId) localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
   });
-  
-  // Sauvegarder le sujet et le corps du mail
+  document.getElementById('emailClient').addEventListener('blur', function() {
+    if (currentClientId && this.value.trim()) localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
+  });
   document.getElementById('sujet').addEventListener('blur', function() {
-    if (currentClientId) {
-      localStorage.setItem('sujet_' + currentClientId, this.value);
-    }
+    if (currentClientId) localStorage.setItem('sujet_' + currentClientId, this.value);
   });
-  
   document.getElementById('corps').addEventListener('blur', function() {
-    if (currentClientId) {
-      localStorage.setItem('corps_' + currentClientId, this.value);
-    }
+    if (currentClientId) localStorage.setItem('corps_' + currentClientId, this.value);
+  });
+  document.getElementById('emailCopie').addEventListener('blur', function() {
+    if (currentClientId) localStorage.setItem('emailCopie_' + currentClientId, this.value);
   });
 });
 
 function tel(t) {
   if (!t) return '';
   const str = String(t).replace(/\D/g, '');
-  if (str.length === 10) {
-    return str.replace(/(\d{2})(?=\d)/g, '$1 ');
-  }
+  if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
   return str;
-}
-
-function envoi(email, nom, prenom) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  const corps = (document.getElementById('corps').value || 'Bonjour').replace('{PRENOM}', prenom).replace('{NOM}', nom);
-  const emailCopie = document.getElementById('emailCopie').value || '';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = emailCopie 
-    ? `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}&bcc=${emailCopie}`
-    : `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl);
 }
 
 async function generateAndSendContract(reservationId) {
   const emailClient = document.getElementById('emailClient').value.trim();
-  
   if (!emailClient) {
     Swal.fire({
       icon: 'warning',
@@ -570,133 +302,75 @@ async function generateAndSendContract(reservationId) {
     });
     return;
   }
-  
-  // Récupérer les infos de la réservation
+
+  // Récupérer la réservation courante
   const r = await fetch(URL + '?clientId=' + currentClientId);
   const j = await r.json();
-  const reservation = j.data.find(x => x.id == reservationId);
-  
+  const reservation = (j.data || []).find(x => String(x.id) === String(reservationId));
   if (!reservation) {
     Swal.fire('Erreur', 'Réservation non trouvée', 'error');
     return;
   }
-  
+
   Swal.fire({
     title: 'Génération du contrat...',
-    html: 'Veuillez patienter pendant la génération du PDF<br><small>Cela peut prendre 15-20 secondes...</small>',
+    html: 'Veuillez patienter pendant la génération du PDF',
     allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
+    didOpen: () => Swal.showLoading()
   });
-  
+
   try {
-    // Envoyer la requête pour générer le PDF SANS partage et SANS envoi auto
-    fetch(URL, {
+    // Appel Apps Script pour générer et retourner le PDF en base64 (sans partage, sans envoi)
+    const response = await fetch(URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         clientId: currentClientId,
         action: 'generateContract',
         reservationId: reservationId,
         clientEmail: emailClient,
-        sendEmail: false,
-        shareOnDrive: false  // NE PAS partager pour éviter les notifications
-      }),
-      mode: 'no-cors'
+        downloadPdf: true
+      })
     });
-    
-    // Attendre la génération
-    await new Promise(resolve => setTimeout(resolve, 15000));
-    
+    const result = await response.json();
     Swal.close();
-    
-    // Nom du contrat
-    const contractName = "Contrat_" + (reservation.prenom || "") + "_" + (reservation.nom || "") + "_" + new Date().toLocaleDateString('fr-FR').replace(/\//g, '-') + ".pdf";
-    
-    // Instructions détaillées
-    const result = await Swal.fire({
-      icon: 'success',
-      title: '✅ Contrat généré !',
-      html: `
-        <div class="text-left">
-          <p class="mb-4">Le contrat PDF <strong>${contractName}</strong> a été généré.</p>
-          
-          <p class="mb-2 font-bold">📋 Prochaines étapes :</p>
-          <ol class="list-decimal ml-6 mb-4 text-sm">
-            <li class="mb-2"><strong>Gmail va s'ouvrir</strong> avec un email pré-rempli</li>
-            <li class="mb-2"><strong>Allez dans votre Google Drive</strong> → Photobooth - Contrats → ${currentClientId}</li>
-            <li class="mb-2"><strong>Téléchargez le PDF</strong> ${contractName}</li>
-            <li class="mb-2">Dans Gmail, <strong>cliquez sur 📎</strong> et attachez le PDF</li>
-            <li class="mb-2"><strong>Cliquez sur Envoyer</strong></li>
-            <li><strong>Revenez ici</strong> et cochez la case "✅ Envoyé"</li>
-          </ol>
-          
-          <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mt-4">
-            <p class="text-sm text-blue-800">💡 <strong>Astuce :</strong> Ouvrez d'abord votre Drive dans un autre onglet pour télécharger le PDF, puis revenez cliquer sur "Ouvrir Gmail"</p>
-          </div>
-        </div>
-      `,
-      width: '600px',
-      confirmButtonText: '📧 Ouvrir Gmail',
-      showCancelButton: true,
-      cancelButtonText: 'Annuler'
-    });
-    
-    if (result.isConfirmed) {
-      // Ouvrir Gmail avec le mail pré-rempli
-      openGmailForContract(reservation);
+
+    if (!result.success || !result.pdfBase64) {
+      throw new Error(result.message || 'Échec génération du PDF');
     }
-    
+
+    // Téléchargement automatique dans "Téléchargements"
+    const fileName = result.fileName || `Contrat_${reservation.prenom || ''}_${reservation.nom || ''}.pdf`;
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + result.pdfBase64;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Ouvrir Gmail avec email propre (sans lien Drive)
+    const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
+    let corps = (document.getElementById('corps').value || 'Bonjour')
+      .replace('{PRENOM}', reservation.prenom || '')
+      .replace('{NOM}', reservation.nom || '');
+    corps += '\n\nMerci de nous retourner le contrat signé accompagné de :\n- L\'acompte de 35€\n- Une copie de votre pièce d\'identité';
+    const bcc = document.getElementById('emailCopie').value.trim();
+    const s = encodeURIComponent(sujet);
+    const b = encodeURIComponent(corps);
+    const baseUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(reservation.email || '')}&su=${s}&body=${b}`;
+    const mailtoUrl = bcc ? `${baseUrl}&bcc=${encodeURIComponent(bcc)}` : baseUrl;
+    window.open(mailtoUrl, '_blank');
+
+    Swal.fire('✅ Contrat généré et téléchargé !', 'Attachez-le dans Gmail via 📎 puis envoyez.', 'success');
   } catch (err) {
     console.error(err);
     Swal.close();
-    Swal.fire({
-      icon: 'error',
-      title: 'Erreur',
-      text: 'Erreur lors de la génération du contrat'
-    });
+    Swal.fire({ icon: 'error', title: 'Erreur', text: err.message || 'Erreur lors de la génération du contrat' });
   }
 }
 
-function openGmailForContract(reservation) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  let corps = (document.getElementById('corps').value || 'Bonjour')
-    .replace('{PRENOM}', reservation.prenom || '')
-    .replace('{NOM}', reservation.nom || '');
-  
-  corps += '\n\n⚠️ N\'oubliez pas de joindre le contrat PDF avant d\'envoyer !\n\nMerci de nous retourner le contrat signé accompagné de :\n- L\'acompte de 35€\n- Une copie de votre pièce d\'identité\n\nCordialement,\nL\'équipe Photobooth';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl, '_blank');
-}
-
-function openGmailForContract(reservation) {
-  const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
-  let corps = (document.getElementById('corps').value || 'Bonjour')
-    .replace('{PRENOM}', reservation.prenom || '')
-    .replace('{NOM}', reservation.nom || '');
-  
-  corps += '\n\nMerci de nous retourner le contrat signé accompagné de :\n- L\'acompte de 35€\n- Une copie de votre pièce d\'identité';
-  
-  const s = encodeURIComponent(sujet);
-  const b = encodeURIComponent(corps);
-  
-  const mailtoUrl = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${s}&body=${b}`;
-  
-  window.open(mailtoUrl, '_blank');
-}
-
 function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
-  // Récupérer l'email du client depuis la configuration
   const emailClient = document.getElementById('emailClient').value.trim();
-  
   if (!emailClient) {
     Swal.fire({
       icon: 'warning',
@@ -706,28 +380,15 @@ function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
     });
     return;
   }
-  
-  // Convertir les dates au format Google Calendar (YYYYMMDD)
   const startDate = enlevement.replace(/-/g, '');
   const endDate = restitution.replace(/-/g, '');
-  
-  // Créer le titre de l'événement
   const title = encodeURIComponent(`Photobooth - ${prenom} ${nom}`);
-  
-  // Détails de l'événement
   const details = encodeURIComponent(`Location Photobooth pour ${prenom} ${nom}\n\nEnlèvement: ${new Date(enlevement).toLocaleDateString('fr-FR')}\nRestitution: ${new Date(restitution).toLocaleDateString('fr-FR')}`);
-  
-  // Lieu
   const location = encodeURIComponent(adresse || '');
-  
-  // Créer l'URL Google Calendar AVEC l'email spécifique du client
-  // Cela va ouvrir Google Calendar avec le bon compte
-  const calendarUrl = `https://calendar.google.com/calendar/u/${emailClient}/r/eventedit?text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&sf=true`;
-  
-  // Ouvrir dans un nouvel onglet
+
+  const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&sf=true`;
   window.open(calendarUrl, '_blank');
-  
-  // Message de confirmation
+
   Swal.fire({
     icon: 'info',
     title: 'Agenda Google',
@@ -741,20 +402,16 @@ async function load() {
   try {
     const r = await fetch(URL + '?clientId=' + currentClientId);
     const j = await r.json();
-    
-    if (!j.success) {
-      throw new Error(j.message || 'Erreur');
-    }
-    
+    if (!j.success) throw new Error(j.message || 'Erreur');
+
     const data = j.data || [];
-    
     const filtre = document.getElementById('filtre').value;
     const mois = [...new Set(data.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
-    document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + 
+    document.getElementById('filtre').innerHTML =
+      '<option value="">Tous les mois</option>' +
       mois.map(m => `<option value="${m}" ${filtre === m ? 'selected' : ''}>${new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</option>`).join('');
 
     const tbody = document.getElementById('tbody');
-    
     if (data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
       return;
@@ -768,7 +425,6 @@ async function load() {
         const dateRest = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
         const telephone = tel(r.telephone || '');
         const nomComplet = `${r.nom || ''} ${r.prenom || ''}`.trim();
-        
         return `<tr class="${ok ? 'paid' : 'notpaid'}">
           <td>${dateEnl}</td>
           <td>${dateRest}</td>
@@ -778,7 +434,7 @@ async function load() {
           <td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td>
           <td>${r.pseudo || ''}</td>
           <td class="space-x-2">
-            <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et envoyer le contrat PDF">📧 Contrat</button>
+            <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et télécharger le contrat PDF">📧 Contrat</button>
             <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Ajouter à l'agenda">📅</button>
           </td>
           <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
@@ -802,13 +458,14 @@ async function maj(id, champ, val) {
   try {
     await fetch(URL, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         clientId: currentClientId,
         action: 'update',
         reservation: { id, [champ]: val ? 'Oui' : 'Non' }
       })
     });
-    setTimeout(() => load(), 2000);
+    setTimeout(() => load(), 500);
   } catch (err) {
     console.error(err);
     Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
@@ -825,8 +482,8 @@ function nouveau() {
 function editer(resa) {
   document.getElementById('titre').textContent = 'Modifier';
   document.getElementById('id').value = resa.id;
-  document.getElementById('enlevement').value = resa.enlevement;
-  document.getElementById('restitution').value = resa.restitution;
+  document.getElementById('enlevement').value = resa.enlevement || '';
+  document.getElementById('restitution').value = resa.restitution || '';
   document.getElementById('nom').value = resa.nom || '';
   document.getElementById('prenom').value = resa.prenom || '';
   document.getElementById('email').value = resa.email || '';
@@ -846,11 +503,11 @@ async function supprimer(id) {
     confirmButtonText: 'Oui',
     cancelButtonText: 'Annuler'
   });
-  
   if (conf.isConfirmed) {
     try {
       await fetch(URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientId: currentClientId,
           action: 'delete',
@@ -871,7 +528,6 @@ function closeModal() {
 
 document.getElementById('form').onsubmit = async function(e) {
   e.preventDefault();
-  
   const edit = document.getElementById('id').value;
   const resa = {
     id: edit || Date.now().toString(),
@@ -885,24 +541,19 @@ document.getElementById('form').onsubmit = async function(e) {
     pseudo: document.getElementById('pseudo').value,
     template: document.getElementById('template').value
   };
-  
-  Swal.fire({
-    title: 'Enregistrement...',
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading()
-  });
-  
+
+  Swal.fire({ title: 'Enregistrement...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   try {
     await fetch(URL, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         clientId: currentClientId,
         action: edit ? 'update' : 'add',
         reservation: resa
       })
     });
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 300));
     closeModal();
     await load();
     Swal.fire('Succès !', '', 'success');
