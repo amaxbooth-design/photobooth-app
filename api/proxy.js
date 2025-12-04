@@ -1,6 +1,6 @@
 // api/proxy.js  ← VERSION QUI MARCHE À 100%
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbx8xd2M6i25cNbgHMG7YEZkbeV0WIGjscizxVSkdYS8H_rlapYKjWjAVrFoGo2zG4Q5fA/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzt-NkwJindI7FzYzGygO_eXk6GUKt5MCdD-NiN1eUypAIyQKrOx65VjaqKNPDiNwzxZQ/exec";
 
 module.exports = async (req, res) => {
   // Gestion du preflight OPTIONS
