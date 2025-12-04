@@ -1,27 +1,23 @@
 // api/proxy.js
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB79ndhRVbHwlYqzxRHERaIpNuPKOUZVIAg8nGazPu1U5qIsmJ3rDzsfdyi0FuKT2_tw/exec';
+const GAS_URL = "https://script.google.com/macros/s/AKfycbx8xd2M6i25cNbgHMG7YEZkbeV0WIGjscizxVSkdYS8H_rlapYKjWjAVrFoGo2zG4Q5fA/exec";
 
-export default async function handler(req, res) {
-  const url = new URL(APPS_SCRIPT_URL);
-  Object.entries(req.query || {}).forEach(([k, v]) => url.searchParams.append(k, v));
-
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return res.status(200).end();
-  }
-
-  const response = await fetch(url, {
+module.exports = async function (req, res) {
+  const target = GAS_URL + req.url;
+  const response = await fetch(target, {
     method: req.method,
-    headers: { 'Content-Type': 'application/json' },
-    body: req.method === 'POST' ? JSON.stringify(req.body) : undefined
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: req.method === "POST" ? JSON.stringify(req.body) : undefined,
+    redirect: "follow"
   });
 
-  const text = await response.text();
-  let json;
-  try { json = JSON.parse(text); } catch { json = { success: false, message: text }; }
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.json(json);
-}
+  const data = await response.text();
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  res.status(response.status).send(data);
+};
