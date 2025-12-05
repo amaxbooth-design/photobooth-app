@@ -21,360 +21,546 @@
   </style>
 </head>
 <body>
-  <!-- PAGE DE CONNEXION -->
-  <div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
-    <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
-      <h1 class="text-4xl font-bold text-blue-900 mb-4">🎉 Photobooth</h1>
-      <p class="text-gray-600 mb-8">Gestion de vos réservations</p>
-      <input id="clientCode" type="text" class="w-full p-4 border-2 rounded-lg text-lg mb-4 focus:outline-none focus:border-blue-500 uppercase" placeholder="Identifiant (ex: TUTU)">
-      <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-lg mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
-      <div class="flex items-center mb-4">
-        <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer">
-        <label for="showPassword" class="text-sm text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
-      </div>
-      <div class="flex items-center mb-6">
-        <input type="checkbox" id="rememberMe" class="w-5 h-5 mr-3 cursor-pointer">
-        <label for="rememberMe" class="text-sm text-gray-700 cursor-pointer select-none">Se souvenir de moi</label>
-      </div>
-      <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
-      <p class="mt-6 text-sm text-gray-500">💡 Contactez votre fournisseur pour vos identifiants</p>
-    </div>
-  </div>
 
-  <!-- APPLICATION -->
-  <div id="app" class="hidden">
-    <!-- HEADER -->
-    <div class="bg-blue-900 shadow-lg">
-      <div class="px-4 py-6 max-w-7xl mx-auto">
-        <div class="flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
-            <p class="text-blue-200 mt-1">Connecté : <span id="userName" class="font-bold"></span></p>
-          </div>
-          <div class="flex gap-3 flex-wrap">
-            <select id="filtre" onchange="load()" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
-              <option value="">Tous les mois</option>
-            </select>
-            <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
-            <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">🚪 Déconnexion</button>
-          </div>
+<!-- PAGE DE CONNEXION -->
+<div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
+  <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
+    <h1 class="text-4xl font-bold text-blue-900 mb-4">🎉 Photobooth</h1>
+    <p class="text-gray-600 mb-8">Gestion de vos réservations</p>
+    
+    <input id="clientCode" type="text" class="w-full p-4 border-2 rounded-lg text-lg mb-4 focus:outline-none focus:border-blue-500 uppercase" placeholder="Identifiant (ex: JEAN2025)">
+    <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-lg mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
+    
+    <div class="flex items-center mb-4">
+      <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer" onchange="togglePassword()">
+      <label for="showPassword" class="text-sm text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
+    </div>
+    
+    <div class="flex items-center mb-6">
+      <input type="checkbox" id="rememberMe" class="w-5 h-5 mr-3 cursor-pointer">
+      <label for="rememberMe" class="text-sm text-gray-700 cursor-pointer select-none">Se souvenir de moi</label>
+    </div>
+    
+    <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
+    <p class="mt-6 text-sm text-gray-500">💡 Contactez votre fournisseur pour vos identifiants</p>
+  </div>
+</div>
+
+<!-- APPLICATION -->
+<div id="app" class="hidden">
+  <!-- HEADER -->
+  <div class="bg-blue-900 shadow-lg">
+    <div class="px-4 py-6 max-w-7xl mx-auto">
+      <div class="flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
+          <p class="text-blue-200 mt-1">Connecté : <span id="userName" class="font-bold"></span></p>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+          <select id="filtre" onchange="load()" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
+            <option value="">Tous les mois</option>
+          </select>
+          <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
+          <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">🚪 Déconnexion</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- CONFIG CLIENT -->
-    <div class="bg-yellow-50 border-l-4 border-yellow-500">
-      <div class="px-4 py-6 max-w-7xl mx-auto">
-        <h3 class="text-2xl font-bold mb-4 text-yellow-900">⚙️ Configuration Client</h3>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-bold mb-2 text-gray-700">📧 Votre email Gmail :</label>
-            <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
-          </div>
-          <div>
-            <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
-            <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail ({PRENOM} {NOM}) :</label>
-            <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+  <!-- CONFIG CLIENT -->
+  <div class="bg-yellow-50 border-l-4 border-yellow-500">
+    <div class="px-4 py-6 max-w-7xl mx-auto">
+      <h3 class="text-2xl font-bold mb-4 text-yellow-900">⚙️ Configuration Client</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Votre email Gmail (Drive + Agenda) :</label>
+          <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
+          <p class="text-xs text-gray-600 mt-1">✅ Contrats partagés sur ce Drive<br>✅ Événements ajoutés à cet Agenda</p>
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
+          <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">Copie cachée (BCC) :</label>
+          <input id="emailCopie" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="optionnel@exemple.com">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
+          <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+
 Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+
 Merci de nous retourner le contrat signé accompagné de :
 - L’acompte de 35€
 - Une copie de votre pièce d’identité
+
 Cordialement,
 L'équipe Photobooth</textarea>
-          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- TABLEAU -->
-    <div class="bg-white min-h-screen">
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>📅 Enlèvement</th>
-              <th>📅 Restitution</th>
-              <th>👤 Nom Prénom</th>
-              <th>📧 Email</th>
-              <th>📞 Téléphone</th>
-              <th>📍 Adresse</th>
-              <th>🎭 Pseudo</th>
-              <th>✉️ Contrat</th>
-              <th>📤 Envoyé</th>
-              <th>✅ Signé</th>
-              <th>💰 Acompte</th>
-              <th>🔒 Caution</th>
-              <th>🎨 Template</th>
-              <th>⚙️ Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr><td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
-      <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
-      <form id="form" class="grid md:grid-cols-2 gap-6">
-        <input type="hidden" id="id">
-        <div><label class="block text-sm font-bold mb-2">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Nom</label><input type="text" id="nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Prénom</label><input type="text" id="prenom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Email</label><input type="email" id="email" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Téléphone</label><input type="tel" id="telephone" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">Adresse</label><textarea id="adresse" rows="2" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
-        <div><label class="block text-sm font-bold mb-2">Pseudo</label><input type="text" id="pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-        <div><label class="block text-sm font-bold mb-2">Template</label>
-          <select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
-            <option value="">Non</option>
-            <option value="Oui">Oui</option>
-          </select>
-        </div>
-        <div class="md:col-span-2 flex gap-4">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">Enregistrer</button>
-          <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">Annuler</button>
-        </div>
-      </form>
+  <!-- TABLEAU -->
+  <div class="bg-white min-h-screen">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>📅 Enlèvement</th>
+            <th>📅 Restitution</th>
+            <th>👤 Nom Prénom</th>
+            <th>📧 Email</th>
+            <th>📞 Téléphone</th>
+            <th>📍 Adresse</th>
+            <th>🎭 Pseudo</th>
+            <th>✉️ Contrat</th>
+            <th>📤 Envoyé</th>
+            <th>✅ Signé</th>
+            <th>💰 Acompte</th>
+            <th>🔒 Caution</th>
+            <th>🎨 Template</th>
+            <th>⚙️ Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr>
+            <td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
 
-  <script>
-    const URL = "/api/proxy";
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
+    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
+    <form id="form" class="grid md:grid-cols-2 gap-6">
+      <input type="hidden" id="id">
+      <div>
+        <label class="block text-sm font-bold mb-2">Date d'enlèvement</label>
+        <input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Date de restitution</label>
+        <input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Nom</label>
+        <input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Prénom</label>
+        <input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Email</label>
+        <input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Téléphone</label>
+        <input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-bold mb-2">Adresse</label>
+        <textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Pseudo</label>
+        <input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2">Template</label>
+        <select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500 cursor-pointer">
+          <option value="">Non</option>
+          <option value="Oui">Oui</option>
+        </select>
+      </div>
+      <div class="md:col-span-2 flex gap-4">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
+        <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-    const CLIENTS = {
-      "TUTU": { password: "2025", name: "Tutu" },
-      "JEAN2025": { password: "photobooth123", name: "Jean Dupont" },
-      "MARIE2025": { password: "party456", name: "Marie Martin" },
-      "TEST": { password: "test123", name: "Client Test" }
-    };
+<script>
+// URL du Google Apps Script
+const URL = "/api/proxy";
 
-    let currentClientId = null;
+// CODES CLIENTS
+const CLIENTS = {
+  "TUTU": { password: "2025", name: "Tutu" },
+  "JEAN2025": { password: "photobooth123", name: "Jean Dupont" },
+  "MARIE2025": { password: "party456", name: "Marie Martin" },
+  "TEST": { password: "test123", name: "Client Test" }
+};
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const rememberedId = localStorage.getItem('rememberedClientId');
-      const rememberedPass = localStorage.getItem('rememberedPassword');
-      if (rememberedId && rememberedPass) {
-        document.getElementById('clientCode').value = rememberedId;
-        document.getElementById('password').value = rememberedPass;
-        document.getElementById('rememberMe').checked = true;
-      }
+let currentClientId = null;
+let currentClientName = null;
 
-      document.getElementById('showPassword').addEventListener('change', () => {
-        const p = document.getElementById('password');
-        p.type = p.type === 'password' ? 'text' : 'password';
-      });
+function togglePassword() {
+  const passwordInput = document.getElementById('password');
+  const checkbox = document.getElementById('showPassword');
+  passwordInput.type = checkbox.checked ? 'text' : 'password';
+}
 
-      window.login = function () {
-        const code = document.getElementById('clientCode').value.trim().toUpperCase();
-        const pass = document.getElementById('password').value;
-        const remember = document.getElementById('rememberMe').checked;
+function login() {
+  const code = document.getElementById('clientCode').value.trim().toUpperCase();
+  const pass = document.getElementById('password').value;
+  const rememberMe = document.getElementById('rememberMe').checked;
+  
+  if (!code || !pass) {
+    Swal.fire('Erreur', 'Veuillez remplir tous les champs', 'error');
+    return;
+  }
+  const client = CLIENTS[code];
+  if (!client || client.password !== pass) {
+    Swal.fire('Erreur', 'Identifiant ou mot de passe incorrect', 'error');
+    return;
+  }
+  currentClientId = code;
+  currentClientName = client.name;
 
-        if (!code || !pass) return Swal.fire('Erreur', 'Tous les champs sont obligatoires', 'error');
-        const client = CLIENTS[code];
-        if (!client || client.password !== pass) return Swal.fire('Erreur', 'Identifiants incorrects', 'error');
+  if (rememberMe) {
+    localStorage.setItem('rememberedClientId', code);
+    localStorage.setItem('rememberedPassword', pass);
+  } else {
+    localStorage.removeItem('rememberedClientId');
+    localStorage.removeItem('rememberedPassword');
+  }
 
-        currentClientId = code;
-        if (remember) {
-          localStorage.setItem('rememberedClientId', code);
-          localStorage.setItem('rememberedPassword', pass);
-        } else {
-          localStorage.removeItem('rememberedClientId');
-          localStorage.removeItem('rememberedPassword');
-        }
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userName').textContent = currentClientName;
 
-        document.getElementById('login').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('userName').textContent = client.name;
-        load();
-      };
+  const savedEmail = localStorage.getItem('emailClient_' + currentClientId);
+  if (savedEmail) document.getElementById('emailClient').value = savedEmail;
+  const savedSubject = localStorage.getItem('sujet_' + currentClientId);
+  const savedBody = localStorage.getItem('corps_' + currentClientId);
+  const savedBcc = localStorage.getItem('emailCopie_' + currentClientId);
+  if (savedSubject) document.getElementById('sujet').value = savedSubject;
+  if (savedBody) document.getElementById('corps').value = savedBody;
+  if (savedBcc) document.getElementById('emailCopie').value = savedBcc;
 
-      // === CHARGEMENT TABLEAU ===
-      window.load = async function () {
-        try {
-          const res = await fetch(URL + '?clientId=' + currentClientId);
-          const j = await res.json();
-          if (!j.success) throw new Error(j.message || 'Erreur');
-          const data = j.data || [];
+  load();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const rememberedId = localStorage.getItem('rememberedClientId');
+  const rememberedPass = localStorage.getItem('rememberedPassword');
+  if (rememberedId && rememberedPass) {
+    document.getElementById('clientCode').value = rememberedId;
+    document.getElementById('password').value = rememberedPass;
+    document.getElementById('rememberMe').checked = true;
+  }
+  document.getElementById('clientCode').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') login();
+  });
+  document.getElementById('enlevement').addEventListener('change', function() {
+    if (this.value && !document.getElementById('restitution').value) {
+      document.getElementById('restitution').value = this.value;
+    }
+  });
 
-          const tbody = document.getElementById('tbody');
-          tbody.innerHTML = data.length === 0
-            ? '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>'
-            : data.map(r => {
-                const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
-                const dateEnl = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
-                const dateRest = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
-                const tel = r.telephone ? r.telephone.replace(/(\d{2})(?=\d)/g, '$1 ') : '';
-                const nomComplet = `${r.prenom || ''} ${r.nom || ''}`.trim();
-                return `<tr class="${ok ? 'paid' : 'notpaid'}">
-                  <td>${dateEnl}</td>
-                  <td>${dateRest}</td>
-                  <td><strong>${nomComplet}</strong></td>
-                  <td>${r.email || ''}</td>
-                  <td>${tel}</td>
-                  <td style="white-space:normal;max-width:250px;">${r.adresse || ''}</td>
-                  <td>${r.pseudo || ''}</td>
-                  <td><button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded text-sm font-bold">📧 Contrat</button></td>
-                  <td><input type="checkbox" class="w-5 h-5" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
-                  <td><input type="checkbox" class="w-5 h-5" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
-                  <td><input type="checkbox" class="w-5 h-5" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
-                  <td><input type="checkbox" class="w-5 h-5" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
-                  <td>${r.template || ''}</td>
-                  <td>
-                    <button onclick='editer(${JSON.stringify(r)})' class="text-2xl">✏️</button>
-                    <button onclick="supprimer(${r.id})" class="text-2xl">🗑️</button>
-                  </td>
-                </tr>`;
-              }).join('');
-        } catch (e) {
-          document.getElementById('tbody').innerHTML = '<tr><td colspan="14" class="text-red-500 py-8 text-center">Erreur de chargement</td></tr>';
-        }
-      };
+  document.getElementById('emailClient').addEventListener('input', function() {
+    if (currentClientId) localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
+  });
+  document.getElementById('emailClient').addEventListener('blur', function() {
+    if (currentClientId && this.value.trim()) localStorage.setItem('emailClient_' + currentClientId, this.value.trim());
+  });
+  document.getElementById('sujet').addEventListener('blur', function() {
+    if (currentClientId) localStorage.setItem('sujet_' + currentClientId, this.value);
+  });
+  document.getElementById('corps').addEventListener('blur', function() {
+    if (currentClientId) localStorage.setItem('corps_' + currentClientId, this.value);
+  });
+  document.getElementById('emailCopie').addEventListener('blur', function() {
+    if (currentClientId) localStorage.setItem('emailCopie_' + currentClientId, this.value);
+  });
+});
 
-      // === PDF CLIENT-SIDE (PLUS JAMAIS "Réservation introuvable") ===
-      window.generateAndSendContract = function (id) {
-        fetch(URL + '?clientId=' + currentClientId)
-          .then(r => r.json())
-          .then(j => {
-            const reservation = j.data.find(x => x.id == id); // == pour accepter number/string
-            if (!reservation) return Swal.fire('Erreur', 'Réservation introuvable', 'error');
+function tel(t) {
+  if (!t) return '';
+  const str = String(t).replace(/\D/g, '');
+  if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
+  return str;
+}
 
-            const win = window.open('', '_blank');
-            win.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <meta charset="utf-8">
-                <title>Contrat Photobooth</title>
-                <style>
-                  body { font-family: Arial, sans-serif; margin: 60px; line-height: 1.8; font-size: 16px; }
-                  h1 { text-align: center; color: #1e40af; font-size: 28px; margin-bottom: 40px; }
-                  table { width: 100%; margin: 30px 0; }
-                  td { padding: 8px 0; }
-                  .label { font-weight: bold; }
-                  hr { border: 1px solid #ccc; margin: 40px 0; }
-                  .signature { margin-top: 120px; text-align: right; }
-                  @media print { body { margin: 20mm; } }
-                </style>
-              </head>
-              <body onload="window.print()">
-                <h1>CONTRAT DE LOCATION PHOTOBOOTH</h1>
-                <p><strong>Client :</strong> ${reservation.prenom} ${reservation.nom}</p>
-                <p><strong>Enlèvement :</strong> ${new Date(reservation.enlevement).toLocaleDateString('fr-FR')}</p>
-                <p><strong>Restitution :</strong> ${new Date(reservation.restitution).toLocaleDateString('fr-FR')}</p>
-                <p><strong>Email :</strong> ${reservation.email}</p>
-                <p><strong>Téléphone :</strong> ${reservation.telephone}</p>
-                <p><strong>Adresse :</strong> ${reservation.adresse.replace(/\n/g, '<br>')}</p>
-                <hr>
-                <p><strong>Total :</strong> 250 € • <strong>Acompte :</strong> 35 € • <strong>Caution :</strong> 500 €</p>
-                <div class="signature">
-                  Date & signature :<br><br>
-                  _______________________________
-                </div>
-              </body>
-              </html>
-            `);
-            win.document.close();
-
-            // Gmail
-            const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
-            let corps = document.getElementById('corps').value
-              .replace('{PRENOM}', reservation.prenom || '')
-              .replace('{NOM}', reservation.nom || '');
-            const gmail = `https://mail.google.com/mail/?view=cm&to=${reservation.email}&su=${sujet}&body=${encodeURIComponent(corps)}`;
-            setTimeout(() => window.open(gmail, '_blank'), 1000);
-          })
-          .catch(() => Swal.fire('Erreur', 'Impossible de récupérer les données', 'error'));
-      };
-
-      // === LE RESTE EST IDENTIQUE (maj, nouveau, editer, supprimer, form) ===
-      window.maj = async (id, champ, val) => {
-        await fetch(URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientId: currentClientId,
-            action: 'update',
-            reservation: { id, [champ]: val ? 'Oui' : 'Non' }
-          })
-        });
-        load();
-      };
-
-      window.nouveau = function () {
-        document.getElementById('titre').textContent = 'Nouvelle réservation';
-        document.getElementById('form').reset();
-        document.getElementById('id').value = '';
-        document.getElementById('modal').classList.remove('hidden');
-      };
-
-      window.editer = function (resa) {
-        document.getElementById('titre').textContent = 'Modifier';
-        document.getElementById('id').value = resa.id;
-        document.getElementById('enlevement').value = resa.enlevement || '';
-        document.getElementById('restitution').value = resa.restitution || '';
-        document.getElementById('nom').value = resa.nom || '';
-        document.getElementById('prenom').value = resa.prenom || '';
-        document.getElementById('email').value = resa.email || '';
-        document.getElementById('telephone').value = resa.telephone || '';
-        document.getElementById('adresse').value = resa.adresse || '';
-        document.getElementById('pseudo').value = resa.pseudo || '';
-        document.getElementById('template').value = resa.template || '';
-        document.getElementById('modal').classList.remove('hidden');
-      };
-
-      window.supprimer = async function (id) {
-        const c = await Swal.fire({ title: 'Supprimer ?', icon: 'warning', showCancelButton: true });
-        if (c.isConfirmed) {
-          await fetch(URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientId: currentClientId, action: 'delete', id })
-          });
-          load();
-        }
-      };
-
-      window.closeModal = function () {
-        document.getElementById('modal').classList.add('hidden');
-      };
-
-      document.getElementById('form').onsubmit = async e => {
-        e.preventDefault();
-        const edit = document.getElementById('id').value;
-        const resa = {
-          id: edit || Date.now().toString(),
-          enlevement: document.getElementById('enlevement').value,
-          restitution: document.getElementById('restitution').value,
-          nom: document.getElementById('nom').value,
-          prenom: document.getElementById('prenom').value,
-          email: document.getElementById('email').value,
-          telephone: document.getElementById('telephone').value,
-          adresse: document.getElementById('adresse').value,
-          pseudo: document.getElementById('pseudo').value,
-          template: document.getElementById('template').value
-        };
-        await fetch(URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientId: currentClientId,
-            action: edit ? 'update' : 'add',
-            reservation: resa
-          })
-        });
-        closeModal();
-        load();
-      };
+async function generateAndSendContract(reservationId) {
+  const emailClient = document.getElementById('emailClient').value.trim();
+  if (!emailClient) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Email client manquant',
+      text: 'Veuillez configurer votre email Gmail dans la section "Configuration Client".',
+      confirmButtonText: 'OK'
     });
-  </script>
+    return;
+  }
+
+  // Charger la réservation courante
+  const r = await fetch(URL + '?clientId=' + currentClientId);
+  const j = await r.json();
+  const reservation = (j.data || []).find(x => String(x.id) === String(reservationId));
+  if (!reservation) {
+    Swal.fire('Erreur', 'Réservation non trouvée', 'error');
+    return;
+  }
+
+  Swal.fire({
+    title: 'Génération du contrat...',
+    html: 'Veuillez patienter pendant la génération du PDF',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    // Appel Apps Script pour obtenir le PDF en base64 (sans partage Drive, sans envoi automatique)
+    const response = await fetch(URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: currentClientId,
+        action: 'generateContract',
+        reservationId: reservationId,
+        clientEmail: emailClient,
+        downloadPdf: true
+      })
+    });
+    const result = await response.json();
+    Swal.close();
+
+    if (!result.success || !result.pdfBase64) {
+      throw new Error(result.message || 'Échec génération du PDF');
+    }
+
+    // Téléchargement automatique dans "Téléchargements"
+    const fileName = result.fileName || `Contrat_${reservation.prenom || ''}_${reservation.nom || ''}.pdf`;
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + result.pdfBase64;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Ouvrir Gmail avec email propre (sans lien Drive)
+    const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
+    let corps = (document.getElementById('corps').value || 'Bonjour')
+      .replace('{PRENOM}', reservation.prenom || '')
+      .replace('{NOM}', reservation.nom || '');
+    const bcc = document.getElementById('emailCopie').value.trim();
+    const b = encodeURIComponent(corps);
+    const baseUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(reservation.email || '')}&su=${sujet}&body=${b}`;
+    const mailtoUrl = bcc ? `${baseUrl}&bcc=${encodeURIComponent(bcc)}` : baseUrl;
+    window.open(mailtoUrl, '_blank');
+
+    Swal.fire('✅ Contrat généré et téléchargé !', 'Ajoutez-le dans Gmail via 📎 puis envoyez.', 'success');
+  } catch (err) {
+    console.error(err);
+    Swal.close();
+    Swal.fire({ icon: 'error', title: 'Erreur', text: err.message || 'Erreur lors de la génération du contrat' });
+  }
+}
+
+function addToCalendar(enlevement, restitution, nom, prenom, adresse) {
+  const emailClient = document.getElementById('emailClient').value.trim();
+  if (!emailClient) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Email manquant',
+      html: 'Veuillez configurer votre email Gmail dans la section "Configuration Client" pour ajouter l\'événement à votre agenda Google.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
+  const startDate = enlevement.replace(/-/g, '');
+  const endDate = restitution.replace(/-/g, '');
+  const title = encodeURIComponent(`Photobooth - ${prenom} ${nom}`);
+  const details = encodeURIComponent(`Location Photobooth pour ${prenom} ${nom}\n\nEnlèvement: ${new Date(enlevement).toLocaleDateString('fr-FR')}\nRestitution: ${new Date(restitution).toLocaleDateString('fr-FR')}`);
+  const location = encodeURIComponent(adresse || '');
+
+  const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&sf=true`;
+  window.open(calendarUrl, '_blank');
+
+  Swal.fire({
+    icon: 'info',
+    title: 'Agenda Google',
+    html: `L'événement va s'ouvrir dans Google Calendar.<br><br>✅ Assurez-vous d'être connecté avec <strong>${emailClient}</strong>`,
+    timer: 3000,
+    showConfirmButton: false
+  });
+}
+
+async function load() {
+  try {
+    const r = await fetch(URL + '?clientId=' + currentClientId);
+    const j = await r.json();
+    if (!j.success) throw new Error(j.message || 'Erreur');
+
+    const data = j.data || [];
+    const filtre = document.getElementById('filtre').value;
+    const mois = [...new Set(data.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
+    document.getElementById('filtre').innerHTML =
+      '<option value="">Tous les mois</option>' +
+      mois.map(m => `<option value="${m}" ${filtre === m ? 'selected' : ''}>${new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</option>`).join('');
+
+    const tbody = document.getElementById('tbody');
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data
+      .filter(x => !filtre || x.enlevement?.startsWith(filtre))
+      .map(r => {
+        const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
+        const dateEnl = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
+        const dateRest = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
+        const telephone = tel(r.telephone || '');
+        const nomComplet = `${r.nom || ''} ${r.prenom || ''}`.trim();
+        return `<tr class="${ok ? 'paid' : 'notpaid'}">
+          <td>${dateEnl}</td>
+          <td>${dateRest}</td>
+          <td><strong>${nomComplet}</strong></td>
+          <td>${r.email || ''}</td>
+          <td class="font-mono">${telephone}</td>
+          <td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td>
+          <td>${r.pseudo || ''}</td>
+          <td class="space-x-2">
+            <button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Générer et télécharger le contrat PDF">📧 Contrat</button>
+            <button onclick="addToCalendar('${r.enlevement}','${r.restitution}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}','${(r.adresse || '').replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm" title="Ajouter à l'agenda">📅</button>
+          </td>
+          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
+          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
+          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
+          <td><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
+          <td>${r.template || ''}</td>
+          <td class="whitespace-nowrap">
+            <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'")})' class="text-2xl hover:scale-110 transition mr-2">✏️</button>
+            <button onclick="supprimer(${r.id})" class="text-2xl hover:scale-110 transition">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="14" class="text-center py-8 text-red-500">❌ Erreur de chargement</td></tr>';
+  }
+}
+
+async function maj(id, champ, val) {
+  try {
+    await fetch(URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: currentClientId,
+        action: 'update',
+        reservation: { id, [champ]: val ? 'Oui' : 'Non' }
+      })
+    });
+    setTimeout(() => load(), 500);
+  } catch (err) {
+    console.error(err);
+    Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
+  }
+}
+
+function nouveau() {
+  document.getElementById('titre').textContent = 'Nouvelle réservation';
+  document.getElementById('form').reset();
+  document.getElementById('id').value = '';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function editer(resa) {
+  document.getElementById('titre').textContent = 'Modifier';
+  document.getElementById('id').value = resa.id;
+  document.getElementById('enlevement').value = resa.enlevement || '';
+  document.getElementById('restitution').value = resa.restitution || '';
+  document.getElementById('nom').value = resa.nom || '';
+  document.getElementById('prenom').value = resa.prenom || '';
+  document.getElementById('email').value = resa.email || '';
+  document.getElementById('telephone').value = resa.telephone || '';
+  document.getElementById('adresse').value = resa.adresse || '';
+  document.getElementById('pseudo').value = resa.pseudo || '';
+  document.getElementById('template').value = resa.template || '';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+async function supprimer(id) {
+  const conf = await Swal.fire({
+    title: 'Supprimer ?',
+    text: 'Cette action est irréversible',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Annuler'
+  });
+  if (conf.isConfirmed) {
+    try {
+      await fetch(URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: currentClientId,
+          action: 'delete',
+          id: id
+        })
+      });
+      load();
+      Swal.fire('Supprimé !', '', 'success');
+    } catch (err) {
+      Swal.fire('Erreur', 'Impossible de supprimer', 'error');
+    }
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+}
+
+document.getElementById('form').onsubmit = async function(e) {
+  e.preventDefault();
+  const edit = document.getElementById('id').value;
+  const resa = {
+    id: edit || Date.now().toString(),
+    enlevement: document.getElementById('enlevement').value,
+    restitution: document.getElementById('restitution').value,
+    nom: document.getElementById('nom').value,
+    prenom: document.getElementById('prenom').value,
+    email: document.getElementById('email').value,
+    telephone: document.getElementById('telephone').value,
+    adresse: document.getElementById('adresse').value,
+    pseudo: document.getElementById('pseudo').value,
+    template: document.getElementById('template').value
+  };
+
+  Swal.fire({ title: 'Enregistrement...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  try {
+    await fetch(URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: currentClientId,
+        action: edit ? 'update' : 'add',
+        reservation: resa
+      })
+    });
+    await new Promise(resolve => setTimeout(resolve, 300));
+    closeModal();
+    await load();
+    Swal.fire('Succès !', '', 'success');
+  } catch (err) {
+    Swal.fire('Erreur', err.message, 'error');
+  }
+};
+</script>
+
 </body>
 </html>
