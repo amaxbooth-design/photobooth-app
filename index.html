@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; min-height: 100vh; background: #f3f4f6; }
+    html, body { width: 100%; min-height: 100vh; background: #f3f4f6; overflow-x: hidden; }
     .table-wrapper { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th { background: #1e40af; color: white; padding: 1rem 0.75rem; position: sticky; top: 0; z-index: 10; white-space: nowrap; text-align: center; font-size: 0.875rem; font-weight: 600; }
@@ -18,7 +18,6 @@
     .paid:hover { background: #a7f3d0 !important; }
     .notpaid { background: #fee2e2; }
     .notpaid:hover { background: #fecaca !important; }
-    #contractPreview[contenteditable="true"] * { outline: 1px dashed #ccc !important; min-height: 20px; }
   </style>
 </head>
 <body>
@@ -39,6 +38,7 @@
         <label for="rememberMe" class="text-sm text-gray-700 cursor-pointer select-none">Se souvenir de moi</label>
       </div>
       <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
+      <p class="mt-6 text-sm text-gray-500">Contactez votre fournisseur pour vos identifiants</p>
     </div>
   </div>
 
@@ -64,11 +64,35 @@
       </div>
     </div>
 
-    <!-- TON TABLEAU ET MODAL RÉSERVATION (inchangés) -->
-    <!-- ... ton code existant pour le tableau et la modale réservation ... -->
+    <!-- CONFIG CLIENT -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-500">
+      <div class="px-4 py-6 max-w-7xl mx-auto">
+        <h3 class="text-2xl font-bold mb-4 text-yellow-900">Configuration Client</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold mb-2 text-gray-700">Votre email Gmail :</label>
+            <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
+            <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail ({PRENOM} {NOM}) :</label>
+            <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+Merci de nous retourner le contrat signé accompagné de :
+- L’acompte de 35€
+- Une copie de votre pièce d’identité
+Cordialement,
+L'équipe Photobooth</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- TABLEAU (exemple simplifié) -->
-    <div class="bg-white min-h-screen p-8">
+    <!-- TABLEAU -->
+    <div class="bg-white min-h-screen">
       <div class="table-wrapper">
         <table>
           <thead>
@@ -78,33 +102,66 @@
               <th>Nom Prénom</th>
               <th>Email</th>
               <th>Téléphone</th>
+              <th>Adresse</th>
+              <th>Pseudo</th>
               <th>Contrat</th>
+              <th>Envoyé</th>
+              <th>Signé</th>
+              <th>Acompte</th>
+              <th>Caution</th>
+              <th>Template</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="tbody">
-            <tr><td colspan="7" class="text-center py-8 text-gray-500">Chargement...</td></tr>
+            <tr><td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- MODALE ÉDITEUR DE CONTRAT VISUEL (comme sur ta photo) -->
+  <!-- MODAL RÉSERVATION (inchangée) -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
+      <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
+      <form id="form" class="grid md:grid-cols-2 gap-6">
+        <input type="hidden" id="id">
+        <div><label class="block text-sm font-bold mb-2">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Nom</label><input type="text" id="nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Prénom</label><input type="text" id="prenom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Email</label><input type="email" id="email" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Téléphone</label><input type="tel" id="telephone" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">Adresse</label><textarea id="adresse" rows="2" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
+        <div><label class="block text-sm font-bold mb-2">Pseudo</label><input type="text" id="pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Template</label>
+          <select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+            <option value="">Non</option>
+            <option value="Oui">Oui</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 flex gap-4">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">Enregistrer</button>
+          <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE ÉDITEUR VISUEL DE CONTRAT -->
   <div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-95vh flex flex-col">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-95vh flex flex-col">
       <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
         <h2 class="text-3xl font-bold">✏️ Modifier mon contrat Photobooth</h2>
       </div>
-      <div class="flex-1 overflow-hidden flex">
-        <div id="contractPreview" class="flex-1 p-10 overflow-auto bg-white" contenteditable="true">
-          <!-- Le contrat complet sera chargé ici -->
-        </div>
+      <div class="flex-1 overflow-auto p-10" id="contractPreview" contenteditable="true">
+        <!-- Le contrat complet sera chargé ici -->
       </div>
       <div class="p-6 bg-gray-100 flex justify-center gap-6">
         <button onclick="saveCustomContract()" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-lg font-bold text-xl">Sauvegarder mon contrat</button>
         <button onclick="resetToDefaultContract()" class="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-xl">Réinitialiser</button>
-        <button onclick="closeContractEditor()" class="bg-gray-600 hover:bg-gray-700 text-white px-10 py-4 rounded-lg font-bold text-xl">Fermer</button>
+        <button onclick="document.getElementById('contractEditorModal').classList.add('hidden')" class="bg-gray-600 hover:bg-gray-700 text-white px-10 py-4 rounded-lg font-bold text-xl">Fermer</button>
       </div>
     </div>
   </div>
@@ -121,11 +178,12 @@
 
     let currentClientId = null;
 
-    // === CONNEXION ===
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('showPassword').addEventListener('change', () => {
-        const p = document.getElementById('password');
-        p.type = document.getElementById('showPassword').checked ? 'text' : 'password';
+      // === CONNEXION + AFFICHAGE MOT DE PASSE ===
+      const showPassword = document.getElementById('showPassword');
+      const passwordInput = document.getElementById('password');
+      showPassword.addEventListener('change', () => {
+        passwordInput.type = showPassword.checked ? 'text' : 'password';
       });
 
       window.login = function () {
@@ -133,7 +191,7 @@
         const pass = document.getElementById('password').value;
         const remember = document.getElementById('rememberMe').checked;
 
-        if (!code || !pass) return Swal.fire('Erreur', 'Identifiant et mot de passe requis', 'error');
+        if (!code || !pass) return Swal.fire('Erreur', 'Tous les champs sont obligatoires', 'error');
         const client = CLIENTS[code];
         if (!client || client.password !== pass) return Swal.fire('Erreur', 'Identifiants incorrects', 'error');
 
@@ -141,9 +199,6 @@
         if (remember) {
           localStorage.setItem('rememberedClientId', code);
           localStorage.setItem('rememberedPassword', pass);
-        } else {
-          localStorage.removeItem('rememberedClientId');
-          localStorage.removeItem('rememberedPassword');
         }
 
         document.getElementById('login').classList.add('hidden');
@@ -152,28 +207,22 @@
         load();
       };
 
-      // === CHARGEMENT DU TABLEAU (inchangé) ===
-      // ... ton code load(), maj(), nouveau(), editer(), supprimer() ...
-
-      // === ÉDITEUR VISUEL ULTRA SIMPLE ===
+      // === ÉDITEUR VISUEL DE CONTRAT ===
       window.openContractEditor = function () {
         const preview = document.getElementById('contractPreview');
         let html = localStorage.getItem(`contrat_${currentClientId}`);
 
         if (!html) {
-          html = `
-            `<!DOCTYPE html>
+          html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <style>
     body { font-family: Arial; margin: 40px; font-size: 12pt; line-height: 1.6; }
-    h1 { text-align: center; font-weight: bold; margin-bottom: 30px; }
+    h1 { text-align: center; font-weight: bold; }
     .logo { float: right; width: 150px; margin: 0 0 20px 20px; }
     .box { border: 2px solid black; padding: 20px; margin: 30px 0; page-break-inside: avoid; }
     .checkbox { margin: 10px 0; }
-    .underline { text-decoration: underline; }
-    .signature { margin-top: 100px; text-align: center; }
     @media print { body { margin: 20mm; } }
   </style>
 </head>
@@ -184,25 +233,25 @@
   <p style="text-align:center;"><strong>Contrat n° 001 / Date :</strong> .................... / .................... / 202....</p>
 
   <div class="box">
-    <p><strong>Le loueur :</strong><br>
+    <strong>Le loueur :</strong><br>
     Mr CHIMOT Alexis,<br>
     3 Allée Michelet, 34410 Sauvian<br>
-    06.68.17.24.63</p>
+    06.68.17.24.63
   </div>
 
   <div class="box">
-    <p><strong>Le locataire :</strong><br>
+    <strong>Le locataire :</strong><br>
     Nom : ........................................<br>
     Prénom : ........................................<br>
     Adresse : ........................................<br>
     Ville : ........................................ Code postal : ................<br>
     Mail : ........................................<br>
     Numéro de téléphone : ........................................<br>
-    Numéro pièce d’identité : ........................................</p>
+    Numéro pièce d’identité : ................................................
   </div>
 
   <div class="box">
-    <p><strong>La location :</strong><br>
+    <strong>La location :</strong><br>
     Date : du .................... / .................... / 202.... à 17h00 au .................... / .................... / 202.... à 11h00<br>
     (enlèvement de dépôt à l’adresse du loueur)<br><br>
     <div class="checkbox">☐ Offre Week End 75 € ( du vendredi au lundi )</div>
@@ -211,27 +260,11 @@
     <div class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : ........</div>
     <br>
     Total : ........ €<br>
-    Adresse de votre événement : ........................................</p>
+    Adresse de votre événement : ................................................
   </div>
 
   <p style="text-align:center; margin-top:80px;">Page 1</p>
   <p style="text-align:right;">Paraphes : ________________</p>
-
-  <!-- Tu peux ajouter les articles ici si tu veux -->
-  <div style="page-break-before: always;"></div>
-  <h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2>
-  <p>Le loueur met à disposition du locataire, un matériel complet de photographie présenté sous forme de photobooth.</p>
-  <p>Tout retard de restitution par le locataire du photobooth dans son intégralité sera facturé d’un montant TTC de 75€ par jour.</p>
-  <!-- ... tous les articles ... -->
-
-  <div class="signature">
-    <p>Fait à ...................., le ....................</p>
-    <br><br><br>
-    <p>Signature du loueur ____________________</p>
-    <br><br>
-    <p>Signature du locataire ____________________<br>
-    (précédée de la mention « bon pour accord »)</p>
-  </div>
 </body>
 </html>`;
         }
@@ -243,7 +276,7 @@
       window.saveCustomContract = function () {
         const html = document.getElementById('contractPreview').innerHTML;
         localStorage.setItem(`contrat_${currentClientId}`, html);
-        Swal.fire('Sauvegardé !', 'Votre contrat personnalisé est maintenant utilisé', 'success');
+        Swal.fire('Sauvegardé !', 'Votre contrat personnalisé est enregistré', 'success');
       };
 
       window.resetToDefaultContract = function () {
@@ -253,21 +286,17 @@
         }
       };
 
-      window.closeContractEditor = function () {
-        document.getElementById('contractEditorModal').classList.add('hidden');
-      };
-
-      // === GÉNÉRATION DU CONTRAT (utilise la version modifiée) ===
+      // === GÉNÉRATION DU CONTRAT ===
       window.generateAndSendContract = async function (id) {
         // ... ton code existant pour récupérer la réservation ...
 
         let html = localStorage.getItem(`contrat_${currentClientId}`);
         if (!html) {
-          // fallback si jamais
+          // fallback
           html = document.getElementById('contractPreview').innerHTML || "Contrat par défaut";
         }
 
-        // Remplissage automatique des champs
+        // Remplissage automatique
         const today = new Date().toLocaleDateString('fr-FR');
         html = html
           .replace(/{PRENOM}/g, reservation.prenom || '')
