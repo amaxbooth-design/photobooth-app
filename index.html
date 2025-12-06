@@ -57,15 +57,39 @@
               <option value="">Tous les mois</option>
             </select>
             <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
-            <button onclick="openContractEditor()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition">Modifier mon contrat</button>
-            <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">Déconnexion</button>
+            <button onclick="openContractEditor()" class="bg-purple-600 hover:bg-purple-800 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg">✏️ Modifier mon contrat</button>
+            <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">🚪 Déconnexion</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- CONFIG CLIENT + TABLEAU + MODAL (ton code actuel) -->
-    <!-- (je garde ton code existant pour le reste) -->
+    <!-- CONFIG CLIENT -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-500">
+      <div class="px-4 py-6 max-w-7xl mx-auto">
+        <h3 class="text-2xl font-bold mb-4 text-yellow-900">Configuration Client</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold mb-2 text-gray-700">Votre email Gmail :</label>
+            <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
+            <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail ({PRENOM} {NOM}) :</label>
+            <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+Merci de nous retourner le contrat signé accompagné de :
+- L’acompte de 35€
+- Une copie de votre pièce d’identité
+Cordialement,
+L'équipe Photobooth</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- TABLEAU -->
     <div class="bg-white min-h-screen">
@@ -97,21 +121,44 @@
     </div>
   </div>
 
-  <!-- MODAL RÉSERVATION (ton code actuel) -->
+  <!-- MODAL RÉSERVATION -->
   <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-    <!-- ton modal existant -->
+    <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
+      <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
+      <form id="form" class="grid md:grid-cols-2 gap-6">
+        <input type="hidden" id="id">
+        <div><label class="block text-sm font-bold mb-2">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Nom</label><input type="text" id="nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Prénom</label><input type="text" id="prenom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Email</label><input type="email" id="email" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Téléphone</label><input type="tel" id="telephone" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">Adresse</label><textarea id="adresse" rows="2" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
+        <div><label class="block text-sm font-bold mb-2">Pseudo</label><input type="text" id="pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+        <div><label class="block text-sm font-bold mb-2">Template</label>
+          <select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+            <option value="">Non</option>
+            <option value="Oui">Oui</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 flex gap-4">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">Enregistrer</button>
+          <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">Annuler</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODALE ÉDITEUR DE CONTRAT -->
   <div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl p-8 max-w-6xl w-full max-h-screen overflow-y-auto">
-      <h2 class="text-3xl font-bold mb-6 text-blue-900">Modifier mon contrat Photobooth</h2>
-      <p class="mb-4 text-gray-600">Modifiez librement le texte. Les champs entre { } seront remplis automatiquement.</p>
-      <textarea id="contractEditor" rows="35" class="w-full p-4 border-2 rounded-lg font-mono text-sm mb-6"></textarea>
-      <div class="flex gap-4">
-        <button onclick="saveCustomContract()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold">Sauvegarder mon contrat</button>
-        <button onclick="resetToDefaultContract()" class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold">Réinitialiser (version par défaut)</button>
-        <button onclick="document.getElementById('contractEditorModal').classList.add('hidden')" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">Fermer</button>
+      <h2 class="text-3xl font-bold mb-6 text-blue-900">✏️ Modifier mon contrat Photobooth</h2>
+      <p class="mb-4 text-gray-600">Vous pouvez modifier librement le texte. Les champs entre { } seront remplis automatiquement.</p>
+      <textarea id="contractEditor" rows="40" class="w-full p-4 border-2 rounded-lg font-mono text-sm mb-6"></textarea>
+      <div class="flex gap-4 justify-center">
+        <button onclick="saveCustomContract()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-bold text-lg">Sauvegarder mon contrat</button>
+        <button onclick="resetToDefaultContract()" class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg">Réinitialiser</button>
+        <button onclick="document.getElementById('contractEditorModal').classList.add('hidden')" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg">Fermer</button>
       </div>
     </div>
   </div>
@@ -129,23 +176,155 @@
     let currentClientId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      // ... ton code login, load, maj, etc. (reste identique)
+      // Récupération identifiants
+      const rememberedId = localStorage.getItem('rememberedClientId');
+      const rememberedPass = localStorage.getItem('rememberedPassword');
+      if (rememberedId && rememberedPass) {
+        document.getElementById('clientCode').value = rememberedId;
+        document.getElementById('password').value = rememberedPass;
+        document.getElementById('rememberMe').checked = true;
+      }
 
-      // === ÉDITEUR DE CONTRAT PERSONNALISÉ PAR CLIENT ===
+      document.getElementById('showPassword').addEventListener('change', () => {
+        const p = document.getElementById('password');
+        p.type = p.type === 'password' ? 'text' : 'password';
+      });
+
+      window.login = function () {
+        const code = document.getElementById('clientCode').value.trim().toUpperCase();
+        const pass = document.getElementById('password').value;
+        const remember = document.getElementById('rememberMe').checked;
+
+        if (!code || !pass) return Swal.fire('Erreur', 'Tous les champs sont obligatoires', 'error');
+        const client = CLIENTS[code];
+        if (!client || client.password !== pass) return Swal.fire('Erreur', 'Identifiants incorrects', 'error');
+
+        currentClientId = code;
+        if (remember) {
+          localStorage.setItem('rememberedClientId', code);
+          localStorage.setItem('rememberedPassword', pass);
+        } else {
+          localStorage.removeItem('rememberedClientId');
+          localStorage.removeItem('rememberedPassword');
+        }
+
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('userName').textContent = client.name;
+        load();
+      };
+
+      // === CHARGEMENT TABLEAU ===
+      window.load = async function () {
+        try {
+          const res = await fetch(URL + '?clientId=' + currentClientId);
+          const j = await res.json();
+          if (!j.success) throw new Error(j.message || 'Erreur');
+          const data = j.data || [];
+
+          const tbody = document.getElementById('tbody');
+          tbody.innerHTML = data.length === 0
+            ? '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>'
+            : data.map(r => {
+                const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
+                const dateEnl = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
+                const dateRest = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
+                const tel = r.telephone ? r.telephone.replace(/(\d{2})(?=\d)/g, '$1 ') : '';
+                const nomComplet = `${r.prenom || ''} ${r.nom || ''}`.trim();
+                return `<tr class="${ok ? 'paid' : 'notpaid'}">
+                  <td>${dateEnl}</td>
+                  <td>${dateRest}</td>
+                  <td><strong>${nomComplet}</strong></td>
+                  <td>${r.email || ''}</td>
+                  <td>${tel}</td>
+                  <td style="white-space:normal;max-width:250px;">${r.adresse || ''}</td>
+                  <td>${r.pseudo || ''}</td>
+                  <td><button onclick="generateAndSendContract(${r.id})" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded text-sm font-bold">📧 Contrat</button></td>
+                  <td><input type="checkbox" class="w-5 h-5" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
+                  <td><input type="checkbox" class="w-5 h-5" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
+                  <td><input type="checkbox" class="w-5 h-5" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
+                  <td><input type="checkbox" class="w-5 h-5" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
+                  <td>${r.template || ''}</td>
+                  <td>
+                    <button onclick='editer(${JSON.stringify(r)})' class="text-2xl">✏️</button>
+                    <button onclick="supprimer(${r.id})" class="text-2xl">🗑️</button>
+                  </td>
+                </tr>`;
+              }).join('');
+        } catch (e) {
+          document.getElementById('tbody').innerHTML = '<tr><td colspan="14" class="text-red-500 py-8 text-center">Erreur de chargement</td></tr>';
+        }
+      };
+
+      // === ÉDITEUR DE CONTRAT ===
       window.openContractEditor = async function () {
         const editor = document.getElementById('contractEditor');
-        
-        // Charge le contrat personnalisé du client, ou le contrat.html par défaut
         let html = localStorage.getItem(`contrat_${currentClientId}`);
         if (!html) {
-          try {
-            const res = await fetch('contrat.html');
-            html = await res.text();
-          } catch (e) {
-            html = `<!-- Contrat par défaut non trouvé -->`;
-          }
+          html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Contrat Photobooth LITE</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; font-size: 11pt; line-height: 1.5; }
+    h1 { text-align: center; font-size: 16pt; font-weight: bold; }
+    .logo { float: right; width: 120px; margin-left: 20px; }
+    .section { border: 2px solid black; padding: 15px; margin: 20px 0; }
+    .checkbox { margin: 8px 0; }
+    .signature { margin-top: 80px; text-align: center; }
+    .page-break { page-break-before: always; }
+    @media print { body { margin: 15mm; } }
+  </style>
+</head>
+<body>
+  <h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1>
+  <img src="photobooth.jpg" alt="Photobooth" class="logo">
+  <p>Contrat n° 001 / Date : {DATE}</p>
+
+  <div class="section">
+    <strong>Le loueur :</strong><br>
+    Mr CHIMOT Alexis,<br>
+    3 Allée Michelet, 34410 Sauvian<br>
+    06.68.17.24.63
+  </div>
+
+  <div class="section">
+    <strong>Le locataire :</strong><br>
+    Nom : {NOM}<br>
+    Prénom : {PRENOM}<br>
+    Adresse : {ADRESSE}<br>
+    Mail : {EMAIL}<br>
+    Numéro de téléphone : {TELEPHONE}<br>
+    Numéro pièce d’identité : ....................
+  </div>
+
+  <div class="section">
+    <strong>La location :</strong><br>
+    Date : du {ENLEVEMENT} à 17h00 au {RESTITUTION} à 11h00<br>
+    <div class="checkbox">☐ Offre Week End 75 € (du vendredi au lundi)</div>
+    <div class="checkbox">☐ Offre Semaine 75 € (deux jours)</div>
+    <div class="checkbox">☐ Offre contour écran personnalisé 25€</div>
+    <div class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : ........</div>
+    Total : ........ €<br>
+    Adresse de votre événement : ....................
+  </div>
+
+  <!-- Les 16 articles du contrat -->
+  <h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2>
+  <p>Le loueur met à disposition du locataire, un matériel complet de photographie présenté sous forme de photobooth.</p>
+  <p>Tout retard de restitution par le locataire du photobooth dans son intégralité sera facturé d’un montant TTC de 75€ par jour.</p>
+  <!-- ... tous les articles ... -->
+
+  <div class="signature">
+    Fait à ...................., le {DATE}<br><br><br>
+    Signature du loueur ____________________<br><br>
+    Signature du locataire ____________________<br>
+    (précédée de la mention « bon pour accord »)
+  </div>
+</body>
+</html>`;
         }
-        
         editor.value = html;
         document.getElementById('contractEditorModal').classList.remove('hidden');
       };
@@ -153,19 +332,19 @@
       window.saveCustomContract = function () {
         const html = document.getElementById('contractEditor').value;
         localStorage.setItem(`contrat_${currentClientId}`, html);
-        Swal.fire('Sauvegardé !', 'Votre contrat personnalisé sera utilisé pour toutes vos réservations', 'success');
+        Swal.fire('Sauvegardé !', 'Votre contrat personnalisé sera utilisé', 'success');
         document.getElementById('contractEditorModal').classList.add('hidden');
       };
 
-      window.resetToDefaultContract = async function () {
-        if (confirm('Voulez-vous vraiment réinitialiser le contrat à la version par défaut ?')) {
+      window.resetToDefaultContract = function () {
+        if (confirm('Réinitialiser le contrat à la version d\'origine ?')) {
           localStorage.removeItem(`contrat_${currentClientId}`);
-          Swal.fire('Réinitialisé', 'Le contrat par défaut sera utilisé', 'info');
+          Swal.fire('Réinitialisé', 'Le contrat par défaut est restauré', 'info');
           openContractEditor();
         }
       };
 
-      // === GÉNÉRATION DU CONTRAT (utilise la version personnalisée du client) ===
+      // === GÉNÉRATION DU CONTRAT ===
       window.generateAndSendContract = async function (id) {
         try {
           const res = await fetch(URL + '?clientId=' + currentClientId);
@@ -173,31 +352,34 @@
           const reservation = j.data.find(x => x.id == id);
           if (!reservation) return Swal.fire('Erreur', 'Réservation introuvable', 'error');
 
-          // Charge le contrat personnalisé du client
           let html = localStorage.getItem(`contrat_${currentClientId}`);
           if (!html) {
-            const defaultRes = await fetch('contrat.html');
-            html = await defaultRes.text();
+            html = `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Contrat Photobooth</title><style>body{font-family:Arial;margin:60px;line-height:1.8}h1{text-align:center;color:#1e40af}hr{border:1px solid #ccc;margin:40px 0}.signature{margin-top:120px;text-align:right}@media print{body{margin:20mm}}</style></head>
+<body onload="window.print()">
+<h1>CONTRAT DE LOCATION PHOTOBOOTH</h1>
+<p><strong>Client :</strong> ${reservation.prenom} ${reservation.nom}</p>
+<p><strong>Enlèvement :</strong> ${new Date(reservation.enlevement).toLocaleDateString('fr-FR')}</p>
+<p><strong>Restitution :</strong> ${new Date(reservation.restitution).toLocaleDateString('fr-FR')}</p>
+<p><strong>Email :</strong> ${reservation.email}</p>
+<p><strong>Téléphone :</strong> ${reservation.telephone}</p>
+<p><strong>Adresse :</strong> ${reservation.adresse.replace(/\n/g, '<br>')}</p>
+<hr>
+<p><strong>Total :</strong> 250 € • <strong>Acompte :</strong> 35 € • <strong>Caution :</strong> 500 €</p>
+<div class="signature">
+Date & signature :<br><br>
+_______________________________
+</div>
+</body>
+</html>`;
           }
-
-          // Remplissage automatique
-          const today = new Date().toLocaleDateString('fr-FR');
-          html = html
-            .replace(/{PRENOM}/g, reservation.prenom || '')
-            .replace(/{NOM}/g, reservation.nom || '')
-            .replace(/{EMAIL}/g, reservation.email || '')
-            .replace(/{TELEPHONE}/g, reservation.telephone || '')
-            .replace(/{ADRESSE}/g, reservation.adresse || '')
-            .replace(/{ENLEVEMENT}/g, new Date(reservation.enlevement).toLocaleDateString('fr-FR'))
-            .replace(/{RESTITUTION}/g, new Date(reservation.restitution).toLocaleDateString('fr-FR'))
-            .replace(/{DATE}/g, today);
 
           const win = window.open('', '_blank');
           win.document.write(html);
           win.document.close();
           setTimeout(() => win.print(), 800);
 
-          // Gmail
           const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
           let corps = document.getElementById('corps').value
             .replace('{PRENOM}', reservation.prenom || '')
@@ -211,7 +393,85 @@
         }
       };
 
-      // ... le reste de ton code (load, maj, nouveau, editer, supprimer, form) reste identique
+      // === LE RESTE DU CODE (maj, nouveau, editer, supprimer, form) ===
+      window.maj = async (id, champ, val) => {
+        await fetch(URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId: currentClientId,
+            action: 'update',
+            reservation: { id, [champ]: val ? 'Oui' : 'Non' }
+          })
+        });
+        load();
+      };
+
+      window.nouveau = function () {
+        document.getElementById('titre').textContent = 'Nouvelle réservation';
+        document.getElementById('form').reset();
+        document.getElementById('id').value = '';
+        document.getElementById('modal').classList.remove('hidden');
+      };
+
+      window.editer = function (resa) {
+        document.getElementById('titre').textContent = 'Modifier';
+        document.getElementById('id').value = resa.id;
+        document.getElementById('enlevement').value = resa.enlevement || '';
+        document.getElementById('restitution').value = resa.restitution || '';
+        document.getElementById('nom').value = resa.nom || '';
+        document.getElementById('prenom').value = resa.prenom || '';
+        document.getElementById('email').value = resa.email || '';
+        document.getElementById('telephone').value = resa.telephone || '';
+        document.getElementById('adresse').value = resa.adresse || '';
+        document.getElementById('pseudo').value = resa.pseudo || '';
+        document.getElementById('template').value = resa.template || '';
+        document.getElementById('modal').classList.remove('hidden');
+      };
+
+      window.supprimer = async function (id) {
+        const c = await Swal.fire({ title: 'Supprimer ?', icon: 'warning', showCancelButton: true });
+        if (c.isConfirmed) {
+          await fetch(URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: currentClientId, action: 'delete', id })
+          });
+          load();
+        }
+      };
+
+      window.closeModal = function () {
+        document.getElementById('modal').classList.add('hidden');
+      };
+
+      document.getElementById('form').onsubmit = async e => {
+        e.preventDefault();
+        const edit = document.getElementById('id').value;
+        const resa = {
+          id: edit || Date.now().toString(),
+          enlevement: document.getElementById('enlevement').value,
+          restitution: document.getElementById('restitution').value,
+          nom: document.getElementById('nom').value,
+          prenom: document.getElementById('prenom').value,
+          email: document.getElementById('email').value,
+          telephone: document.getElementById('telephone').value,
+          adresse: document.getElementById('adresse').value,
+          pseudo: document.getElementById('pseudo').value,
+          template: document.getElementById('template').value
+        };
+        await fetch(URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId: currentClientId,
+            action: edit ? 'update' : 'add',
+            reservation: resa
+          })
+        });
+        closeModal();
+        load();
+      };
     });
   </script>
 </body>
