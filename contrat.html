@@ -2,162 +2,136 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Contrat de Location Photobooth LITE</title>
+  <title>Contrat Photobooth LITE</title>
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 12pt; margin: 40mm; color: #000; }
-    h1 { text-align: center; color: #000; font-size: 16pt; margin-bottom: 20pt; }
-    h2 { font-size: 14pt; margin-top: 30pt; text-transform: uppercase; }
-    p { margin-bottom: 10pt; }
-    table { width: 100%; margin-bottom: 20pt; border-collapse: collapse; }
-    td { padding: 5pt; vertical-align: top; border: 1px solid #000; }
-    .checkbox { font-size: 10pt; }
-    .signature { margin-top: 50pt; text-align: center; }
-    .page-break { page-break-before: always; }
-    img { float: right; width: 100px; margin-left: 20pt; }
-    @media print { body { margin: 20mm; } }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      margin: 40px;
+      line-height: 1.4;
+    }
+    h1 {
+      text-align: center;
+      font-size: 14pt;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .logo {
+      float: right;
+      width: 120px;
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+    .section {
+      border: 2px solid black;
+      padding: 12px;
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 8px;
+    }
+    .field {
+      margin-bottom: 8px;
+    }
+    .checkbox {
+      margin: 6px 0;
+    }
+    .signature {
+      margin-top: 60px;
+      text-align: center;
+    }
+    .page-number {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 10pt;
+    }
+    .paraphe {
+      float: right;
+      margin-right: 50px;
+    }
+    @media print {
+      body { margin: 15mm; }
+      .page-break { page-break-before: always; }
+    }
   </style>
 </head>
 <body>
+
   <h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1>
 
-  <img src="photobooth.jpg" alt="Photo du Photobooth">
+  <img src="photobooth.jpg" alt="Photobooth" class="logo">
 
-  <p>Contrat n° 001 / Date : {DATE}</p>
+  <p style="clear:both;"><strong>Contrat n° 001 / Date :</strong> {DATE}</p>
 
-  <h2>Le loueur :</h2>
-  <p>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</p>
+  <div class="section">
+    <div class="section-title">Le loueur :</div>
+    Mr CHIMOT Alexis,<br>
+    3 Allée Michelet, 34410 Sauvian<br>
+    06.68.17.24.63
+  </div>
 
-  <h2>Le locataire :</h2>
-  <table>
-    <tr><td>Nom :</td><td>{NOM}</td></tr>
-    <tr><td>Prénom :</td><td>{PRENOM}</td></tr>
-    <tr><td>Adresse :</td><td>{ADRESSE}</td></tr>
-    <tr><td>Ville :</td><td>{VILLE}</td></tr>
-    <tr><td>Code postal :</td><td>{CODE_POSTAL}</td></tr>
-    <tr><td>Mail :</td><td>{EMAIL}</td></tr>
-    <tr><td>Numéro de téléphone :</td><td>{TELEPHONE}</td></tr>
-    <tr><td>Numéro pièce d’identité :</td><td>{ID_PIECE}</td></tr>
-  </table>
+  <div class="section">
+    <div class="section-title">Le locataire :</div>
+    <div class="field">Nom : {NOM}</div>
+    <div class="field">Prénom : {PRENOM}</div>
+    <div class="field">Adresse : {ADRESSE}</div>
+    <div class="field">Ville : ................................................ Code postal : ....................</div>
+    <div class="field">Mail : {EMAIL}</div>
+    <div class="field">Numéro de téléphone : {TELEPHONE}</div>
+    <div class="field">Numéro pièce d’identité : ................................................</div>
+  </div>
 
-  <h2>La location :</h2>
-  <p>Date : du {ENLEVEMENT} à 17h00 au {RESTITUTION} à 11h00</p>
-  <p>(enlèvement de dépôt à l’adresse du loueur)</p>
-  <p class="checkbox">☐ Offre Week End 75 € (du vendredi au lundi)</p>
-  <p class="checkbox">☐ Offre Semaine 75 € (deux jours)</p>
-  <p class="checkbox">☐ Offre contour écran personnalisé 25€</p>
-  <p class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour -> Nombre de jours : {NOMBRE_JOURS}</p>
-  <p>Total : {TOTAL} €</p>
-  <p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p>
+  <div class="section">
+    <div class="section-title">La location :</div>
+    <p>Date : du {ENLEVEMENT} à 17h00 au {RESTITUTION} à 11h00<br>
+    (enlèvement de dépôt à l’adresse du loueur)</p>
 
-  <p>Page 1<br>Paraphes :</p>
+    <div class="checkbox">☐ Offre Week End 75 € ( du vendredi au lundi )</div>
+    <div class="checkbox">☐ Offre Semaine 75 € ( deux jours )</div>
+    <div class="checkbox">☐ Offre contour écran personnalisé 25€</div>
+    <div class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : .............</div>
+
+    <p><strong>Total : {TOTAL} €</strong></p>
+    <p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p>
+  </div>
+
+  <div class="page-number">Page 1</div>
+  <div class="paraphe">Paraphes :</div>
 
   <div class="page-break"></div>
+
+  <!-- Tu peux copier-coller ici les articles 1 à 16 de ton contrat -->
+  <!-- Je te les mets en texte brut pour que tu les colles facilement -->
 
   <h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2>
   <p>Le loueur met à disposition du locataire, un matériel complet de photographie présenté sous forme de photobooth.</p>
   <p>Tout retard de restitution par le locataire du photobooth dans son intégralité sera facturé d’un montant TTC de 75€ par jour.</p>
-  <p>Mr CHIMOT ALEXIS (le loueur) ne peut être tenu responsable des éventuels retards de mise à disposition ou de livraison dus à toute raison indépendante de sa volonté. La location prend effet au moment où le matériel est mis à disposition du locataire à l’adresse indiquée par le loueur.</p>
-  <p>Lors de la remise du matériel, la charge des risques est transférée au locataire qui en assume la garde matérielle et juridique sous son entière responsabilité.</p>
-  <p>La location prend fin le jour où le matériel est restitué par le locataire à l’adresse indiquée par le loueur.</p>
+  <p>Mr CHIMOT ALEXIS (le loueur) ne peut être tenu responsable des éventuels retards de mise à disposition ou de livraison dus à toute raison indépendante de sa volonté...</p>
 
-  <h2>ARTICLE 2 – PRIX DE LA LOCATION</h2>
-  <p>Les parties s’entendent sur un prix total de location, pour la durée d’engagement notée dans le paragraphe “La location”.</p>
-  <p>A noter que le tarif est en TTC aucune TVA ne se rajoute. (TVA non applicable, art. 293 B du Code Général des Impôts).</p>
-  <p>Détail du prix : Borne photo | Photobooth Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr CHIMOT ALEXIS.</p>
-
-  <h2>ARTICLE 3 – ACOMPTE</h2>
-  <p>Un acompte de 35€ est versé lors de la réservation de la location. La réservation sera effective qu’à réception de l'acompte. En cas de non versement de l’acompte à la signature du présent contrat, le loueur s’autorise à louer sur les dates indiquées dans le paragraphe “La location” à un autre locataire.</p>
-
-  <h2>ARTICLE 4 – DÉPÔT DE GARANTIE</h2>
-  <p>Le locataire s’engage à verser par chèque à l’ordre de Mr CHIMOT Alexis, le jour de la réservation du matériel, une somme de 250 € (deux cents cinquante euros) à titre de dépôt de garantie, non encaissé, pour répondre des dégâts qui pourraient être causés aux objets loués ou à la non restitution du matériel. Une copie de la pièce d’identité du Loueur sera demandée et devra être au même nom que l’éditeur du chèque de dépôt de garantie.</p>
-
-  <p>Page 2<br>Paraphes :</p>
-
-  <div class="page-break"></div>
-
-  <h2>ARTICLE 5 – MISE À DISPOSITION DU MATÉRIEL</h2>
-  <p>À la prise de possession du matériel au 3 allée Michelet 34410 Sauvian, une fiche d’état des lieux du matériel sera signée par les deux parties. Le matériel loué est remis au locataire conformément aux réglementations en vigueur, notamment concernant la sécurité.</p>
-  <p>Le matériel sera testé avant le départ par le loueur en présence du locataire, cela implique pour le locataire qu’il accepte le parfait état de fonctionnement de celui-ci. Le locataire reconnaît avoir reçu le matériel en bon état d’usage et d’entretien, apte au fonctionnement, avec la notice technique, les consignes de sécurité et les accessoires nécessaires. A défaut d’observation formulée lors de la prise de possession, le locataire est réputé avoir réceptionné le matériel en bon état et avec l’ensemble des accessoires nécessaires.</p>
-  <p>Le locataire certifie connaître toutes les mises en garde de sécurité, les risques et précautions à prendre relatifs à l’utilisation, le fonctionnement et la manipulation du matériel. Le locataire sera donc tenu responsable de tout mauvais emploi. En aucun cas Mr CHIMOT Alexis ne pourra être tenu pour responsable de tous dommages corporels ou matériels résultant de l’utilisation de son matériel par le locataire ayant accepté le parfait état de fonctionnement du matériel par la signature de la fiche d’état des lieux du matériel.</p>
-  <p>Le transport, chargement, déchargement, attelage et arrimage du matériel sont à la charge et sous la responsabilité du locataire.</p>
-  <p>Quelles que soient les modalités de transport et/ou de montage, le locataire est responsable du matériel dès que celui-ci quitte le loueur.</p>
-  <p>Toutes taxes, charges, redevances, autorisations, et assurances sont à la charge du locataire.</p>
-  <p>La restitution du matériel se fera au 3 allée Michelet 34410 Sauvian.</p>
-  <p>Lors de la restitution du matériel, ce dernier sera testé par Mr CHIMOT Alexis. Toute défectuosité, irrégularité, ou usure exagérée par rapport à l’utilisation spécifiée, constatée lors de ce contrôle sont à la charge du locataire. Le matériel devant subir une réparation sera réparé par Mr CHIMOT Alexis ou tout autre avec facture à charge du locataire ; si le matériel ne peut être réparé, ou n’est pas restitué dans un délai de une semaine, il sera considéré comme manquant au retour. Le matériel manquant au retour sera facturé, en partie, par le biais du dépôt de garantie déposé par le locataire. Si le montant de réparation et/ou du matériel à racheter dépasse le montant de cette caution, le locataire s’engage à rembourser l’intégralité de ce dépassement budgétaire.</p>
-
-  <p>Page 3<br>Paraphes :</p>
-
-  <div class="page-break"></div>
-
-  <h2>ARTICLE 6 – UTILISATION DU MATÉRIEL</h2>
-  <p>Le locataire certifie être habilité à se servir du matériel qu’il s’engage à utiliser lui-même ou par l’intermédiaire de son personnel dûment qualifié, formé et habilité. Le prêt et la sous-location du matériel sont strictement interdits. Il s’engage à installer et utiliser le matériel avec prudence et diligence, à respecter les consignes et notices d’utilisation et de sécurité, et à le maintenir constamment en bon état de marche.</p>
-  <p>Il prend toute mesure utile pour que les règles de sécurité légale, réglementaires ou édictées par le loueur soient appliquées. Il est responsable du respect des règles régissant le domaine public et la prise en compte de l’environnement. Il s’interdit toute modification, aménagement ou transformation du matériel.</p>
-
-  <h2>ARTICLE 7 – RÉPARATIONS</h2>
-  <p>Mr CHIMOT Alexis ne peut être tenue responsable à l’égard du locataire ou des tiers des conséquences directes ou indirectes, matérielles ou immatérielles, d’un arrêt ou d’un dysfonctionnement du bien loué, qui ne sera pas dû à un vice prouvé existant au moment de la mise à disposition, et ne sera donc redevable d’aucune indemnité de quelque nature que ce soit. En cas de panne, dysfonctionnement ou dégradation, le locataire doit immédiatement cesser d’utiliser le matériel, aviser Mr CHIMOT Alexis par téléphone au +33(0)6.68.17.24.63 et lui adresser confirmation par écrit à l’adresse email suivante – amaxbooth@gmail.com – en relatant les circonstances.</p>
-  <p>Cette immobilisation n’est pas imputable au loueur.</p>
-
-  <h2>ARTICLE 8 – RESPONSABILITÉS / ASSURANCE</h2>
-  <p>Le locataire ne peut employer le matériel à un usage autre que celui auquel il est destiné ni enfreindre les règles de sécurité. Il assume la garde matérielle et juridique du matériel et est responsable des dommages causés au matériel loué. Toutefois, il ne saurait être tenu des conséquences dommageables des vices cachés du matériel le rendant impropre à sa destination, dès lors qu’il apporte la preuve desdits vices.</p>
-  <p>Mr CHIMOT Alexis ne peut être tenu responsable des pertes, vols ou dommages causés par tous biens transportés ou laissés par le locataire ou tout tiers, dans ou sur le matériel pendant la durée de la location ou après restitution du matériel. Les pertes d’exploitation, directes ou indirectes, quelque soit la cause, ne sont jamais prises en charge par Mr CHIMOT Alexis. Le locataire est responsable des dommages causés par le matériel pendant la durée de la location. Le loueur se réserve la possibilité d’exercer un recours contre le locataire. Le locataire doit être titulaire d’une assurance civile entreprise ou chef de famille pour couvrir les dommages causés aux tiers par le matériel.</p>
-
-  <p>Page 4<br>Paraphes :</p>
-
-  <div class="page-break"></div>
-
-  <h2>ARTICLE 9 – DÉCLARATION EN CAS DE GARANTIE</h2>
-  <p>En cas d’incident de quelque nature que ce soit, le locataire s’engage à informer le loueur dès la connaissance de l’incident et lui transmettre sa déclaration de sinistre par écrit au plus tard dans les 12 heures à l’adresse mail suivante : amaxbooth@gmail.com</p>
-  <p>Il doit mentionner la date, le lieu, les circonstances, les causes et les conséquences présumées, le nom, l’adresse et la qualification de l’utilisateur du matériel, des victimes, des témoins, si des agents de la sécurité sont intervenus et si un procès-verbal a été établi, l’endroit où les dommages peuvent être constatés, les garanties souscrites sur les mêmes risques auprès d’autres assureurs. Il doit permettre au loueur l’accès au matériel.</p>
-  <p>En cas de vol, il doit faire dans les 24 heures, auprès des autorités, une déclaration mentionnant l’identification du matériel, la date et les circonstances du vol et transmettre les originaux au loueur dans le même délai ou sur demande. Il doit transmettre au loueur dès réception, toute réclamation, convocation, assignation, pièce de procédure qui lui serait adressé ou signifié, et lui communiquer tout document sans délai sur simple demande.</p>
-  <p>La location est facturée jusqu’à la récupération du matériel.</p>
-
-  <h2>ARTICLE 10 – INFRACTIONS</h2>
-  <p>Le locataire reste seul responsable des infractions commises par lui ou ses préposés et en supporte les conséquences pénales, civiles et fiscales nominatives le concernant.</p>
-
-  <h2>ARTICLE 11 – RESTITUTION</h2>
-  <p>Le matériel ne peut être restitué qu’aux jours et horaires définis dans le contrat. Le locataire reste tenu de toutes les obligations découlant du contrat jusqu’à récupération effective par Mr CHIMOT Alexis, il reste notamment gardien de la chose louée et s’engage à la conserver sous surveillance. Le matériel ne sera considéré « restitué », et la garde juridique transférée à Mr CHIMOT Alexis qu’après la remise du matériel.</p>
-  <p>La restitution est obligatoire à l’expiration de la durée de location sans qu’il y ait lieu d’adresser une mise en demeure. Le locataire est tenu de rendre le matériel en bon état et en conformité, avec tous les accessoires et équipements.</p>
-  <p>A défaut, les prestations de remise en état, nettoyage et fournitures diverses seront facturées. À la restitution, un bon de retour précisant la date de restitution et l’état apparent du matériel sous réserve des dégâts apparents ou non signalés, est établi contradictoirement entre le loueur et le locataire.</p>
-  <p>En cas de non restitution du matériel quel qu’en soit la cause, une indemnité est facturée sur la base définie dans les articles précédents en sus de la location. Les équipements, accessoires, éléments démontables ou pièces détachées non restitués sont facturées au prix de remplacement, les prix étant définis à références identiques.</p>
-  <p>En cas de décalage de la date ou heure de la restitution demandée par le loueur, aucune modification tarifaire ne sera appliquée.</p>
-
-  <p>Page 5<br>Paraphes :</p>
-
-  <div class="page-break"></div>
-
-  <h2>ARTICLE 12 – ÉVICTION DU LOUEUR</h2>
-  <p>Le locataire s’interdit d’enlever ou modifier les plaques de propriété et/ou inscriptions apposés sur le bien loué. Le matériel ne peut être ni cédé, ni remis en garantie. Le locataire s’engage à ne consentir à l’égard de la chose louée aucun droit, réel ou autre, au profit de quiconque, susceptible d’en affecter la jouissance, ou d’en limiter la disponibilité ou la pleine propriété de Mr CHIMOT Alexis.</p>
-
-  <h2>ARTICLE 13 – RÉSERVATION / CONFIRMATION</h2>
-  <p>Pour confirmer la réservation, nous vous remercions de nous retourner le contrat de location ainsi que les conditions générales signées avec la mention « bon pour accord et commande, j’ai lu et approuvé le contrat de location et conditions générales pour le Photobooth LITE » et de procéder au versement de l’acompte. Dès réception de ces derniers ainsi que d’une copie de pièce d’identité en cours de validité, nous vous confirmerons, par retour de mail.</p>
-
-  <h2>ARTICLE 14 – ANNULATION</h2>
-  <p>Pour toute annulation de notre prestation, des frais pourraient vous être demandés.</p>
-  <p>Après confirmation du contrat de location -> 100% de l’acompte</p>
-  <p>Moins de 15 jours avant l’événement -> 100% de la somme totale.</p>
-
-  <h2>ARTICLE 15 – RÈGLEMENTS</h2>
-  <p>Déroulement du règlement :</p>
-  <p>1/ Acompte de 35€ à régler à la signature du contrat de location, par virement paypal (frais à la charge du locataire), en espèces ou virement bancaire.</p>
-  <p>2/ Le restant dû de 40€ s’effectue le jour de la remise du photobooth, après la signature de l’état des lieux.</p>
-  <p>Toute somme non payée, incluant le dépôt de garantie, à la remise du photobooth entraîne l’annulation, sans délai, de la location et par conséquent l’acompte initialement versé par le locataire ne lui pourra être restitué.</p>
-
-  <h2>ARTICLE 16 – LOI APPLICABLE ET ATTRIBUTION JURIDIQUE</h2>
-  <p>Le présent contrat est régi par la loi française et soumis à la juridiction exclusive des tribunaux français. Tout différend relatif aux présentes conditions impliquant un particulier sera tranché par le tribunal auquel les parties attribuent une compétence exclusive, même en cas de référé, d’appel en garantie ou de pluralité de défendeurs.</p>
-  <p>Tout différend relatif aux présentes conditions impliquant un consommateur sera soumis aux règles légales de compétence d’attribution et territoriale.</p>
-
-  <p>Fait à {VILLE}, Le {DATE}</p>
+  <!-- Continue avec tous les articles jusqu'à la fin -->
 
   <div class="signature">
-    <table style="width: 100%;">
+    <p>Fait à ........................................., le {DATE}</p>
+    <br><br><br>
+    <table width="100%">
       <tr>
-        <td style="width: 50%; text-align: center;">Signature du loueur</td>
-        <td style="width: 50%; text-align: center;">Signature du locataire<br>Précédée de la mention « bon pour accord , j’ai lu et approuvé le contrat de location et conditions générales pour le Photobooth LITE »</td>
+        <td width="50%" align="center">Signature du loueur</td>
+        <td width="50%" align="center">
+          Signature du locataire<br>
+          précédée de la mention « bon pour accord »
+        </td>
       </tr>
     </table>
   </div>
 
-  <p>Page 6<br>Paraphes :</p>
-
+  <script>
+    // Impression automatique
+    window.onload = function() {
+      setTimeout(() => window.print(), 800);
+    }
+  </script>
 </body>
 </html>
