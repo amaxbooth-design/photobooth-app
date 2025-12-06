@@ -53,8 +53,8 @@
             <p class="text-blue-200 mt-1">Connecté : <span id="userName" class="font-bold"></span></p>
           </div>
           <div class="flex gap-3 flex-wrap">
-            <select id="filtre" onchange="load()" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
-              <option value="">Tous les mois</option>
+            <select id="filtreMois" onchange="load()" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
+              <option value="">📅 Tous les mois</option>
             </select>
             <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
             <button onclick="openContractEditor()" class="bg-purple-600 hover:bg-purple-800 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg">Modifier mon contrat</button>
@@ -97,20 +97,20 @@ L'équipe Photobooth</textarea>
         <table>
           <thead>
             <tr>
-              <th>Enlèvement</th>
-              <th>Restitution</th>
-              <th>Nom Prénom</th>
-              <th>Email</th>
-              <th>Téléphone</th>
-              <th>Adresse</th>
-              <th>Pseudo</th>
-              <th>Contrat</th>
-              <th>Envoyé</th>
-              <th>Signé</th>
-              <th>Acompte</th>
-              <th>Caution</th>
-              <th>Template</th>
-              <th>Actions</th>
+              <th>📤 Enlèvement</th>
+              <th>📥 Restitution</th>
+              <th>👤 Nom Prénom</th>
+              <th>📧 Email</th>
+              <th>📱 Téléphone</th>
+              <th>🏠 Adresse</th>
+              <th>🎭 Pseudo</th>
+              <th>📄 Contrat</th>
+              <th>✉️ Envoyé</th>
+              <th>✅ Signé</th>
+              <th>💰 Acompte</th>
+              <th>🔒 Caution</th>
+              <th>🎨 Template</th>
+              <th>⚙️ Actions</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -468,6 +468,38 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
             acompte: 'Oui',
             caution: 'Oui',
             template: 'Oui'
+          },
+          {
+            id: 2,
+            enlevement: '2025-01-10',
+            restitution: '2025-01-12',
+            nom: 'Martin',
+            prenom: 'Jean',
+            email: 'jean.martin@email.com',
+            telephone: '0623456789',
+            adresse: '28 avenue des Champs, 69001 Lyon',
+            pseudo: 'JeanMar',
+            contratEnvoye: 'Non',
+            contratSigne: 'Non',
+            acompte: 'Non',
+            caution: 'Non',
+            template: 'Non'
+          },
+          {
+            id: 3,
+            enlevement: '2025-01-25',
+            restitution: '2025-01-27',
+            nom: 'Bernard',
+            prenom: 'Sophie',
+            email: 'sophie.bernard@email.com',
+            telephone: '0634567890',
+            adresse: '42 rue du Commerce, 33000 Bordeaux',
+            pseudo: 'SophieB',
+            contratEnvoye: 'Oui',
+            contratSigne: 'Non',
+            acompte: 'Non',
+            caution: 'Non',
+            template: 'Oui'
           }
         ];
       }
@@ -496,12 +528,66 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
           dataStore[currentClientId] = [];
         }
         
+        // Remplir le menu déroulant des mois
+        populateMonthFilter();
+        
         load();
       };
 
+      // === REMPLIR LE MENU DÉROULANT DES MOIS ===
+      function populateMonthFilter() {
+        const data = dataStore[currentClientId] || [];
+        const moisSet = new Set();
+        
+        data.forEach(r => {
+          if (r.enlevement) {
+            const date = new Date(r.enlevement);
+            const moisAnnee = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            moisSet.add(moisAnnee);
+          }
+        });
+        
+        const moisArray = Array.from(moisSet).sort().reverse();
+        const select = document.getElementById('filtreMois');
+        
+        // Garder l'option "Tous les mois"
+        select.innerHTML = '<option value="">📅 Tous les mois</option>';
+        
+        moisArray.forEach(mois => {
+          const [annee, moisNum] = mois.split('-');
+          const moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+          const moisNom = moisNoms[parseInt(moisNum) - 1];
+          const option = document.createElement('option');
+          option.value = mois;
+          option.textContent = `${moisNom} ${annee}`;
+          select.appendChild(option);
+        });
+      }
+
       // === CHARGEMENT DU TABLEAU ===
       window.load = function () {
-        const data = dataStore[currentClientId] || [];
+        let data = dataStore[currentClientId] || [];
+        
+        // Récupérer le filtre mois sélectionné
+        const filtreMois = document.getElementById('filtreMois').value;
+        
+        // Filtrer par mois si sélectionné
+        if (filtreMois) {
+          data = data.filter(r => {
+            if (!r.enlevement) return false;
+            const date = new Date(r.enlevement);
+            const moisAnnee = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            return moisAnnee === filtreMois;
+          });
+        }
+        
+        // Trier par date d'enlèvement (plus récent en premier)
+        data.sort((a, b) => {
+          const dateA = a.enlevement ? new Date(a.enlevement) : new Date(0);
+          const dateB = b.enlevement ? new Date(b.enlevement) : new Date(0);
+          return dateB - dateA;
+        });
+        
         const tbody = document.getElementById('tbody');
         
         tbody.innerHTML = data.length === 0
@@ -637,6 +723,7 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
       window.supprimer = function(id) {
         if (confirm('Supprimer cette réservation ?')) {
           dataStore[currentClientId] = dataStore[currentClientId].filter(r => r.id !== id);
+          populateMonthFilter(); // Mettre à jour le filtre des mois
           load();
           Swal.fire('Supprimé !', 'La réservation a été supprimée', 'success');
         }
@@ -681,6 +768,7 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         }
 
         closeModal();
+        populateMonthFilter(); // Mettre à jour le filtre des mois
         load();
         Swal.fire('Enregistré !', 'La réservation a été enregistrée', 'success');
       };
