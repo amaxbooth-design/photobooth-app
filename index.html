@@ -172,7 +172,6 @@ L'équipe Photobooth</textarea>
 
     const CLIENTS = {
       "TUTU": { password: "2025", name: "Tutu" },
-      "MAX": { password: "2025", name: "Max" },
       "JEAN2025": { password: "photobooth123", name: "Jean Dupont" },
       "MARIE2025": { password: "party456", name: "Marie Martin" },
       "TEST": { password: "test123", name: "Client Test" }
@@ -505,6 +504,12 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         ];
       }
 
+      // Charger les données depuis localStorage au démarrage
+      const savedData = localStorage.getItem('photoboothData');
+      if (savedData) {
+        dataStore = JSON.parse(savedData);
+      }
+
       // === CONNEXION + AFFICHAGE MOT DE PASSE ===
       document.getElementById('showPassword').addEventListener('change', () => {
         const p = document.getElementById('password');
@@ -601,6 +606,11 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         localStorage.setItem(`emailConfig_${currentClientId}`, JSON.stringify(config));
       };
 
+      // === SAUVEGARDER TOUTES LES DONNÉES ===
+      function saveData() {
+        localStorage.setItem('photoboothData', JSON.stringify(dataStore));
+      }
+
       // === CHARGEMENT DU TABLEAU ===
       window.load = function () {
         let data = dataStore[currentClientId] || [];
@@ -663,6 +673,7 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         const index = data.findIndex(r => r.id === id);
         if (index !== -1) {
           data[index][champ] = checked ? 'Oui' : 'Non';
+          saveData(); // Sauvegarder après modification
           load();
         }
       };
@@ -760,6 +771,7 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
       window.supprimer = function(id) {
         if (confirm('Supprimer cette réservation ?')) {
           dataStore[currentClientId] = dataStore[currentClientId].filter(r => r.id !== id);
+          saveData(); // Sauvegarder après suppression
           populateMonthFilter(); // Mettre à jour le filtre des mois
           load();
           Swal.fire('Supprimé !', 'La réservation a été supprimée', 'success');
@@ -804,6 +816,7 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
           dataStore[currentClientId].push(resa);
         }
 
+        saveData(); // Sauvegarder après ajout/modification
         closeModal();
         populateMonthFilter(); // Mettre à jour le filtre des mois
         load();
