@@ -71,15 +71,15 @@
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-bold mb-2 text-gray-700">Votre email Gmail :</label>
-            <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com">
+            <input id="emailClient" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="votreemail@gmail.com" onchange="saveEmailConfig()">
           </div>
           <div>
             <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
-            <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+            <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer" onchange="saveEmailConfig()">
           </div>
           <div class="md:col-span-2">
             <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail ({PRENOM} {NOM}) :</label>
-            <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+            <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" onchange="saveEmailConfig()">Bonjour {PRENOM} {NOM},
 Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
 Merci de nous retourner le contrat signé accompagné de :
 - L'acompte de 35€
@@ -510,13 +510,30 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         p.type = document.getElementById('showPassword').checked ? 'text' : 'password';
       });
 
+      // Charger les identifiants sauvegardés au démarrage
+      const savedCredentials = localStorage.getItem('savedCredentials');
+      if (savedCredentials) {
+        const creds = JSON.parse(savedCredentials);
+        document.getElementById('clientCode').value = creds.clientCode || '';
+        document.getElementById('password').value = creds.password || '';
+        document.getElementById('rememberMe').checked = true;
+      }
+
       window.login = function () {
         const code = document.getElementById('clientCode').value.trim().toUpperCase();
         const pass = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
 
         if (!code || !pass) return Swal.fire('Erreur', 'Identifiant et mot de passe requis', 'error');
         const client = CLIENTS[code];
         if (!client || client.password !== pass) return Swal.fire('Erreur', 'Identifiants incorrects', 'error');
+
+        // Sauvegarder ou supprimer les identifiants
+        if (rememberMe) {
+          localStorage.setItem('savedCredentials', JSON.stringify({ clientCode: code, password: pass }));
+        } else {
+          localStorage.removeItem('savedCredentials');
+        }
 
         currentClientId = code;
         document.getElementById('login').classList.add('hidden');
@@ -526,6 +543,15 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
         // Initialiser les données si nécessaire
         if (!dataStore[currentClientId]) {
           dataStore[currentClientId] = [];
+        }
+        
+        // Charger la configuration email du client
+        const savedEmail = localStorage.getItem(`emailConfig_${currentClientId}`);
+        if (savedEmail) {
+          const config = JSON.parse(savedEmail);
+          document.getElementById('emailClient').value = config.email || '';
+          document.getElementById('sujet').value = config.sujet || 'Votre contrat Photobooth - À signer';
+          document.getElementById('corps').value = config.corps || document.getElementById('corps').value;
         }
         
         // Remplir le menu déroulant des mois
@@ -563,6 +589,16 @@ Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr C
           select.appendChild(option);
         });
       }
+
+      // === SAUVEGARDER LA CONFIGURATION EMAIL ===
+      window.saveEmailConfig = function() {
+        const config = {
+          email: document.getElementById('emailClient').value,
+          sujet: document.getElementById('sujet').value,
+          corps: document.getElementById('corps').value
+        };
+        localStorage.setItem(`emailConfig_${currentClientId}`, JSON.stringify(config));
+      };
 
       // === CHARGEMENT DU TABLEAU ===
       window.load = function () {
