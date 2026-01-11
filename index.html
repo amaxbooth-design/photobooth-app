@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestionnaire de Locations</title>
+  <title>Photobooth - Alexis</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -22,21 +22,59 @@
 </head>
 <body>
 
-<div id="app">
+<div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
+  <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
+    <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth</h1>
+    <p class="text-gray-600 mb-2">Bienvenue Alexis</p>
+    <p class="text-sm text-gray-500 mb-8">Gestion de vos réservations</p>
+    <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-xl mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
+    <div class="flex items-center mb-4">
+      <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer" onchange="togglePassword()">
+      <label for="showPassword" class="text-base text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
+    </div>
+    <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
   <div class="bg-blue-900 shadow-lg">
     <div class="px-4 py-6 max-w-7xl mx-auto">
       <div class="flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Locations</h1>
+          <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
           <p class="text-blue-200 mt-1">Gestion complète de mes locations</p>
         </div>
         <div class="flex gap-3 flex-wrap">
           <select id="filtre" onchange="load()" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
             <option value="">Tous les mois</option>
           </select>
-          <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle location</button>
-          <button onclick="exportAllHTML()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition">📄 Export HTML</button>
-          <button onclick="exportAllPremium()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-bold transition">✨ Premium</button>
+          <button onclick="nouveau()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
+          <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">🚪 Déconnexion</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-yellow-50 border-l-4 border-yellow-500">
+    <div class="px-4 py-6 max-w-7xl mx-auto">
+      <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
+          <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Mon email (pour recevoir les copies) :</label>
+          <input id="emailCopie" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="alexis@exemple.com" value="">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
+          <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+
+Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+
+Cordialement,
+Alexis - Photobooth</textarea>
         </div>
       </div>
     </div>
@@ -54,17 +92,16 @@
             <th>📞 Téléphone</th>
             <th>📍 Adresse</th>
             <th>🎭 Pseudo</th>
-            <th>📄 Envoyé</th>
+            <th>✉️ Envoyer Contrat</th>
             <th>✅ Signé</th>
             <th>💰 Acompte</th>
             <th>🔒 Caution</th>
             <th>🎨 Template</th>
-            <th>📆 Agenda</th>
             <th>⚙️ Actions</th>
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="14" class="text-center py-8 text-gray-500">Chargement...</td></tr>
+          <tr><td colspan="13" class="text-center py-8 text-gray-500">Chargement des réservations...</td></tr>
         </tbody>
       </table>
     </div>
@@ -73,81 +110,60 @@
 
 <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
-    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle location</h2>
-    <div id="form" class="grid md:grid-cols-2 gap-6">
+    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
+    <form id="form" class="grid md:grid-cols-2 gap-6">
       <input type="hidden" id="id">
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date d'enlèvement</label><input type="datetime-local" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date de restitution</label><input type="datetime-local" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Nom</label><input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Prénom</label><input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Email</label><input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Téléphone</label><input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></div>
-      <div class="md:col-span-2"><label class="block text-sm font-bold mb-2 text-gray-700">Adresse</label><textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500" required></textarea></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Nom</label><input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Prénom</label><input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Email</label><input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Téléphone</label><input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div class="md:col-span-2"><label class="block text-sm font-bold mb-2 text-gray-700">Adresse</label><textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
       <div><label class="block text-sm font-bold mb-2 text-gray-700">Pseudo</label><input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
       <div><label class="block text-sm font-bold mb-2 text-gray-700">Template</label><select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500 cursor-pointer"><option value="">Non</option><option value="Oui">Oui</option></select></div>
       <div class="md:col-span-2 flex gap-4">
-        <button onclick="save()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
-        <button onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
+        <button type="button" onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
 <script>
-  let locations = [];
+  // 🔧 CONFIGURATION ALEXIS
+  const URL = "VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI";
+  const PASSWORD = "amax";
+  const CLIENT_ID = "Alexis";
 
-  async function load() {
-    try {
-      const result = await window.storage.get('locations-data');
-      if (result && result.value) {
-        const data = JSON.parse(result.value);
-        locations = data.data || [];
-      } else {
-        locations = [];
-      }
-    } catch (error) {
-      locations = [];
-    }
-    
-    const filtre = document.getElementById('filtre').value;
-    const mois = [...new Set(locations.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
-    document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + mois.map(m => `<option value="${m}" ${filtre === m ? 'selected' : ''}>${new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</option>`).join('');
-    
-    const tbody = document.getElementById('tbody');
-    if (locations.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-gray-500">Aucune location trouvée</td></tr>';
-      return;
-    }
-    
-    tbody.innerHTML = locations.filter(x => !filtre || x.enlevement?.startsWith(filtre)).map(r => {
-      const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
-      const dateEnlevement = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : '-';
-      const dateRestitution = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : '-';
-      const telephone = tel(r.telephone || '');
-      const nomComplet = `${r.nom || ''} ${r.prenom || ''}`.trim();
-      return `<tr class="${ok ? 'paid' : 'notpaid'}">
-        <td>${dateEnlevement}</td>
-        <td>${dateRestitution}</td>
-        <td><strong>${nomComplet}</strong></td>
-        <td>${r.email || ''}</td>
-        <td class="font-mono">${telephone}</td>
-        <td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td>
-        <td>${r.pseudo || ''}</td>
-        <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratEnvoye === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratEnvoye',this.checked)"></td>
-        <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)"></td>
-        <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)"></td>
-        <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
-        <td>${r.template || ''}</td>
-        <td class="text-center">
-          <button onclick="syncToGoogle(${r.id})" class="text-2xl hover:scale-110 transition" title="Ajouter à Google Agenda">📆</button>
-        </td>
-        <td class="text-center whitespace-nowrap">
-          <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'"')})' class="text-2xl hover:scale-110 transition mr-2" title="Modifier">✏️</button>
-          <button onclick="supprimer(${r.id})" class="text-2xl hover:scale-110 transition" title="Supprimer">🗑️</button>
-        </td>
-      </tr>`;
-    }).join('');
+  function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const checkbox = document.getElementById('showPassword');
+    passwordInput.type = checkbox.checked ? 'text' : 'password';
   }
+
+  function login() {
+    const pass = document.getElementById('password').value;
+    if (pass === PASSWORD) {
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      load();
+    } else {
+      Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('password').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') login();
+    });
+    document.getElementById('enlevement').addEventListener('change', function() {
+      const dateEnlevement = this.value;
+      if (dateEnlevement && !document.getElementById('restitution').value) {
+        document.getElementById('restitution').value = dateEnlevement;
+      }
+    });
+  });
 
   function tel(t) {
     if (!t) return '';
@@ -156,42 +172,82 @@
     return str;
   }
 
-  async function saveToStorage() {
+  function envoi(email, nom, prenom) {
+    const sujet = document.getElementById('sujet').value || 'Votre contrat Photobooth';
+    const corps = (document.getElementById('corps').value || 'Bonjour,\n\nVoici votre contrat.').replace('{PRENOM}', prenom).replace('{NOM}', nom);
+    const emailCopie = document.getElementById('emailCopie').value || '';
+    const s = encodeURIComponent(sujet);
+    const b = encodeURIComponent(corps);
+    const mailtoUrl = emailCopie ? `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}&bcc=${emailCopie}` : `https://mail.google.com/mail/?view=cm&to=${email}&su=${s}&body=${b}`;
+    window.open(mailtoUrl);
+  }
+
+  async function load() {
     try {
-      await window.storage.set('locations-data', JSON.stringify({
-        success: true,
-        data: locations
-      }));
-    } catch (error) {
-      console.error('Erreur de sauvegarde:', error);
+      const r = await fetch(URL + '?clientId=' + CLIENT_ID);
+      const j = await r.json();
+      const data = j.data || [];
+      const filtre = document.getElementById('filtre').value;
+      const mois = [...new Set(data.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
+      document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + mois.map(m => `<option value="${m}" ${filtre === m ? 'selected' : ''}>${new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</option>`).join('');
+      const tbody = document.getElementById('tbody');
+      if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-gray-500">Aucune réservation trouvée</td></tr>'; return; }
+      tbody.innerHTML = data.filter(x => !filtre || x.enlevement?.startsWith(filtre)).map(r => {
+        const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
+        const dateEnlevement = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
+        const dateRestitution = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
+        const telephone = tel(r.telephone || '');
+        const nomComplet = `${r.nom || ''} ${r.prenom || ''}`.trim();
+        return `<tr class="${ok ? 'paid' : 'notpaid'}">
+          <td>${dateEnlevement}</td><td>${dateRestitution}</td><td><strong>${nomComplet}</strong></td><td>${r.email || ''}</td>
+          <td class="font-mono">${telephone}</td><td style="white-space:normal; max-width:250px;">${r.adresse || ''}</td><td>${r.pseudo || ''}</td>
+          <td class="text-center"><button onclick="envoi('${(r.email || '').replace(/'/g, "\\'")}','${(r.nom || '').replace(/'/g, "\\'")}','${(r.prenom || '').replace(/'/g, "\\'")}');" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition">📧</button></td>
+          <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer checkbox-signe" ${r.contratSigne === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'contratSigne',this.checked)" data-row-id="${r.id}"></td>
+          <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer checkbox-acompte" ${r.acompte === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'acompte',this.checked)" data-row-id="${r.id}"></td>
+          <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer checkbox-caution" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)" data-row-id="${r.id}"></td>
+          <td>${r.template || ''}</td>
+          <td class="text-center whitespace-nowrap">
+            <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'")})' class="text-2xl hover:scale-110 transition mr-2" title="Modifier">✏️</button>
+            <button onclick="supprimer(${r.id})" class="text-2xl hover:scale-110 transition" title="Supprimer">🗑️</button>
+          </td></tr>`;
+      }).join('');
+    } catch (err) {
+      console.error('Erreur chargement:', err);
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="13" class="text-center py-8 text-red-500">❌ Erreur de chargement des données</td></tr>';
     }
   }
 
   async function maj(id, champ, val) {
-    locations = locations.map(loc => 
-      loc.id === id ? { ...loc, [champ]: val ? 'Oui' : 'Non' } : loc
-    );
-    await saveToStorage();
-    await load();
+    const checkbox = event.target;
+    const row = checkbox.closest('tr');
+    checkbox.disabled = true;
+    try {
+      await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CLIENT_ID, action: 'update', reservation: { id, [champ]: val ? 'Oui' : 'Non' } }), mode: 'no-cors' });
+      const checkboxSigne = row.querySelector('.checkbox-signe');
+      const checkboxAcompte = row.querySelector('.checkbox-acompte');
+      if (checkboxSigne && checkboxAcompte && checkboxSigne.checked && checkboxAcompte.checked) {
+        row.classList.remove('notpaid'); row.classList.add('paid');
+      } else {
+        row.classList.remove('paid'); row.classList.add('notpaid');
+      }
+      checkbox.disabled = false;
+      setTimeout(() => load(), 3000);
+    } catch (err) {
+      console.error('Erreur mise à jour:', err);
+      checkbox.checked = !val; checkbox.disabled = false;
+      Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
+    }
   }
 
   function nouveau() {
-    document.getElementById('titre').textContent = 'Nouvelle location';
+    document.getElementById('titre').textContent = 'Nouvelle réservation';
+    document.getElementById('form').reset();
     document.getElementById('id').value = '';
-    document.getElementById('enlevement').value = '';
-    document.getElementById('restitution').value = '';
-    document.getElementById('nom').value = '';
-    document.getElementById('prenom').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('telephone').value = '';
-    document.getElementById('adresse').value = '';
-    document.getElementById('pseudo').value = '';
-    document.getElementById('template').value = '';
     document.getElementById('modal').classList.remove('hidden');
   }
 
   function editer(resa) {
-    document.getElementById('titre').textContent = 'Modifier la location';
+    document.getElementById('titre').textContent = 'Modifier la réservation';
     document.getElementById('id').value = resa.id;
     document.getElementById('enlevement').value = resa.enlevement;
     document.getElementById('restitution').value = resa.restitution;
@@ -205,10 +261,27 @@
     document.getElementById('modal').classList.remove('hidden');
   }
 
-  async function save() {
+  async function supprimer(id) {
+    const conf = await Swal.fire({ title: 'Supprimer cette réservation ?', text: 'Cette action est irréversible', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Oui, supprimer', cancelButtonText: 'Annuler' });
+    if (conf.isConfirmed) {
+      try {
+        await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CLIENT_ID, action: 'delete', id: id }), mode: 'no-cors' });
+        load();
+        Swal.fire('Supprimé !', 'La réservation a été supprimée', 'success');
+      } catch (err) {
+        console.error('Erreur suppression:', err);
+        Swal.fire('Erreur', 'Impossible de supprimer', 'error');
+      }
+    }
+  }
+
+  function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+  document.getElementById('form').onsubmit = async function(e) {
+    e.preventDefault();
     const edit = document.getElementById('id').value;
-    const newLoc = {
-      id: edit || Date.now(),
+    const resa = {
+      id: edit || Date.now().toString(),
       enlevement: document.getElementById('enlevement').value,
       restitution: document.getElementById('restitution').value,
       nom: document.getElementById('nom').value,
@@ -218,224 +291,21 @@
       adresse: document.getElementById('adresse').value,
       pseudo: document.getElementById('pseudo').value,
       template: document.getElementById('template').value,
-      contratEnvoye: edit ? locations.find(l => l.id == edit)?.contratEnvoye || 'Non' : 'Non',
-      contratSigne: edit ? locations.find(l => l.id == edit)?.contratSigne || 'Non' : 'Non',
-      acompte: edit ? locations.find(l => l.id == edit)?.acompte || 'Non' : 'Non',
-      caution: edit ? locations.find(l => l.id == edit)?.caution || 'Oui' : 'Oui',
-      eventId: edit ? locations.find(l => l.id == edit)?.eventId || '' : ''
+      contratSigne: 'Non', acompte: 'Non', caution: 'Non'
     };
-
-    if (edit) {
-      locations = locations.map(loc => loc.id == edit ? newLoc : loc);
-    } else {
-      locations.push(newLoc);
-    }
-
-    await saveToStorage();
-    closeModal();
-    await load();
-    Swal.fire('Succès !', 'Location enregistrée', 'success');
-  }
-
-  async function supprimer(id) {
-    const conf = await Swal.fire({
-      title: 'Supprimer ?',
-      text: 'Action irréversible',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      confirmButtonText: 'Oui',
-      cancelButtonText: 'Non'
-    });
-    
-    if (conf.isConfirmed) {
-      locations = locations.filter(loc => loc.id !== id);
-      await saveToStorage();
+    Swal.fire({ title: 'Enregistrement...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    try {
+      const payload = { clientId: CLIENT_ID, action: edit ? 'update' : 'add', reservation: resa };
+      await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), mode: 'no-cors' });
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      closeModal();
       await load();
-      Swal.fire('Supprimé !', '', 'success');
+      Swal.fire('Succès !', edit ? 'Réservation modifiée' : 'Réservation ajoutée', 'success');
+    } catch (err) {
+      console.error('Erreur enregistrement:', err);
+      Swal.fire('Erreur', 'Problème de connexion: ' + err.message, 'error');
     }
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-  }
-
-  function syncToGoogle(id) {
-    const location = locations.find(l => l.id === id);
-    if (!location || !location.enlevement || !location.restitution) {
-      Swal.fire('Erreur', 'Dates manquantes pour la synchronisation', 'error');
-      return;
-    }
-
-    const title = `Location - ${location.prenom} ${location.nom}`;
-    const details = `Client: ${location.prenom} ${location.nom}
-Email: ${location.email}
-Tél: ${location.telephone}
-Adresse: ${location.adresse}
-Pseudo: ${location.pseudo}`;
-
-    const startDate = new Date(location.enlevement).toISOString().replace(/-|:|\.\d+/g, '');
-    const endDate = new Date(location.restitution).toISOString().replace(/-|:|\.\d+/g, '');
-
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(details)}`;
-    
-    window.open(url, '_blank');
-  }
-
-  function exportAllHTML() {
-    if (locations.length === 0) {
-      Swal.fire('Erreur', 'Aucune location à exporter', 'error');
-      return;
-    }
-    
-    locations.forEach(loc => {
-      const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location - ${loc.prenom} ${loc.nom}</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
-        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
-        .section { margin: 20px 0; }
-        .label { font-weight: bold; color: #666; }
-        .value { color: #333; margin-left: 10px; }
-        .status { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin: 5px; }
-        .status-oui { background: #4CAF50; color: white; }
-        .status-non { background: #f44336; color: white; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Fiche de Location</h1>
-        <div class="section">
-            <h2>Informations Client</h2>
-            <p><span class="label">Nom:</span><span class="value">${loc.nom}</span></p>
-            <p><span class="label">Prénom:</span><span class="value">${loc.prenom}</span></p>
-            <p><span class="label">Email:</span><span class="value">${loc.email}</span></p>
-            <p><span class="label">Téléphone:</span><span class="value">${loc.telephone}</span></p>
-            <p><span class="label">Adresse:</span><span class="value">${loc.adresse}</span></p>
-            <p><span class="label">Pseudo:</span><span class="value">${loc.pseudo}</span></p>
-        </div>
-        <div class="section">
-            <h2>Dates de Location</h2>
-            <p><span class="label">Enlèvement:</span><span class="value">${loc.enlevement}</span></p>
-            <p><span class="label">Restitution:</span><span class="value">${loc.restitution}</span></p>
-        </div>
-        <div class="section">
-            <h2>Statuts</h2>
-            <span class="status ${loc.contratEnvoye === 'Oui' ? 'status-oui' : 'status-non'}">Contrat envoyé: ${loc.contratEnvoye}</span>
-            <span class="status ${loc.contratSigne === 'Oui' ? 'status-oui' : 'status-non'}">Contrat signé: ${loc.contratSigne}</span>
-            <span class="status ${loc.acompte === 'Oui' ? 'status-oui' : 'status-non'}">Acompte: ${loc.acompte}</span>
-            <span class="status ${loc.caution === 'Oui' ? 'status-oui' : 'status-non'}">Caution: ${loc.caution}</span>
-        </div>
-    </div>
-</body>
-</html>`;
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `location_${loc.id}_standard.html`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-    
-    Swal.fire('Succès', `${locations.length} fichier(s) HTML exporté(s)`, 'success');
-  }
-
-  function exportAllPremium() {
-    if (locations.length === 0) {
-      Swal.fire('Erreur', 'Aucune location à exporter', 'error');
-      return;
-    }
-    
-    locations.forEach(loc => {
-      const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Premium - ${loc.prenom} ${loc.nom}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 32px; margin-bottom: 10px; }
-        .header p { opacity: 0.9; }
-        .content { padding: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px; }
-        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .card h3 { color: #667eea; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
-        .info-row { margin: 12px 0; display: flex; align-items: center; }
-        .info-label { font-weight: 600; color: #555; min-width: 100px; }
-        .info-value { color: #333; flex: 1; }
-        .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 30px; }
-        .status-badge { padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .status-oui { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
-        .status-non { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white; }
-        .dates-section { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; }
-        .date-box { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin: 10px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; border-top: 1px solid #eee; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎯 Fiche de Location Premium</h1>
-            <p>Référence #${loc.id}</p>
-        </div>
-        <div class="content">
-            <div class="dates-section">
-                <h3 style="margin-bottom: 15px; font-size: 20px;">📅 Période de Location</h3>
-                <div class="date-box"><strong>Enlèvement:</strong> ${loc.enlevement || 'Non défini'}</div>
-                <div class="date-box"><strong>Restitution:</strong> ${loc.restitution || 'Non défini'}</div>
-            </div>
-            <div class="grid">
-                <div class="card">
-                    <h3>👤 Informations Client</h3>
-                    <div class="info-row"><span class="info-label">Nom:</span><span class="info-value">${loc.nom}</span></div>
-                    <div class="info-row"><span class="info-label">Prénom:</span><span class="info-value">${loc.prenom}</span></div>
-                    <div class="info-row"><span class="info-label">Pseudo:</span><span class="info-value">${loc.pseudo}</span></div>
-                </div>
-                <div class="card">
-                    <h3>📞 Contact</h3>
-                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value">${loc.email}</span></div>
-                    <div class="info-row"><span class="info-label">Téléphone:</span><span class="info-value">${loc.telephone}</span></div>
-                    <div class="info-row"><span class="info-label">Adresse:</span><span class="info-value">${loc.adresse}</span></div>
-                </div>
-            </div>
-            <div class="card">
-                <h3>✅ Statuts & Validations</h3>
-                <div class="status-grid">
-                    <div class="status-badge ${loc.contratEnvoye === 'Oui' ? 'status-oui' : 'status-non'}">📄 Contrat Envoyé<br>${loc.contratEnvoye}</div>
-                    <div class="status-badge ${loc.contratSigne === 'Oui' ? 'status-oui' : 'status-non'}">✍️ Contrat Signé<br>${loc.contratSigne}</div>
-                    <div class="status-badge ${loc.acompte === 'Oui' ? 'status-oui' : 'status-non'}">💰 Acompte<br>${loc.acompte}</div>
-                    <div class="status-badge ${loc.caution === 'Oui' ? 'status-oui' : 'status-non'}">🛡️ Caution<br>${loc.caution}</div>
-                </div>
-            </div>
-        </div>
-        <div class="footer"><p>Document généré le ${new Date().toLocaleDateString('fr-FR')}</p></div>
-    </div>
-</body>
-</html>`;
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `location_${loc.id}_premium.html`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-    
-    Swal.fire('Succès', `${locations.length} fichier(s) Premium exporté(s)`, 'success');
-  }
-
-  window.addEventListener('DOMContentLoaded', load);
+  };
 </script>
 </body>
 </html>
