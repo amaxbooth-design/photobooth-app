@@ -118,12 +118,16 @@
 
   function login() {
     const pass = document.getElementById('password').value;
+    console.log('🔑 Mot de passe saisi:', pass);
+    console.log('🔑 Mot de passe attendu:', PASSWORD);
+    console.log('🔑 Comparaison:', pass === PASSWORD);
+    
     if (pass === PASSWORD) {
       document.getElementById('login').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
       load();
     } else {
-      Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
+      Swal.fire('Erreur', 'Mot de passe incorrect. Vous avez tapé: "' + pass + '"', 'error');
     }
   }
 
@@ -171,7 +175,7 @@
           <td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer" ${r.caution === 'Oui' ? 'checked' : ''} onchange="maj(${r.id},'caution',this.checked)"></td>
           <td>${r.template || ''}</td>
           <td class="text-center whitespace-nowrap">
-            <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'"')})' class="text-2xl hover:scale-110 transition mr-2" title="Modifier">✏️</button>
+            <button onclick='editer(${JSON.stringify(r).replace(/'/g, "\\'")})' class="text-2xl hover:scale-110 transition mr-2" title="Modifier">✏️</button>
             <button onclick="supprimer(${r.id})" class="text-2xl hover:scale-110 transition" title="Supprimer">🗑️</button>
           </td></tr>`;
       }).join('');
