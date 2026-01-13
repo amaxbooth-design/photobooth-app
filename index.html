@@ -3,489 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photobooth - Alexis</title>
+  <title>Photobooth - DEBUG MODE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #f3f4f6; overflow-x: hidden; }
-    .table-wrapper { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #1e40af; color: white; padding: 1rem 0.75rem; position: sticky; top: 0; z-index: 10; white-space: nowrap; text-align: center; font-size: 0.875rem; font-weight: 600; }
-    td { padding: 0.875rem 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 0.875rem; }
-    tbody tr:hover { background: #f9fafb; }
-    .paid { background: #d1fae5; }
-    .paid:hover { background: #a7f3d0 !important; }
-    .notpaid { background: #fee2e2; }
-    .notpaid:hover { background: #fecaca !important; }
+    #debugConsole {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      color: #00ff00;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 9999;
+      border-top: 3px solid #00ff00;
+    }
+    .debug-line { margin-bottom: 5px; padding: 3px; }
+    .debug-success { color: #00ff00; }
+    .debug-error { color: #ff0000; }
+    .debug-warning { color: #ffaa00; }
+    .debug-info { color: #00aaff; }
   </style>
 </head>
 <body>
 
+<div id="debugConsole">
+  <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #00ff00; padding-bottom: 5px;">
+    <strong style="color: #00ff00;">🐛 CONSOLE DE DÉBOGAGE</strong>
+    <button onclick="clearDebug()" style="background: #ff0000; color: white; padding: 2px 10px; border: none; cursor: pointer; border-radius: 3px;">Effacer</button>
+  </div>
+  <div id="debugLog"></div>
+</div>
+
 <div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
   <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
-    <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth</h1>
-    <p class="text-gray-600 mb-2">Bienvenue Alexis</p>
-    <p class="text-sm text-gray-500 mb-8">Gestion de vos réservations</p>
+    <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth DEBUG</h1>
+    <p class="text-xs text-red-600 font-bold mb-4">🐛 MODE DEBUG ACTIVÉ - Vérifiez la console en bas</p>
     <input id="password" type="password" class="w-full p-4 border-2 rounded-lg text-xl mb-2 focus:outline-none focus:border-blue-500" placeholder="Mot de passe">
     <div class="flex items-center mb-4">
       <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer">
       <label for="showPassword" class="text-base text-gray-700 cursor-pointer select-none">Afficher le mot de passe</label>
     </div>
     <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">Se connecter</button>
+    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-300 rounded text-left text-sm">
+      <p class="font-bold text-yellow-800">Mot de passe attendu :</p>
+      <p class="font-mono text-gray-700">amax</p>
+    </div>
   </div>
 </div>
 
 <div id="app" class="hidden">
-  <div class="bg-blue-900 shadow-lg">
-    <div class="px-4 py-6 max-w-7xl mx-auto">
-      <div class="flex flex-wrap justify-between items-center gap-4">
-        <div>
-          <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
-          <p class="text-blue-200 mt-1">Gestion complète de mes locations</p>
-        </div>
-        <div class="flex gap-3 flex-wrap">
-          <select id="filtre" class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
-            <option value="">Tous les mois</option>
-          </select>
-          <button id="newBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">+ Nouvelle réservation</button>
-          <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">🚪 Déconnexion</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="bg-yellow-50 border-l-4 border-yellow-500">
-    <div class="px-4 py-6 max-w-7xl mx-auto">
-      <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div>
-          <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
-          <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
-        </div>
-        <div>
-          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Mon email (pour recevoir les copies) :</label>
-          <input id="emailCopie" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="alexis@exemple.com" value="">
-        </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
-          <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
-
-Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
-
-Cordialement,
-Alexis - Photobooth</textarea>
-        </div>
-      </div>
-      <button id="openContractBtn" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition">📝 Modifier mon contrat</button>
-    </div>
-  </div>
-
-  <div class="bg-white min-h-screen">
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>📅 Enlèvement</th>
-            <th>📅 Restitution</th>
-            <th>👤 Nom Prénom</th>
-            <th>📧 Email</th>
-            <th>📞 Téléphone</th>
-            <th>📍 Adresse</th>
-            <th>🎭 Pseudo</th>
-            <th>✉️ Envoyer Contrat</th>
-            <th>✅ Signé</th>
-            <th>💰 Acompte</th>
-            <th>🔒 Caution</th>
-            <th>🎨 Template</th>
-            <th>⚙️ Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr><td colspan="13" class="text-center py-8 text-gray-500">Chargement...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
-    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
-    <div class="grid md:grid-cols-2 gap-6">
-      <input type="hidden" id="id">
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Nom</label><input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Prénom</label><input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Email</label><input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Téléphone</label><input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div class="md:col-span-2"><label class="block text-sm font-bold mb-2 text-gray-700">Adresse</label><textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Pseudo</label><input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Template</label><select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500 cursor-pointer"><option value="">Non</option><option value="Oui">Oui</option></select></div>
-      <div class="md:col-span-2 flex gap-4">
-        <button id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
-        <button id="cancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl" style="max-height: 90vh; display: flex; flex-direction: column;">
-    <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
-      <h2 class="text-3xl font-bold">📝 Modifier mon contrat Photobooth</h2>
-    </div>
-    <div style="flex: 1; overflow-y: auto; padding: 40px;" id="contractPreview" contenteditable="true"></div>
-    <div class="p-6 bg-gray-100 flex justify-center gap-6">
-      <button id="saveContractBtn" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-lg font-bold text-xl">💾 Sauvegarder</button>
-      <button id="resetContractBtn" class="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-xl">🔄 Réinitialiser</button>
-      <button id="closeContractBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-10 py-4 rounded-lg font-bold text-xl">❌ Fermer</button>
-    </div>
-  </div>
+  <h1 style="text-align:center; padding: 20px; background: #4CAF50; color: white;">✅ CONNEXION RÉUSSIE - Application chargée</h1>
 </div>
 
 <script>
-const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E6wno9AdCtIk2Eung6H5ycyTHXL9agoFIWsJ-PQvU/exec";
 const PASSWORD = "amax";
-const CLIENT_ID = "Alexis";
 
-function getDefaultContract() {
-  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Contrat Photobooth LITE</title><style>body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:40px;line-height:1.4}h1{text-align:center;font-size:14pt;font-weight:bold;margin-bottom:20px;text-transform:uppercase}h2{font-size:11pt;font-weight:bold;margin-top:25px;margin-bottom:10px;text-transform:uppercase}.section{border:2px solid black;padding:15px;margin-bottom:20px;page-break-inside:avoid}.section-title{font-weight:bold;text-decoration:underline;margin-bottom:10px}.field{margin-bottom:5px}.checkbox{margin:8px 0}.signature-zone{margin-top:80px}.page-number{text-align:center;margin-top:50px;font-size:10pt}.paraphe{text-align:right;margin-top:10px;margin-right:30px}.page-break{page-break-before:always}p{margin-bottom:10px;text-align:justify}ul{margin-left:20px;margin-bottom:10px}@media print{body{margin:15mm}.page-break{page-break-before:always}}</style></head><body><h1>Contrat de location et conditions générales pour le Photobooth LITE</h1><p style="text-align:center;"><strong>Contrat n° 001 / Date :</strong> {DATE}</p><div class="section"><div class="section-title">Le loueur :</div>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</div><div class="section"><div class="section-title">Le locataire :</div><div class="field">Nom : {NOM}</div><div class="field">Prénom : {PRENOM}</div><div class="field">Adresse : {ADRESSE}</div><div class="field">Ville : ................................................ Code postal : ....................</div><div class="field">Mail : {EMAIL}</div><div class="field">Numéro de téléphone : {TELEPHONE}</div><div class="field">Numéro pièce d\'identité : ................................................</div></div><div class="section"><div class="section-title">La location :</div><p>Date : du {ENLEVEMENT} à 17h00 au {RESTITUTION} à 11h00<br>(enlèvement de dépôt à l\'adresse du loueur)</p><div class="checkbox">☐ Offre Week End 75 € ( du vendredi au lundi )</div><div class="checkbox">☐ Offre Semaine 75 € ( deux jours )</div><div class="checkbox">☐ Offre contour écran personnalisé 25€</div><div class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : .............</div><p><strong>Total : ............ €</strong></p><p>Adresse de votre événement : {ADRESSE}</p></div><div class="page-number">Page 1</div><div class="paraphe">Paraphes : ________________</div><div class="page-break"></div><p style="text-align:center; margin-top:20px;"><strong>Ville : ................................................ Code postal : ....................</strong></p><h2>Article 1 – Nature et date d\'effet du contrat</h2><p>Le loueur met à disposition du locataire, un matériel complet de photographie présenté sous forme de photobooth.</p><p>Tout retard de restitution par le locataire du photobooth dans son intégralité sera facturé d\'un montant TTC de 75€ par jour.</p><p>Mr CHIMOT ALEXIS ( le loueur ) ne peut être tenu responsable des éventuels retards de mise à disposition ou de livraison dus à toute raison indépendante de sa volonté. La location prend effet au moment où le matériel est mis à disposition du locataire à l\'adresse indiqué par le loueur.</p><p>Lors de la remise du matériel, la charge des risques est transférée au locataire qui en assume la garde matérielle et juridique sous son entière responsabilité.</p><p>La location prend fin le jour où le matériel est restitué par le locataire à l\'adresse indiquée par le loueur.</p><h2>Article 2 – Prix de la location</h2><p>Les parties s\'entendent sur un prix total de location, pour la durée d\'engagement notée dans le paragraphe "La location".</p><p>A noter que le tarif est en TTC aucune TVA ne se rajoute. (TVA non applicable, art. 293 B du Code Général des Impôts).</p><p><strong>Détail du prix :</strong></p><p>Borne photo | Photobooth<br>Prise de photos illimitée sur micro SD avec adaptateur clé USB fourni par Mr CHIMOT ALEXIS.</p><h2>Article 3 – Acompte</h2><p>Un acompte de 35€ est versé lors de la réservation de la location.</p><p>La réservation sera effective qu\'à réception de l\'acompte. En cas de non versement de l\'acompte à la signature du présent contrat, le loueur s\'autorise à louer sur les dates indiquées dans le paragraphe "La location" à un autre locataire.</p><h2>Article 4 – Dépôt de garantie</h2><p>Le locataire s\'engage à verser par chèque à l\'ordre de Mr CHIMOT Alexis, le jour de la réservation du matériel, une somme de 250 € (deux cents cinquante euros) à titre de dépôt de garantie, non encaissé, pour répondre des dégâts qui pourraient être causés aux objets loués ou à la non restitution du matériel. Une copie de la pièce d\'identité du Loueur sera demandée et devra être au même nom que l\'éditeur du chèque de dépôt de garantie.</p><div class="page-number">Page 2</div><div class="paraphe">Paraphes : ________________</div><div class="page-break"></div><p>Le chèque de caution reste bloqué durant toute la période de location et ne sera donc pas encaissé.</p><p>Le chèque de caution pourra couvrir tout ou partie d\'éventuelles détériorations ou remises en état du matériel et des accessoires loués.</p><p>Le remboursement du dépôt de garantie sera effectué au retour du matériel si celui-ci n\'a pas été endommagé. En cas de dégradation, le locataire devra s\'acquitter des frais de remise en état.</p><p>A noter que la valeur du matériel s\'élève à 1000 euros (mille euros) et le montant du dépôt de garantie ne couvre pas la totalité de la valeur de l\'appareil. En cas de non restitution ou de détérioration du matériel, des frais supplémentaires pourront être réclamés au Locataire pouvant dépasser la valeur du matériel si cela engendre une perte de chiffre d\'affaires du Loueur.</p><p>Le chèque de caution ne couvre pas l\'usure naturelle du matériel (et de ses accessoires) du fait de son utilisation.</p><h2>Article 5 – Mise à disposition du matériel</h2><p>À la prise de possession du matériel au 3 allée Michelet 34410 Sauvian, une fiche d\'état des lieux du matériel sera signée par les deux parties. Le matériel loué est remis au locataire conformément aux réglementations en vigueur, notamment concernant la sécurité.</p><p>Le matériel sera testé avant le départ par le loueur en présence du locataire, cela implique pour le locataire qu\'il accepte le parfait état de fonctionnement de celui-ci. Le locataire reconnaît avoir reçu le matériel en bon état d\'usage et d\'entretien, apte au fonctionnement, avec la notice technique, les consignes de sécurité et les accessoires nécessaires. A défaut d\'observation formulée lors de la prise de possession, le locataire est réputé avoir réceptionné le matériel en bon état et avec l\'ensemble des accessoires nécessaires. Le locataire certifie connaître toutes les mises en garde de sécurité, les risques et précautions à prendre relatifs à l\'utilisation, le fonctionnement et la manipulation du matériel. Le locataire sera donc tenu responsable de tout mauvais emploi. En aucun cas Mr CHIMOT Alexis ne pourra être tenu pour responsable de tous dommages corporels ou matériels résultant de l\'utilisation de son matériel par le locataire ayant accepté le parfait état de fonctionnement du matériel par la signature de la fiche d\'état des lieux du matériel.</p><p>Le transport, chargement, déchargement, attelage et arrimage du matériel sont à la charge et sous la responsabilité du locataire.</p><p>Quelles que soient les modalités de transport et/ou de montage, le locataire est responsable du matériel dès que celui-ci quitte le loueur.</p><p>Toutes taxes, charges, redevances, autorisations, et assurances sont à la charge du locataire.</p><p>La restitution du matériel se fera au 3 allée Michelet 34410 Sauvian.</p><p>Lors de la restitution du matériel, ce dernier sera testé par Mr CHIMOT Alexis. Toute défectuosité, irrégularité, ou usure exagérée par rapport à l\'utilisation spécifiée, constatée lors de ce contrôle sont à la charge du locataire. Le matériel devant subir une réparation sera réparé par Mr CHIMOT Alexis ou tout autre avec facture à charge du locataire ; si le matériel ne peut être réparé, ou n\'est pas restitué dans un délai de une semaine, il sera considéré comme manquant au retour. Le matériel manquant au retour sera facturé, en</p><div class="page-number">Page 3</div><div class="paraphe">Paraphes : ________________</div><div class="page-break"></div><p>partie, par le biais du dépôt de garantie déposé par le locataire. Si le montant de réparation et/ou du matériel à racheter dépasse le montant de cette caution, le locataire s\'engage à rembourser l\'intégralité de ce dépassement budgétaire.</p><h2>Article 6 – Utilisation du matériel</h2><p>Le locataire certifie être habilité à se servir du matériel qu\'il s\'engage à utiliser lui-même ou par l\'intermédiaire de son personnel dûment qualifié, formé et habilité. Le prêt et la sous-location du matériel sont strictement interdits. Il s\'engage à installer et utiliser le matériel avec prudence et diligence, à respecter les consignes et notices d\'utilisation et de sécurité, et à le maintenir constamment en bon état de marche.</p><p>Il prend toute mesure utile pour que les règles de sécurité légale, réglementaires ou édictées par le loueur soient appliquées. Il est responsable du respect des règles régissant le domaine public et la prise en compte de l\'environnement. Il s\'interdit toute modification, aménagement ou transformation du matériel.</p><h2>Article 7 – Réparations</h2><p>Mr CHIMOT Alexis ne peut être tenue responsable à l\'égard du locataire ou des tiers des conséquences directes ou indirectes, matérielles ou immatérielles, d\'un arrêt ou d\'un dysfonctionnement du bien loué, qui ne sera pas dû à un vice prouvé existant au moment de la mise à disposition, et ne sera donc redevable d\'aucune indemnité de quelque nature que ce soit. En cas de panne, dysfonctionnement ou dégradation, le locataire doit immédiatement cesser d\'utiliser le matériel, aviser Mr CHIMOT Alexis</p><ul><li>par téléphone au +33(0)6.68.17.24.63</li><li>et lui adresser confirmation par écrit à l\'adresse email suivante – amaxbooth@gmail.com – en relatant les circonstances.</li></ul><p>Cette immobilisation n\'est pas imputable au loueur.</p><h2>Article 8 – Responsabilités / Assurance</h2><p>Le locataire ne peut employer le matériel à un usage autre que celui auquel il est destiné ni enfreindre les règles de sécurité. Il assume la garde matérielle et juridique du matériel et est responsable des dommages causés au matériel loué. Toutefois, il ne saurait être tenu des conséquences dommageables des vices cachés du matériel le rendant impropre à sa destination, dès lors qu\'il apporte la preuve desdits vices.</p><p>Mr CHIMOT Alexis ne peut être tenu responsable des pertes, vols ou dommages causés par tous biens transportés ou laissés par le locataire ou tout tiers, dans ou sur le matériel pendant la durée de la location ou après restitution du matériel. Les pertes d\'exploitation, directes ou indirectes, quelque soit la cause, ne sont jamais prises en charge par Mr CHIMOT Alexis. Le locataire est responsable des dommages causés par le matériel pendant la durée de la location. Le loueur se réserve la possibilité d\'exercer un recours contre le locataire. Le locataire doit être titulaire d\'une assurance civile entreprise ou chef de famille pour couvrir les dommages causés aux tiers par le matériel.</p><div class="page-number">Page 4</div><div class="paraphe">Paraphes : ________________</div><div class="page-break"></div><p>Le locataire est responsable de l\'utilisation du matériel et des dommages subis par ce matériel. Il assume la charge des conséquences financières de ces dommages.</p><p>Il est conseillé et recommandé au locataire d\'assurer tous risques le matériel loué (vandalisme, catastrophes naturelles, dégâts corporels et matériels …) auprès de sa compagnie d\'assurance.</p><h2>Article 9 – Déclaration en cas de garantie</h2><p>En cas d\'incident de quelque nature que ce soit, le locataire s\'engage à informer le loueur dès la connaissance de l\'incident et lui transmettre sa déclaration de sinistre par écrit au plus tard dans les 12 heures à l\'adresse mail suivante : amaxbooth@gmail.com</p><p>Il doit mentionner la date, le lieu, les circonstances, les causes et les conséquences présumées, le nom, l\'adresse et la qualification de l\'utilisateur du matériel, des victimes, des témoins, si des agents de la sécurité sont intervenus et si un procès-verbal a été établi, l\'endroit où les dommages peuvent être constatés, les garanties souscrites sur les mêmes risques auprès d\'autres assureurs. Il doit permettre au loueur l\'accès au matériel.</p><p>En cas de vol, il doit faire dans les 24 heures, auprès des autorités, une déclaration mentionnant l\'identification du matériel, la date et les circonstances du vol et transmettre les originaux au loueur dans le même délai ou sur demande. Il doit transmettre au loueur dès réception, toute réclamation, convocation, assignation, pièce de procédure qui lui serait adressé ou signifié, et lui communiquer tout document sans délai sur simple demande.</p><p>La location est facturée jusqu\'à la récupération du matériel.</p><h2>Article 10 – Infractions</h2><p>Le locataire reste seul responsable des infractions commises par lui ou ses préposés et en supporte les conséquences pénales, civiles et fiscales nominatives le concernant.</p><h2>Article 11 – Restitution</h2><p>Le matériel ne peut être restitué qu\'aux jours et horaires définis dans le contrat. Le locataire reste tenu de toutes les obligations découlant du contrat jusqu\'à récupération effective par Mr CHIMOT Alexis, il reste notamment gardien de la chose louée et s\'engage à la conserver sous surveillance. Le matériel ne sera considéré « restitué », et la garde juridique transférée à Mr CHIMOT Alexis qu\'après la remise du matériel.</p><p>La restitution est obligatoire à l\'expiration de la durée de location sans qu\'il y ait lieu d\'adresser une mise en demeure. Le locataire est tenu de rendre le matériel en bon état et en conformité, avec tous les accessoires et équipements.</p><p>A défaut, les prestations de remise en état, nettoyage et fournitures diverses seront facturées. À la restitution, un bon de retour précisant la date de restitution et l\'état apparent du matériel sous réserve des dégâts apparents ou non signalés, est établi contradictoirement entre le loueur et le locataire.</p><p>En cas de vol ou perte, le contrat et la facturation ne prennent fin qu\'à réception par le loueur de la déclaration du locataire auprès des autorités compétentes.</p><div class="page-number">Page 5</div><div class="paraphe">Paraphes : ________________</div><div class="page-break"></div><p>En cas de non restitution du matériel quel qu\'en soit la cause, une indemnité est facturée sur la base définie dans les articles précédents en sus de la location. Les équipements, accessoires, éléments démontables ou pièces détachées non restitués sont facturés au prix de remplacement, les prix étant définis à références identiques.</p><p>En cas de décalage de la date ou heure de la restitution demandée par le loueur, aucune modification tarifaire ne sera appliquée.</p><h2>Article 12 – Éviction du loueur</h2><p>Le locataire s\'interdit d\'enlever ou modifier les plaques de propriété et/ou inscriptions apposés sur le bien loué. Le matériel ne peut être ni cédé, ni remis en garantie. Le locataire s\'engage à ne consentir à
-
-function tel(t) {
-  if (!t) return '';
-  const str = String(t).replace(/\D/g, '');
-  if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
-  return str;
-}
-
-function saveEmailConfig() {
-  const config = {
-    email: document.getElementById('emailCopie').value,
-    sujet: document.getElementById('sujet').value,
-    corps: document.getElementById('corps').value
+function debugLog(message, type) {
+  type = type || 'info';
+  const log = document.getElementById('debugLog');
+  const time = new Date().toLocaleTimeString();
+  const colors = {
+    success: 'debug-success',
+    error: 'debug-error',
+    warning: 'debug-warning',
+    info: 'debug-info'
   };
-  localStorage.setItem('emailConfig_' + CLIENT_ID, JSON.stringify(config));
+  const line = document.createElement('div');
+  line.className = 'debug-line ' + (colors[type] || 'debug-info');
+  line.textContent = '[' + time + '] ' + message;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+  console.log('[DEBUG ' + type.toUpperCase() + '] ' + message);
 }
 
-function openContractEditor() {
-  const preview = document.getElementById('contractPreview');
-  let html = localStorage.getItem('contrat_' + CLIENT_ID);
-  if (!html) html = getDefaultContract();
-  preview.innerHTML = html;
-  document.getElementById('contractEditorModal').classList.remove('hidden');
+function clearDebug() {
+  document.getElementById('debugLog').innerHTML = '';
+  debugLog('Console effacée', 'info');
 }
 
-function saveCustomContract() {
-  const html = document.getElementById('contractPreview').innerHTML;
-  localStorage.setItem('contrat_' + CLIENT_ID, html);
-  Swal.fire('Sauvegardé !', 'Votre contrat personnalisé est enregistré', 'success');
-}
-
-function resetToDefaultContract() {
-  if (confirm('Réinitialiser le contrat à la version d\'origine ?')) {
-    localStorage.removeItem('contrat_' + CLIENT_ID);
-    openContractEditor();
-  }
-}
-
-function generateAndSendContract(id, resa) {
-  let html = localStorage.getItem('contrat_' + CLIENT_ID);
-  if (!html) html = getDefaultContract();
-  const today = new Date().toLocaleDateString('fr-FR');
-  html = html.replace(/{PRENOM}/g, resa.prenom || '').replace(/{NOM}/g, resa.nom || '').replace(/{EMAIL}/g, resa.email || '').replace(/{TELEPHONE}/g, resa.telephone || '').replace(/{ADRESSE}/g, resa.adresse || '').replace(/{ENLEVEMENT}/g, resa.enlevement ? new Date(resa.enlevement).toLocaleDateString('fr-FR') : '').replace(/{RESTITUTION}/g, resa.restitution ? new Date(resa.restitution).toLocaleDateString('fr-FR') : '').replace(/{DATE}/g, today);
-  
-  // Ouvrir le contrat dans une nouvelle fenêtre
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  
-  // Lancer l'impression automatiquement
-  setTimeout(function() { 
-    win.print(); 
-  }, 800);
-  
-  // Préparer le lien Gmail
-  const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
-  let corps = document.getElementById('corps').value.replace('{PRENOM}', resa.prenom || '').replace('{NOM}', resa.nom || '');
-  const gmail = 'https://mail.google.com/mail/?view=cm&to=' + resa.email + '&su=' + sujet + '&body=' + encodeURIComponent(corps);
-  
-  // Ouvrir Gmail après un délai
-  setTimeout(function() { 
-    window.open(gmail, '_blank'); 
-  }, 1500);
-  
-  maj(id, 'contratEnvoye', true);
-}
-
-async function load() {
-  try {
-    const r = await fetch(URL + '?clientId=' + CLIENT_ID);
-    const j = await r.json();
-    console.log('📥 Données:', j);
-    const data = j.data || [];
-    const filtre = document.getElementById('filtre').value;
-    const mois = [...new Set(data.map(function(x) { return x.enlevement ? x.enlevement.slice(0, 7) : null; }))].filter(Boolean).sort().reverse();
-    document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + mois.map(function(m) {
-      return '<option value="' + m + '"' + (filtre === m ? ' selected' : '') + '>' + new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) + '</option>';
-    }).join('');
-    const tbody = document.getElementById('tbody');
-    if (data.length === 0) { 
-      tbody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>'; 
-      return; 
-    }
-    tbody.innerHTML = data.filter(function(x) { return !filtre || (x.enlevement && x.enlevement.startsWith(filtre)); }).map(function(r) {
-      const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
-      const dateEnlevement = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
-      const dateRestitution = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
-      const telephone = tel(r.telephone || '');
-      const nomComplet = (r.nom || '') + ' ' + (r.prenom || '');
-      const rowClass = ok ? 'paid' : 'notpaid';
-      return '<tr class="' + rowClass + '" data-id="' + r.id + '">' +
-        '<td>' + dateEnlevement + '</td>' +
-        '<td>' + dateRestitution + '</td>' +
-        '<td><strong>' + nomComplet + '</strong></td>' +
-        '<td>' + (r.email || '') + '</td>' +
-        '<td class="font-mono">' + telephone + '</td>' +
-        '<td style="white-space:normal; max-width:250px;">' + (r.adresse || '') + '</td>' +
-        '<td>' + (r.pseudo || '') + '</td>' +
-        '<td class="text-center"><button class="btn-send-contract bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition" data-id="' + r.id + '" data-resa=\'' + JSON.stringify(r).replace(/'/g, '&#39;') + '\'>📧</button></td>' +
-        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-signe" data-id="' + r.id + '" ' + (r.contratSigne === 'Oui' ? 'checked' : '') + '></td>' +
-        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-acompte" data-id="' + r.id + '" ' + (r.acompte === 'Oui' ? 'checked' : '') + '></td>' +
-        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-caution" data-id="' + r.id + '" ' + (r.caution === 'Oui' ? 'checked' : '') + '></td>' +
-        '<td>' + (r.template || '') + '</td>' +
-        '<td class="text-center whitespace-nowrap">' +
-        '<button class="btn-edit text-2xl hover:scale-110 transition mr-2" data-resa=\'' + JSON.stringify(r).replace(/'/g, '&#39;') + '\' title="Modifier">✏️</button>' +
-        '<button class="btn-delete text-2xl hover:scale-110 transition" data-id="' + r.id + '" title="Supprimer">🗑️</button>' +
-        '</td></tr>';
-    }).join('');
-    
-    document.querySelectorAll('.btn-send-contract').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        generateAndSendContract(e.target.dataset.id, JSON.parse(e.target.dataset.resa.replace(/&#39;/g, "'")));
-      });
-    });
-    document.querySelectorAll('.chk-signe').forEach(function(cb) {
-      cb.addEventListener('change', function(e) {
-        maj(e.target.dataset.id, 'contratSigne', e.target.checked);
-      });
-    });
-    document.querySelectorAll('.chk-acompte').forEach(function(cb) {
-      cb.addEventListener('change', function(e) {
-        maj(e.target.dataset.id, 'acompte', e.target.checked);
-      });
-    });
-    document.querySelectorAll('.chk-caution').forEach(function(cb) {
-      cb.addEventListener('change', function(e) {
-        maj(e.target.dataset.id, 'caution', e.target.checked);
-      });
-    });
-    document.querySelectorAll('.btn-edit').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        editer(JSON.parse(e.target.dataset.resa.replace(/&#39;/g, "'")));
-      });
-    });
-    document.querySelectorAll('.btn-delete').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        supprimer(e.target.dataset.id);
-      });
-    });
-  } catch (err) {
-    console.error('❌ Erreur:', err);
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="13" class="text-center py-8 text-red-500">❌ Erreur</td></tr>';
-  }
-}
-
-async function maj(id, champ, val) {
-  try {
-    console.log('🔄 MAJ:', id, champ, val);
-    await fetch(URL, { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify({ 
-        clientId: CLIENT_ID, 
-        action: 'update', 
-        reservation: { 
-          id: parseInt(id), 
-          [champ]: val ? 'Oui' : 'Non' 
-        } 
-      }), 
-      mode: 'no-cors' 
-    });
-    setTimeout(function() { load(); }, 2000);
-  } catch (err) {
-    console.error('❌', err);
-    Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
-  }
-}
-
-function editer(resa) {
-  document.getElementById('titre').textContent = 'Modifier';
-  document.getElementById('id').value = resa.id;
-  document.getElementById('enlevement').value = resa.enlevement;
-  document.getElementById('restitution').value = resa.restitution;
-  document.getElementById('nom').value = resa.nom || '';
-  document.getElementById('prenom').value = resa.prenom || '';
-  document.getElementById('email').value = resa.email || '';
-  document.getElementById('telephone').value = resa.telephone || '';
-  document.getElementById('adresse').value = resa.adresse || '';
-  document.getElementById('pseudo').value = resa.pseudo || '';
-  document.getElementById('template').value = resa.template || '';
-  document.getElementById('modal').classList.remove('hidden');
-}
-
-async function supprimer(id) {
-  const conf = await Swal.fire({ 
-    title: 'Supprimer ?', 
-    icon: 'warning', 
-    showCancelButton: true, 
-    confirmButtonColor: '#dc2626', 
-    confirmButtonText: 'Oui', 
-    cancelButtonText: 'Non' 
-  });
-  if (conf.isConfirmed) {
-    try {
-      await fetch(URL, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ 
-          clientId: CLIENT_ID, 
-          action: 'delete', 
-          id: parseInt(id) 
-        }), 
-        mode: 'no-cors' 
-      });
-      setTimeout(function() { 
-        load(); 
-        Swal.fire('Supprimé !', '', 'success'); 
-      }, 1000);
-    } catch (err) {
-      Swal.fire('Erreur', 'Impossible de supprimer', 'error');
-    }
-  }
-}
-
-async function save() {
-  const edit = document.getElementById('id').value;
-  const resa = {
-    id: edit || Date.now().toString(),
-    enlevement: document.getElementById('enlevement').value,
-    restitution: document.getElementById('restitution').value,
-    nom: document.getElementById('nom').value,
-    prenom: document.getElementById('prenom').value,
-    email: document.getElementById('email').value,
-    telephone: document.getElementById('telephone').value,
-    adresse: document.getElementById('adresse').value,
-    pseudo: document.getElementById('pseudo').value,
-    template: document.getElementById('template').value,
-    contratSigne: 'Non', 
-    acompte: 'Non', 
-    caution: 'Non'
-  };
-  
-  console.log('🚀 Envoi:', resa);
-  Swal.fire({ 
-    title: 'Enregistrement...', 
-    allowOutsideClick: false, 
-    didOpen: function() { 
-      Swal.showLoading(); 
-    } 
-  });
-  try {
-    await fetch(URL, { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify({ 
-        clientId: CLIENT_ID, 
-        action: edit ? 'update' : 'add', 
-        reservation: resa 
-      }), 
-      mode: 'no-cors' 
-    });
-    await new Promise(function(r) { setTimeout(r, 3000); });
-    document.getElementById('modal').classList.add('hidden');
-    await load();
-    Swal.fire('Succès !', 'Réservation enregistrée', 'success');
-  } catch (err) {
-    console.error('❌', err);
-    Swal.fire('Erreur', 'Problème de connexion', 'error');
-  }
-}
+debugLog('🚀 Application démarrée', 'success');
+debugLog('🔑 Mot de passe attendu: "' + PASSWORD + '"', 'info');
 
 document.addEventListener('DOMContentLoaded', function() {
+  debugLog('📱 DOM chargé', 'info');
+  
   document.getElementById('showPassword').addEventListener('change', function() {
     document.getElementById('password').type = this.checked ? 'text' : 'password';
+    debugLog('👁️ Affichage mot de passe: ' + (this.checked ? 'ON' : 'OFF'), 'info');
+  });
+  
+  document.getElementById('password').addEventListener('input', function(e) {
+    debugLog('⌨️ Saisie: "' + e.target.value + '" (longueur: ' + e.target.value.length + ')', 'info');
   });
   
   document.getElementById('loginBtn').addEventListener('click', function() {
     const pass = document.getElementById('password').value;
+    debugLog('═══════════════════════════════════', 'warning');
+    debugLog('🔐 TENTATIVE DE CONNEXION', 'warning');
+    debugLog('═══════════════════════════════════', 'warning');
+    debugLog('Mot de passe saisi: "' + pass + '"', 'warning');
+    debugLog('Mot de passe attendu: "' + PASSWORD + '"', 'warning');
+    debugLog('Longueur saisie: ' + pass.length, 'warning');
+    debugLog('Longueur attendue: ' + PASSWORD.length, 'warning');
+    debugLog('Type saisie: ' + typeof pass, 'warning');
+    debugLog('Type attendu: ' + typeof PASSWORD, 'warning');
+    debugLog('Égalité stricte (===): ' + (pass === PASSWORD), 'warning');
+    debugLog('Égalité simple (==): ' + (pass == PASSWORD), 'warning');
+    
+    // Test caractère par caractère
+    for (var i = 0; i < Math.max(pass.length, PASSWORD.length); i++) {
+      var c1 = pass[i] || '(vide)';
+      var c2 = PASSWORD[i] || '(vide)';
+      var match = c1 === c2 ? '✓' : '✗';
+      debugLog('Position ' + i + ': "' + c1 + '" vs "' + c2 + '" ' + match, c1 === c2 ? 'success' : 'error');
+    }
+    
     if (pass === PASSWORD) {
+      debugLog('═══════════════════════════════════', 'success');
+      debugLog('✅ MOT DE PASSE CORRECT !', 'success');
+      debugLog('═══════════════════════════════════', 'success');
       document.getElementById('login').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
-      const savedEmail = localStorage.getItem('emailConfig_' + CLIENT_ID);
-      if (savedEmail) {
-        const config = JSON.parse(savedEmail);
-        document.getElementById('emailCopie').value = config.email || '';
-        document.getElementById('sujet').value = config.sujet || 'Votre contrat Photobooth - À signer';
-        document.getElementById('corps').value = config.corps || document.getElementById('corps').value;
-      }
-      load();
     } else {
-      Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
+      debugLog('═══════════════════════════════════', 'error');
+      debugLog('❌ MOT DE PASSE INCORRECT', 'error');
+      debugLog('═══════════════════════════════════', 'error');
+      alert('MOT DE PASSE INCORRECT ! Vérifiez la console de debug en bas.');
     }
   });
   
   document.getElementById('password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('loginBtn').click();
-  });
-  
-  document.getElementById('newBtn').addEventListener('click', function() {
-    document.getElementById('titre').textContent = 'Nouvelle réservation';
-    document.getElementById('id').value = '';
-    document.getElementById('enlevement').value = '';
-    document.getElementById('restitution').value = '';
-    document.getElementById('nom').value = '';
-    document.getElementById('prenom').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('telephone').value = '';
-    document.getElementById('adresse').value = '';
-    document.getElementById('pseudo').value = '';
-    document.getElementById('template').value = '';
-    document.getElementById('modal').classList.remove('hidden');
-  });
-  
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-    location.reload();
-  });
-  
-  document.getElementById('saveBtn').addEventListener('click', save);
-  
-  document.getElementById('cancelBtn').addEventListener('click', function() {
-    document.getElementById('modal').classList.add('hidden');
-  });
-  
-  document.getElementById('filtre').addEventListener('change', load);
-  
-  document.getElementById('enlevement').addEventListener('change', function() {
-    if (this.value && !document.getElementById('restitution').value) {
-      document.getElementById('restitution').value = this.value;
+    if (e.key === 'Enter') {
+      debugLog('⏎ Touche Entrée détectée', 'info');
+      document.getElementById('loginBtn').click();
     }
   });
   
-  document.getElementById('sujet').addEventListener('change', saveEmailConfig);
-  document.getElementById('emailCopie').addEventListener('change', saveEmailConfig);
-  document.getElementById('corps').addEventListener('change', saveEmailConfig);
-  
-  document.getElementById('openContractBtn').addEventListener('click', openContractEditor);
-  
-  document.getElementById('saveContractBtn').addEventListener('click', saveCustomContract);
-  
-  document.getElementById('resetContractBtn').addEventListener('click', resetToDefaultContract);
-  
-  document.getElementById('closeContractBtn').addEventListener('click', function() {
-    document.getElementById('contractEditorModal').classList.add('hidden');
-  });
+  debugLog('✅ Tous les événements initialisés', 'success');
+  debugLog('💡 Tapez votre mot de passe et observez la console', 'info');
 });
 </script>
 </body>
