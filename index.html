@@ -55,6 +55,32 @@
     </div>
   </div>
 
+  <div class="bg-yellow-50 border-l-4 border-yellow-500">
+    <div class="px-4 py-6 max-w-7xl mx-auto">
+      <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
+          <input id="sujet" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" value="Votre contrat Photobooth - À signer">
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-2 text-gray-700">📧 Mon email (pour recevoir les copies) :</label>
+          <input id="emailCopie" type="email" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500" placeholder="alexis@exemple.com" value="">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-bold mb-2 text-gray-700">Corps du mail (utilisez {PRENOM} et {NOM}) :</label>
+          <textarea id="corps" rows="6" class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">Bonjour {PRENOM} {NOM},
+
+Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+
+Cordialement,
+Alexis - Photobooth</textarea>
+        </div>
+      </div>
+      <button id="openContractBtn" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition">📝 Modifier mon contrat</button>
+    </div>
+  </div>
+
   <div class="bg-white min-h-screen">
     <div class="table-wrapper">
       <table>
@@ -67,6 +93,7 @@
             <th>📞 Téléphone</th>
             <th>📍 Adresse</th>
             <th>🎭 Pseudo</th>
+            <th>✉️ Envoyer Contrat</th>
             <th>✅ Signé</th>
             <th>💰 Acompte</th>
             <th>🔒 Caution</th>
@@ -75,7 +102,7 @@
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="12" class="text-center py-8 text-gray-500">Chargement...</td></tr>
+          <tr><td colspan="13" class="text-center py-8 text-gray-500">Chargement...</td></tr>
         </tbody>
       </table>
     </div>
@@ -104,183 +131,350 @@
   </div>
 </div>
 
+<div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl" style="max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
+      <h2 class="text-3xl font-bold">📝 Modifier mon contrat Photobooth</h2>
+    </div>
+    <div style="flex: 1; overflow-y: auto; padding: 40px;" id="contractPreview" contenteditable="true"></div>
+    <div class="p-6 bg-gray-100 flex justify-center gap-6">
+      <button id="saveContractBtn" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-lg font-bold text-xl">💾 Sauvegarder</button>
+      <button id="resetContractBtn" class="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-xl">🔄 Réinitialiser</button>
+      <button id="closeContractBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-10 py-4 rounded-lg font-bold text-xl">❌ Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E6wno9AdCtIk2Eung6H5ycyTHXL9agoFIWsJ-PQvU/exec";
-  const PASSWORD = "amax";
-  const CLIENT_ID = "Alexis";
+const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E6wno9AdCtIk2Eung6H5ycyTHXL9agoFIWsJ-PQvU/exec";
+const PASSWORD = "amax";
+const CLIENT_ID = "Alexis";
 
-  function tel(t) {
-    if (!t) return '';
-    const str = String(t).replace(/\D/g, '');
-    if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
-    return str;
+function getDefaultContract() {
+  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Contrat Photobooth LITE</title><style>body{font-family:Arial,sans-serif;font-size:11pt;margin:40px;line-height:1.4}h1{text-align:center;font-size:14pt;font-weight:bold;margin-bottom:20px;text-transform:uppercase}h2{font-size:11pt;font-weight:bold;margin-top:25px;margin-bottom:10px;text-transform:uppercase}.section{border:2px solid black;padding:15px;margin-bottom:20px}.section-title{font-weight:bold;text-decoration:underline;margin-bottom:10px}p{margin-bottom:10px;text-align:justify}</style></head><body><h1>Contrat de location Photobooth LITE</h1><p style="text-align:center;"><strong>Date :</strong> {DATE}</p><div class="section"><div class="section-title">Le loueur :</div>Mr CHIMOT Alexis<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</div><div class="section"><div class="section-title">Le locataire :</div>Nom : {NOM}<br>Prénom : {PRENOM}<br>Email : {EMAIL}<br>Téléphone : {TELEPHONE}<br>Adresse : {ADRESSE}</div><div class="section"><div class="section-title">La location :</div>Date : du {ENLEVEMENT} au {RESTITUTION}<br>Adresse de l\'événement : {ADRESSE}</div><h2>Conditions générales</h2><p>Le locataire s\'engage à utiliser le matériel avec soin et à le restituer en bon état.</p><p>Un acompte de 35€ est versé à la réservation. Le solde de 40€ est à régler lors de la remise du photobooth.</p><p>Un dépôt de garantie de 250€ est demandé par chèque non encaissé.</p><div style="margin-top:80px;text-align:center;"><p><strong>Fait à ........., Le {DATE}</strong></p><table width="100%" style="margin-top:40px;"><tr><td width="50%" style="text-align:center;"><p><strong>Signature du loueur</strong></p><br><br><p>____________________</p></td><td width="50%" style="text-align:center;"><p><strong>Signature du locataire</strong></p><br><br><p>____________________</p></td></tr></table></div></body></html>';
+}
+
+function tel(t) {
+  if (!t) return '';
+  const str = String(t).replace(/\D/g, '');
+  if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
+  return str;
+}
+
+function saveEmailConfig() {
+  const config = {
+    email: document.getElementById('emailCopie').value,
+    sujet: document.getElementById('sujet').value,
+    corps: document.getElementById('corps').value
+  };
+  localStorage.setItem('emailConfig_' + CLIENT_ID, JSON.stringify(config));
+}
+
+function openContractEditor() {
+  const preview = document.getElementById('contractPreview');
+  let html = localStorage.getItem('contrat_' + CLIENT_ID);
+  if (!html) html = getDefaultContract();
+  preview.innerHTML = html;
+  document.getElementById('contractEditorModal').classList.remove('hidden');
+}
+
+function saveCustomContract() {
+  const html = document.getElementById('contractPreview').innerHTML;
+  localStorage.setItem('contrat_' + CLIENT_ID, html);
+  Swal.fire('Sauvegardé !', 'Votre contrat personnalisé est enregistré', 'success');
+}
+
+function resetToDefaultContract() {
+  if (confirm('Réinitialiser le contrat à la version d\'origine ?')) {
+    localStorage.removeItem('contrat_' + CLIENT_ID);
+    openContractEditor();
   }
+}
 
-  async function load() {
-    try {
-      const r = await fetch(URL + '?clientId=' + CLIENT_ID);
-      const j = await r.json();
-      console.log('📥 Données:', j);
-      const data = j.data || [];
-      const filtre = document.getElementById('filtre').value;
-      const mois = [...new Set(data.map(x => x.enlevement?.slice(0, 7)))].filter(Boolean).sort().reverse();
-      document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + mois.map(m => '<option value="' + m + '"' + (filtre === m ? ' selected' : '') + '>' + new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) + '</option>').join('');
-      const tbody = document.getElementById('tbody');
-      if (data.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="12" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>'; 
-        return; 
-      }
-      tbody.innerHTML = data.filter(x => !filtre || x.enlevement?.startsWith(filtre)).map(r => {
-        const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
-        const dateEnlevement = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
-        const dateRestitution = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
-        const telephone = tel(r.telephone || '');
-        const nomComplet = (r.nom || '') + ' ' + (r.prenom || '');
-        const rowClass = ok ? 'paid' : 'notpaid';
-        return '<tr class="' + rowClass + '" data-id="' + r.id + '">' +
-          '<td>' + dateEnlevement + '</td>' +
-          '<td>' + dateRestitution + '</td>' +
-          '<td><strong>' + nomComplet + '</strong></td>' +
-          '<td>' + (r.email || '') + '</td>' +
-          '<td class="font-mono">' + telephone + '</td>' +
-          '<td style="white-space:normal; max-width:250px;">' + (r.adresse || '') + '</td>' +
-          '<td>' + (r.pseudo || '') + '</td>' +
-          '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-signe" data-id="' + r.id + '" ' + (r.contratSigne === 'Oui' ? 'checked' : '') + '></td>' +
-          '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-acompte" data-id="' + r.id + '" ' + (r.acompte === 'Oui' ? 'checked' : '') + '></td>' +
-          '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-caution" data-id="' + r.id + '" ' + (r.caution === 'Oui' ? 'checked' : '') + '></td>' +
-          '<td>' + (r.template || '') + '</td>' +
-          '<td class="text-center whitespace-nowrap">' +
-          '<button class="btn-edit text-2xl hover:scale-110 transition mr-2" data-resa=\'' + JSON.stringify(r) + '\' title="Modifier">✏️</button>' +
-          '<button class="btn-delete text-2xl hover:scale-110 transition" data-id="' + r.id + '" title="Supprimer">🗑️</button>' +
-          '</td></tr>';
-      }).join('');
-      
-      document.querySelectorAll('.chk-signe').forEach(cb => cb.addEventListener('change', e => maj(e.target.dataset.id, 'contratSigne', e.target.checked)));
-      document.querySelectorAll('.chk-acompte').forEach(cb => cb.addEventListener('change', e => maj(e.target.dataset.id, 'acompte', e.target.checked)));
-      document.querySelectorAll('.chk-caution').forEach(cb => cb.addEventListener('change', e => maj(e.target.dataset.id, 'caution', e.target.checked)));
-      document.querySelectorAll('.btn-edit').forEach(btn => btn.addEventListener('click', e => editer(JSON.parse(e.target.dataset.resa))));
-      document.querySelectorAll('.btn-delete').forEach(btn => btn.addEventListener('click', e => supprimer(e.target.dataset.id)));
-    } catch (err) {
-      console.error('❌ Erreur:', err);
-      document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="text-center py-8 text-red-500">❌ Erreur</td></tr>';
+function generateAndSendContract(id, resa) {
+  let html = localStorage.getItem('contrat_' + CLIENT_ID);
+  if (!html) html = getDefaultContract();
+  const today = new Date().toLocaleDateString('fr-FR');
+  html = html.replace(/{PRENOM}/g, resa.prenom || '').replace(/{NOM}/g, resa.nom || '').replace(/{EMAIL}/g, resa.email || '').replace(/{TELEPHONE}/g, resa.telephone || '').replace(/{ADRESSE}/g, resa.adresse || '').replace(/{ENLEVEMENT}/g, resa.enlevement ? new Date(resa.enlevement).toLocaleDateString('fr-FR') : '').replace(/{RESTITUTION}/g, resa.restitution ? new Date(resa.restitution).toLocaleDateString('fr-FR') : '').replace(/{DATE}/g, today);
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 800);
+  const sujet = encodeURIComponent(document.getElementById('sujet').value || 'Votre contrat Photobooth');
+  let corps = document.getElementById('corps').value.replace('{PRENOM}', resa.prenom || '').replace('{NOM}', resa.nom || '');
+  const gmail = 'https://mail.google.com/mail/?view=cm&to=' + resa.email + '&su=' + sujet + '&body=' + encodeURIComponent(corps);
+  setTimeout(function() { window.open(gmail, '_blank'); }, 1500);
+  maj(id, 'contratEnvoye', true);
+}
+
+async function load() {
+  try {
+    const r = await fetch(URL + '?clientId=' + CLIENT_ID);
+    const j = await r.json();
+    console.log('📥 Données:', j);
+    const data = j.data || [];
+    const filtre = document.getElementById('filtre').value;
+    const mois = [...new Set(data.map(function(x) { return x.enlevement ? x.enlevement.slice(0, 7) : null; }))].filter(Boolean).sort().reverse();
+    document.getElementById('filtre').innerHTML = '<option value="">Tous les mois</option>' + mois.map(function(m) {
+      return '<option value="' + m + '"' + (filtre === m ? ' selected' : '') + '>' + new Date(m + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) + '</option>';
+    }).join('');
+    const tbody = document.getElementById('tbody');
+    if (data.length === 0) { 
+      tbody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>'; 
+      return; 
     }
-  }
-
-  async function maj(id, champ, val) {
-    try {
-      console.log('🔄 MAJ:', id, champ, val);
-      await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CLIENT_ID, action: 'update', reservation: { id: parseInt(id), [champ]: val ? 'Oui' : 'Non' } }), mode: 'no-cors' });
-      setTimeout(() => load(), 2000);
-    } catch (err) {
-      console.error('❌', err);
-      Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
-    }
-  }
-
-  function editer(resa) {
-    document.getElementById('titre').textContent = 'Modifier';
-    document.getElementById('id').value = resa.id;
-    document.getElementById('enlevement').value = resa.enlevement;
-    document.getElementById('restitution').value = resa.restitution;
-    document.getElementById('nom').value = resa.nom || '';
-    document.getElementById('prenom').value = resa.prenom || '';
-    document.getElementById('email').value = resa.email || '';
-    document.getElementById('telephone').value = resa.telephone || '';
-    document.getElementById('adresse').value = resa.adresse || '';
-    document.getElementById('pseudo').value = resa.pseudo || '';
-    document.getElementById('template').value = resa.template || '';
-    document.getElementById('modal').classList.remove('hidden');
-  }
-
-  async function supprimer(id) {
-    const conf = await Swal.fire({ title: 'Supprimer ?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Oui', cancelButtonText: 'Non' });
-    if (conf.isConfirmed) {
-      try {
-        await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CLIENT_ID, action: 'delete', id: parseInt(id) }), mode: 'no-cors' });
-        setTimeout(() => { load(); Swal.fire('Supprimé !', '', 'success'); }, 1000);
-      } catch (err) {
-        Swal.fire('Erreur', 'Impossible de supprimer', 'error');
-      }
-    }
-  }
-
-  async function save() {
-    const edit = document.getElementById('id').value;
-    const resa = {
-      id: edit || Date.now().toString(),
-      enlevement: document.getElementById('enlevement').value,
-      restitution: document.getElementById('restitution').value,
-      nom: document.getElementById('nom').value,
-      prenom: document.getElementById('prenom').value,
-      email: document.getElementById('email').value,
-      telephone: document.getElementById('telephone').value,
-      adresse: document.getElementById('adresse').value,
-      pseudo: document.getElementById('pseudo').value,
-      template: document.getElementById('template').value,
-      contratSigne: 'Non', acompte: 'Non', caution: 'Non'
-    };
+    tbody.innerHTML = data.filter(function(x) { return !filtre || (x.enlevement && x.enlevement.startsWith(filtre)); }).map(function(r) {
+      const ok = r.contratSigne === 'Oui' && r.acompte === 'Oui';
+      const dateEnlevement = r.enlevement ? new Date(r.enlevement).toLocaleDateString('fr-FR') : '-';
+      const dateRestitution = r.restitution ? new Date(r.restitution).toLocaleDateString('fr-FR') : '-';
+      const telephone = tel(r.telephone || '');
+      const nomComplet = (r.nom || '') + ' ' + (r.prenom || '');
+      const rowClass = ok ? 'paid' : 'notpaid';
+      return '<tr class="' + rowClass + '" data-id="' + r.id + '">' +
+        '<td>' + dateEnlevement + '</td>' +
+        '<td>' + dateRestitution + '</td>' +
+        '<td><strong>' + nomComplet + '</strong></td>' +
+        '<td>' + (r.email || '') + '</td>' +
+        '<td class="font-mono">' + telephone + '</td>' +
+        '<td style="white-space:normal; max-width:250px;">' + (r.adresse || '') + '</td>' +
+        '<td>' + (r.pseudo || '') + '</td>' +
+        '<td class="text-center"><button class="btn-send-contract bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition" data-id="' + r.id + '" data-resa=\'' + JSON.stringify(r).replace(/'/g, '&#39;') + '\'>📧</button></td>' +
+        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-signe" data-id="' + r.id + '" ' + (r.contratSigne === 'Oui' ? 'checked' : '') + '></td>' +
+        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-acompte" data-id="' + r.id + '" ' + (r.acompte === 'Oui' ? 'checked' : '') + '></td>' +
+        '<td class="text-center"><input type="checkbox" class="w-5 h-5 cursor-pointer chk-caution" data-id="' + r.id + '" ' + (r.caution === 'Oui' ? 'checked' : '') + '></td>' +
+        '<td>' + (r.template || '') + '</td>' +
+        '<td class="text-center whitespace-nowrap">' +
+        '<button class="btn-edit text-2xl hover:scale-110 transition mr-2" data-resa=\'' + JSON.stringify(r).replace(/'/g, '&#39;') + '\' title="Modifier">✏️</button>' +
+        '<button class="btn-delete text-2xl hover:scale-110 transition" data-id="' + r.id + '" title="Supprimer">🗑️</button>' +
+        '</td></tr>';
+    }).join('');
     
-    console.log('🚀 Envoi:', resa);
-    Swal.fire({ title: 'Enregistrement...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    try {
-      await fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: CLIENT_ID, action: edit ? 'update' : 'add', reservation: resa }), mode: 'no-cors' });
-      await new Promise(r => setTimeout(r, 3000));
-      document.getElementById('modal').classList.add('hidden');
-      await load();
-      Swal.fire('Succès !', 'Réservation enregistrée et ajoutée à Google Agenda', 'success');
-    } catch (err) {
-      console.error('❌', err);
-      Swal.fire('Erreur', 'Problème de connexion', 'error');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('showPassword').addEventListener('change', function() {
-      document.getElementById('password').type = this.checked ? 'text' : 'password';
+    document.querySelectorAll('.btn-send-contract').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        generateAndSendContract(e.target.dataset.id, JSON.parse(e.target.dataset.resa.replace(/&#39;/g, "'")));
+      });
     });
-    
-    document.getElementById('loginBtn').addEventListener('click', function() {
-      const pass = document.getElementById('password').value;
-      console.log('🔑 Mot de passe:', pass);
-      if (pass === PASSWORD) {
-        document.getElementById('login').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        load();
-      } else {
-        Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
-      }
+    document.querySelectorAll('.chk-signe').forEach(function(cb) {
+      cb.addEventListener('change', function(e) {
+        maj(e.target.dataset.id, 'contratSigne', e.target.checked);
+      });
     });
-    
-    document.getElementById('password').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    document.querySelectorAll('.chk-acompte').forEach(function(cb) {
+      cb.addEventListener('change', function(e) {
+        maj(e.target.dataset.id, 'acompte', e.target.checked);
+      });
     });
-    
-    document.getElementById('newBtn').addEventListener('click', function() {
-      document.getElementById('titre').textContent = 'Nouvelle réservation';
-      document.getElementById('id').value = '';
-      document.getElementById('enlevement').value = '';
-      document.getElementById('restitution').value = '';
-      document.getElementById('nom').value = '';
-      document.getElementById('prenom').value = '';
-      document.getElementById('email').value = '';
-      document.getElementById('telephone').value = '';
-      document.getElementById('adresse').value = '';
-      document.getElementById('pseudo').value = '';
-      document.getElementById('template').value = '';
-      document.getElementById('modal').classList.remove('hidden');
+    document.querySelectorAll('.chk-caution').forEach(function(cb) {
+      cb.addEventListener('change', function(e) {
+        maj(e.target.dataset.id, 'caution', e.target.checked);
+      });
     });
-    
-    document.getElementById('logoutBtn').addEventListener('click', () => location.reload());
-    document.getElementById('saveBtn').addEventListener('click', save);
-    document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
-    document.getElementById('filtre').addEventListener('change', load);
-    
-    document.getElementById('enlevement').addEventListener('change', function() {
-      if (this.value && !document.getElementById('restitution').value) {
-        document.getElementById('restitution').value = this.value;
-      }
+    document.querySelectorAll('.btn-edit').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        editer(JSON.parse(e.target.dataset.resa.replace(/&#39;/g, "'")));
+      });
     });
+    document.querySelectorAll('.btn-delete').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        supprimer(e.target.dataset.id);
+      });
+    });
+  } catch (err) {
+    console.error('❌ Erreur:', err);
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="13" class="text-center py-8 text-red-500">❌ Erreur</td></tr>';
+  }
+}
+
+async function maj(id, champ, val) {
+  try {
+    console.log('🔄 MAJ:', id, champ, val);
+    await fetch(URL, { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({ 
+        clientId: CLIENT_ID, 
+        action: 'update', 
+        reservation: { 
+          id: parseInt(id), 
+          [champ]: val ? 'Oui' : 'Non' 
+        } 
+      }), 
+      mode: 'no-cors' 
+    });
+    setTimeout(function() { load(); }, 2000);
+  } catch (err) {
+    console.error('❌', err);
+    Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
+  }
+}
+
+function editer(resa) {
+  document.getElementById('titre').textContent = 'Modifier';
+  document.getElementById('id').value = resa.id;
+  document.getElementById('enlevement').value = resa.enlevement;
+  document.getElementById('restitution').value = resa.restitution;
+  document.getElementById('nom').value = resa.nom || '';
+  document.getElementById('prenom').value = resa.prenom || '';
+  document.getElementById('email').value = resa.email || '';
+  document.getElementById('telephone').value = resa.telephone || '';
+  document.getElementById('adresse').value = resa.adresse || '';
+  document.getElementById('pseudo').value = resa.pseudo || '';
+  document.getElementById('template').value = resa.template || '';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+async function supprimer(id) {
+  const conf = await Swal.fire({ 
+    title: 'Supprimer ?', 
+    icon: 'warning', 
+    showCancelButton: true, 
+    confirmButtonColor: '#dc2626', 
+    confirmButtonText: 'Oui', 
+    cancelButtonText: 'Non' 
   });
+  if (conf.isConfirmed) {
+    try {
+      await fetch(URL, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          clientId: CLIENT_ID, 
+          action: 'delete', 
+          id: parseInt(id) 
+        }), 
+        mode: 'no-cors' 
+      });
+      setTimeout(function() { 
+        load(); 
+        Swal.fire('Supprimé !', '', 'success'); 
+      }, 1000);
+    } catch (err) {
+      Swal.fire('Erreur', 'Impossible de supprimer', 'error');
+    }
+  }
+}
+
+async function save() {
+  const edit = document.getElementById('id').value;
+  const resa = {
+    id: edit || Date.now().toString(),
+    enlevement: document.getElementById('enlevement').value,
+    restitution: document.getElementById('restitution').value,
+    nom: document.getElementById('nom').value,
+    prenom: document.getElementById('prenom').value,
+    email: document.getElementById('email').value,
+    telephone: document.getElementById('telephone').value,
+    adresse: document.getElementById('adresse').value,
+    pseudo: document.getElementById('pseudo').value,
+    template: document.getElementById('template').value,
+    contratSigne: 'Non', 
+    acompte: 'Non', 
+    caution: 'Non'
+  };
+  
+  console.log('🚀 Envoi:', resa);
+  Swal.fire({ 
+    title: 'Enregistrement...', 
+    allowOutsideClick: false, 
+    didOpen: function() { 
+      Swal.showLoading(); 
+    } 
+  });
+  try {
+    await fetch(URL, { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({ 
+        clientId: CLIENT_ID, 
+        action: edit ? 'update' : 'add', 
+        reservation: resa 
+      }), 
+      mode: 'no-cors' 
+    });
+    await new Promise(function(r) { setTimeout(r, 3000); });
+    document.getElementById('modal').classList.add('hidden');
+    await load();
+    Swal.fire('Succès !', 'Réservation enregistrée', 'success');
+  } catch (err) {
+    console.error('❌', err);
+    Swal.fire('Erreur', 'Problème de connexion', 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('showPassword').addEventListener('change', function() {
+    document.getElementById('password').type = this.checked ? 'text' : 'password';
+  });
+  
+  document.getElementById('loginBtn').addEventListener('click', function() {
+    const pass = document.getElementById('password').value;
+    if (pass === PASSWORD) {
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      const savedEmail = localStorage.getItem('emailConfig_' + CLIENT_ID);
+      if (savedEmail) {
+        const config = JSON.parse(savedEmail);
+        document.getElementById('emailCopie').value = config.email || '';
+        document.getElementById('sujet').value = config.sujet || 'Votre contrat Photobooth - À signer';
+        document.getElementById('corps').value = config.corps || document.getElementById('corps').value;
+      }
+      load();
+    } else {
+      Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
+    }
+  });
+  
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  
+  document.getElementById('newBtn').addEventListener('click', function() {
+    document.getElementById('titre').textContent = 'Nouvelle réservation';
+    document.getElementById('id').value = '';
+    document.getElementById('enlevement').value = '';
+    document.getElementById('restitution').value = '';
+    document.getElementById('nom').value = '';
+    document.getElementById('prenom').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('telephone').value = '';
+    document.getElementById('adresse').value = '';
+    document.getElementById('pseudo').value = '';
+    document.getElementById('template').value = '';
+    document.getElementById('modal').classList.remove('hidden');
+  });
+  
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    location.reload();
+  });
+  
+  document.getElementById('saveBtn').addEventListener('click', save);
+  
+  document.getElementById('cancelBtn').addEventListener('click', function() {
+    document.getElementById('modal').classList.add('hidden');
+  });
+  
+  document.getElementById('filtre').addEventListener('change', load);
+  
+  document.getElementById('enlevement').addEventListener('change', function() {
+    if (this.value && !document.getElementById('restitution').value) {
+      document.getElementById('restitution').value = this.value;
+    }
+  });
+  
+  document.getElementById('sujet').addEventListener('change', saveEmailConfig);
+  document.getElementById('emailCopie').addEventListener('change', saveEmailConfig);
+  document.getElementById('corps').addEventListener('change', saveEmailConfig);
+  
+  document.getElementById('openContractBtn').addEventListener('click', openContractEditor);
+  
+  document.getElementById('saveContractBtn').addEventListener('click', saveCustomContract);
+  
+  document.getElementById('resetContractBtn').addEventListener('click', resetToDefaultContract);
+  
+  document.getElementById('closeContractBtn').addEventListener('click', function() {
+    document.getElementById('contractEditorModal').classList.add('hidden');
+  });
+});
 </script>
 </body>
 </html>
