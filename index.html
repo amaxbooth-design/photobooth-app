@@ -4,15 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Photobooth - Alexis</title>
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- SweetAlert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; min-height: 100vh; background: #f3f4f6; overflow-x: hidden; }
+
     .table-wrapper { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
+
     th {
       background: #1e40af;
       color: white;
@@ -25,35 +30,44 @@
       font-size: 0.875rem;
       font-weight: 600;
     }
+
     td {
       padding: 0.875rem 0.75rem;
       border-bottom: 1px solid #e5e7eb;
       text-align: center;
       font-size: 0.875rem;
     }
+
     tbody tr:hover { background: #f9fafb; }
+
     .paid { background: #d1fae5; }
     .paid:hover { background: #a7f3d0 !important; }
+
     .notpaid { background: #fee2e2; }
     .notpaid:hover { background: #fecaca !important; }
   </style>
 </head>
+
 <body>
+
 <!-- LOGIN SCREEN -->
 <div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
   <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
     <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth</h1>
     <p class="text-gray-600 mb-2">Bienvenue Alexis</p>
     <p class="text-sm text-gray-500 mb-8">Gestion de vos réservations</p>
+
     <input id="password" type="password"
       class="w-full p-4 border-2 rounded-lg text-xl mb-2 focus:outline-none focus:border-blue-500"
       placeholder="Mot de passe">
+
     <div class="flex items-center mb-4">
       <input type="checkbox" id="showPassword" class="w-5 h-5 mr-3 cursor-pointer">
       <label for="showPassword" class="text-base text-gray-700 cursor-pointer select-none">
         Afficher le mot de passe
       </label>
     </div>
+
     <button id="loginBtn"
       class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-xl transition">
       Se connecter
@@ -63,6 +77,7 @@
 
 <!-- APP -->
 <div id="app" class="hidden">
+
   <!-- HEADER -->
   <div class="bg-blue-900 shadow-lg">
     <div class="px-4 py-6 max-w-7xl mx-auto">
@@ -71,15 +86,18 @@
           <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
           <p class="text-blue-200 mt-1">Gestion complète de mes locations</p>
         </div>
+
         <div class="flex gap-3 flex-wrap">
           <select id="filtre"
             class="px-4 py-2 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500 cursor-pointer">
             <option value="">Tous les mois</option>
           </select>
+
           <button id="newBtn"
             class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">
             + Nouvelle réservation
           </button>
+
           <button id="logoutBtn"
             class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition">
             🚪 Déconnexion
@@ -92,37 +110,47 @@
   <!-- EMAIL CONFIG -->
   <div class="bg-yellow-50 border-l-4 border-yellow-500">
     <div class="px-4 py-6 max-w-7xl mx-auto">
+
       <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
+
       <div class="grid md:grid-cols-2 gap-6">
+
         <div>
           <label class="block text-sm font-bold mb-2 text-gray-700">Objet du mail :</label>
           <input id="sujet"
             class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500"
             value="Votre contrat Photobooth - À signer">
         </div>
+
         <div>
           <label class="block text-sm font-bold mb-2 text-gray-700">📧 Mon email (pour recevoir les copies) :</label>
           <input id="emailCopie" type="email"
             class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500"
             placeholder="alexis@exemple.com">
         </div>
+
         <div class="md:col-span-2">
           <label class="block text-sm font-bold mb-2 text-gray-700">
             Corps du mail (utilisez {PRENOM} et {NOM}) :
           </label>
+
           <textarea id="corps" rows="6"
             class="w-full p-4 border-2 rounded-lg bg-white focus:outline-none focus:border-blue-500">
 Bonjour {PRENOM} {NOM},
+
 Veuillez trouver ci-joint votre contrat de location Photobooth à signer.
+
 Cordialement,
 Alexis - Photobooth
           </textarea>
         </div>
       </div>
+
       <button id="openContractBtn"
         class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition">
         📝 Modifier mon contrat
       </button>
+
     </div>
   </div>
 
@@ -147,71 +175,512 @@ Alexis - Photobooth
             <th>⚙️ Actions</th>
           </tr>
         </thead>
+
         <tbody id="tbody">
           <tr>
             <td colspan="13" class="text-center py-8 text-gray-500">Chargement...</td>
           </tr>
         </tbody>
+
       </table>
     </div>
   </div>
+
 </div>
 
 <!-- MODALE ÉDITEUR DE CONTRAT -->
 <div id="contractEditorModal"
      class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
+
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl"
        style="max-height: 90vh; display: flex; flex-direction: column;">
+
     <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
       <h2 class="text-3xl font-bold">📝 Modifier mon contrat Photobooth</h2>
     </div>
+
     <div id="contractPreview"
          contenteditable="true"
          style="flex: 1; overflow-y: auto; padding: 40px; background:white;">
     </div>
+
     <div class="p-6 bg-gray-100 flex justify-center gap-6">
       <button id="saveContractBtn"
               class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-lg font-bold text-xl">
         💾 Sauvegarder
       </button>
+
       <button id="resetContractBtn"
               class="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-xl">
         🔄 Réinitialiser
       </button>
+
       <button id="closeContractBtn"
               class="bg-gray-600 hover:bg-gray-700 text-white px-10 py-4 rounded-lg font-bold text-xl">
         ❌ Fermer
       </button>
     </div>
-  </div>
-</div>
 
-<!-- MODALE NOUVELLE / MODIF RÉSERVATION -->
-<div id="resaModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
-    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
-    <div class="grid md:grid-cols-2 gap-6">
-      <input type="hidden" id="id">
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Nom</label><input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Prénom</label><input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Email</label><input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Téléphone</label><input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div class="md:col-span-2"><label class="block text-sm font-bold mb-2 text-gray-700">Adresse</label><textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Pseudo</label><input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
-      <div><label class="block text-sm font-bold mb-2 text-gray-700">Template</label><select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"><option value="">Non</option><option value="Oui">Oui</option></select></div>
-      <div class="md:col-span-2 flex gap-4">
-        <button id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
-        <button id="cancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
-      </div>
-    </div>
   </div>
 </div>
 
 <script>
-// ... (le reste du script reste IDENTIQUE, mais voici les parties modifiées pour éviter toute confusion)
+/* ----------------------------------------------------------
+   CONFIG
+---------------------------------------------------------- */
 
+const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E6wno9AdCtIk2Eung6H5ycyTHXL9agoFIWsJ-PQvU/exec";
+
+const PASSWORD = "amax";
+const CLIENT_ID = "Alexis";
+
+/* ----------------------------------------------------------
+   FORMATAGE TÉLÉPHONE
+---------------------------------------------------------- */
+function tel(t) {
+  if (!t) return "";
+  const s = String(t).replace(/\D/g, "");
+  if (s.length === 10) return s.replace(/(\d{2})(?=\d)/g, "$1 ");
+  return s;
+}
+
+/* ----------------------------------------------------------
+   SAUVEGARDE CONFIG EMAIL
+---------------------------------------------------------- */
+function saveEmailConfig() {
+  const config = {
+    email: document.getElementById("emailCopie").value,
+    sujet: document.getElementById("sujet").value,
+    corps: document.getElementById("corps").value
+  };
+  localStorage.setItem("emailConfig_" + CLIENT_ID, JSON.stringify(config));
+}
+
+/* ----------------------------------------------------------
+   OUVERTURE ÉDITEUR DE CONTRAT
+---------------------------------------------------------- */
+function openContractEditor() {
+  const preview = document.getElementById("contractPreview");
+  let html = localStorage.getItem("contrat_" + CLIENT_ID);
+  if (!html) html = getDefaultContract();
+  preview.innerHTML = html;
+  document.getElementById("contractEditorModal").classList.remove("hidden");
+}
+
+/* ----------------------------------------------------------
+   SAUVEGARDE CONTRAT PERSONNALISÉ
+---------------------------------------------------------- */
+function saveCustomContract() {
+  const html = document.getElementById("contractPreview").innerHTML;
+  localStorage.setItem("contrat_" + CLIENT_ID, html);
+  Swal.fire("Sauvegardé !", "Votre contrat personnalisé est enregistré", "success");
+}
+
+/* ----------------------------------------------------------
+   RÉINITIALISATION CONTRAT
+---------------------------------------------------------- */
+function resetToDefaultContract() {
+  Swal.fire({
+    title: "Réinitialiser ?",
+    text: "Le contrat reviendra à la version d’origine.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Oui",
+    cancelButtonText: "Non"
+  }).then(res => {
+    if (res.isConfirmed) {
+      localStorage.removeItem("contrat_" + CLIENT_ID);
+      openContractEditor();
+    }
+  });
+}
+
+/* ----------------------------------------------------------
+   CHARGEMENT DES RÉSERVATIONS
+---------------------------------------------------------- */
+async function load() {
+  try {
+    const r = await fetch(URL + "?clientId=" + CLIENT_ID);
+    const j = await r.json();
+    const data = j.data || [];
+
+    const filtre = document.getElementById("filtre").value;
+
+    /* --- Génération liste des mois --- */
+    const mois = [...new Set(
+      data.map(x => x.enlevement ? x.enlevement.slice(0, 7) : null)
+    )]
+      .filter(Boolean)
+      .sort()
+      .reverse();
+
+    document.getElementById("filtre").innerHTML =
+      '<option value="">Tous les mois</option>' +
+      mois.map(m =>
+        `<option value="${m}" ${filtre === m ? "selected" : ""}>
+          ${new Date(m + "-01").toLocaleDateString("fr-FR", {
+            month: "long",
+            year: "numeric"
+          })}
+        </option>`
+      ).join("");
+
+    /* --- Tableau --- */
+    const tbody = document.getElementById("tbody");
+
+    if (data.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="13" class="text-center py-8 text-gray-500">Aucune réservation</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data
+      .filter(x => !filtre || (x.enlevement && x.enlevement.startsWith(filtre)))
+      .map(r => {
+        const ok = r.contratSigne === "Oui" && r.acompte === "Oui";
+
+        return `
+        <tr class="${ok ? "paid" : "notpaid"}" data-id="${r.id}">
+          <td>${r.enlevement ? new Date(r.enlevement).toLocaleDateString("fr-FR") : "-"}</td>
+          <td>${r.restitution ? new Date(r.restitution).toLocaleDateString("fr-FR") : "-"}</td>
+          <td><strong>${(r.nom || "") + " " + (r.prenom || "")}</strong></td>
+          <td>${r.email || ""}</td>
+          <td class="font-mono">${tel(r.telephone)}</td>
+          <td style="white-space:normal; max-width:250px;">${r.adresse || ""}</td>
+          <td>${r.pseudo || ""}</td>
+
+          <td>
+            <button class="btn-send-contract bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm"
+              data-id="${r.id}"
+              data-resa='${JSON.stringify(r).replace(/'/g, "&#39;")}'>
+              📧
+            </button>
+          </td>
+
+          <td><input type="checkbox" class="chk-signe w-5 h-5" data-id="${r.id}" ${r.contratSigne === "Oui" ? "checked" : ""}></td>
+          <td><input type="checkbox" class="chk-acompte w-5 h-5" data-id="${r.id}" ${r.acompte === "Oui" ? "checked" : ""}></td>
+          <td><input type="checkbox" class="chk-caution w-5 h-5" data-id="${r.id}" ${r.caution === "Oui" ? "checked" : ""}></td>
+
+          <td>${r.template || ""}</td>
+
+          <td class="whitespace-nowrap">
+            <button class="btn-edit text-2xl mr-2" data-resa='${JSON.stringify(r).replace(/'/g, "&#39;")}' title="Modifier">✏️</button>
+            <button class="btn-delete text-2xl" data-id="${r.id}" title="Supprimer">🗑️</button>
+          </td>
+        </tr>`;
+      })
+      .join("");
+
+    /* --- Événements dynamiques --- */
+    document.querySelectorAll(".btn-send-contract").forEach(btn => {
+      btn.addEventListener("click", e => {
+        const r = JSON.parse(e.currentTarget.dataset.resa.replace(/&#39;/g, "'"));
+        generateAndSendContract(r.id, r);
+      });
+    });
+
+    document.querySelectorAll(".chk-signe").forEach(cb => {
+      cb.addEventListener("change", e => maj(e.target.dataset.id, "contratSigne", e.target.checked));
+    });
+
+    document.querySelectorAll(".chk-acompte").forEach(cb => {
+      cb.addEventListener("change", e => maj(e.target.dataset.id, "acompte", e.target.checked));
+    });
+
+    document.querySelectorAll(".chk-caution").forEach(cb => {
+      cb.addEventListener("change", e => maj(e.target.dataset.id, "caution", e.target.checked));
+    });
+
+    document.querySelectorAll(".btn-edit").forEach(btn => {
+      btn.addEventListener("click", e => {
+        const r = JSON.parse(e.currentTarget.dataset.resa.replace(/&#39;/g, "'"));
+        editer(r);
+      });
+    });
+
+    document.querySelectorAll(".btn-delete").forEach(btn => {
+      btn.addEventListener("click", e => supprimer(e.currentTarget.dataset.id));
+    });
+
+  } catch (err) {
+    console.error("Erreur load():", err);
+    document.getElementById("tbody").innerHTML =
+      '<tr><td colspan="13" class="text-center py-8 text-red-500">❌ Erreur de chargement</td></tr>';
+  }
+}
+/* ----------------------------------------------------------
+   GÉNÉRATION + ENVOI CONTRAT (VERSION PREMIUM)
+---------------------------------------------------------- */
+function generateAndSendContract(id, resa) {
+
+  /* -----------------------------
+     1) OUVERTURE GMAIL EN PREMIER
+     (pour éviter tout blocage)
+  ----------------------------- */
+  const sujet = encodeURIComponent(
+    document.getElementById("sujet").value || "Votre contrat Photobooth"
+  );
+
+  let corps = document.getElementById("corps").value || "";
+  corps = corps
+    .replace("{PRENOM}", resa.prenom || "")
+    .replace("{NOM}", resa.nom || "");
+
+  const body = encodeURIComponent(corps);
+
+  if (resa.email) {
+    const gmail = `https://mail.google.com/mail/?view=cm&to=${resa.email}&su=${sujet}&body=${body}`;
+    window.open(gmail, "_blank");
+  } else {
+    Swal.fire("Erreur", "Email du client manquant", "error");
+    return;
+  }
+
+  /* -----------------------------
+     2) GÉNÉRATION DU CONTRAT
+  ----------------------------- */
+  let html = localStorage.getItem("contrat_" + CLIENT_ID);
+  if (!html) html = getDefaultContract();
+
+  const today = new Date().toLocaleDateString("fr-FR");
+
+  html = html
+    .replace(/{PRENOM}/g, resa.prenom || "")
+    .replace(/{NOM}/g, resa.nom || "")
+    .replace(/{EMAIL}/g, resa.email || "")
+    .replace(/{TELEPHONE}/g, resa.telephone || "")
+    .replace(/{ADRESSE}/g, resa.adresse || "")
+    .replace(/{VILLE}/g, "")
+    .replace(/{CODE_POSTAL}/g, "")
+    .replace(/{ID_PIECE}/g, "")
+    .replace(/{JOURS_SUPP}/g, "")
+    .replace(/{TOTAL}/g, "")
+    .replace(/{ADRESSE_EVENEMENT}/g, resa.adresse || "")
+    .replace(/{DATE_ENLEVEMENT}/g, resa.enlevement ? new Date(resa.enlevement).toLocaleDateString("fr-FR") : "")
+    .replace(/{DATE_RESTITUTION}/g, resa.restitution ? new Date(resa.restitution).toLocaleDateString("fr-FR") : "")
+    .replace(/{DATE}/g, today);
+
+  /* -----------------------------
+     3) OUVERTURE DU CONTRAT
+  ----------------------------- */
+  const win = window.open("", "_blank");
+  win.document.write(html);
+  win.document.close();
+
+  win.focus();
+  win.print();
+
+  maj(id, "contratEnvoye", true);
+}
+
+/* ----------------------------------------------------------
+   CONTRAT PAR DÉFAUT (VERSION COMPLÈTE AVEC ACCENTS)
+---------------------------------------------------------- */
+function getDefaultContract() {
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Contrat de Location Photobooth LITE</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40mm; line-height: 1.6; font-size: 12pt; }
+    h1 { text-align: center; color: #000; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20pt; }
+    td { padding: 5pt; vertical-align: top; }
+    .label { font-weight: bold; width: 30%; }
+    .checkbox { font-size: 10pt; }
+    .page-break { page-break-before: always; }
+    @media print { body { margin: 20mm; } }
+  </style>
+</head>
+<body>
+
+  <h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1>
+
+  <p>Contrat n° 001 / Date : {DATE}</p>
+
+  <h2>Le loueur :</h2>
+  <p>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</p>
+
+  <h2>Le locataire :</h2>
+  <table>
+    <tr><td class="label">Nom :</td><td>{NOM}</td></tr>
+    <tr><td class="label">Prénom :</td><td>{PRENOM}</td></tr>
+    <tr><td class="label">Adresse :</td><td>{ADRESSE}</td></tr>
+    <tr><td class="label">Ville :</td><td>{VILLE}</td></tr>
+    <tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr>
+    <tr><td class="label">Mail :</td><td>{EMAIL}</td></tr>
+    <tr><td class="label">Numéro de téléphone :</td><td>{TELEPHONE}</td></tr>
+    <tr><td class="label">Numéro pièce d’identité :</td><td>{ID_PIECE}</td></tr>
+  </table>
+
+  <h2>La location :</h2>
+  <p>Date : du {DATE_ENLEVEMENT} à 17h00 au {DATE_RESTITUTION} à 11h00</p>
+  <p>(enlèvement de dépôt à l’adresse du loueur)</p>
+  <p class="checkbox">☐ Offre Week-End 75 € (du vendredi au lundi)</p>
+  <p class="checkbox">☐ Offre Semaine 75 € (deux jours)</p>
+  <p class="checkbox">☐ Offre contour écran personnalisé 25 €</p>
+  <p class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : {JOURS_SUPP}</p>
+  <p>Total : {TOTAL} €</p>
+  <p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p>
+
+  <p class="page-break"></p>
+
+  <h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2>
+  <p>Le loueur met à disposition du locataire un matériel complet de photographie présenté sous forme de photobooth.</p>
+  <p>Tout retard de restitution sera facturé 75 € par jour.</p>
+
+  <h2>ARTICLE 2 – PRIX DE LA LOCATION</h2>
+  <p>Tarif TTC — TVA non applicable (art. 293 B du CGI).</p>
+
+  <h2>ARTICLE 3 – ACOMPTE</h2>
+  <p>Acompte de 35 € à la réservation.</p>
+
+  <h2>ARTICLE 4 – DÉPÔT DE GARANTIE</h2>
+  <p>Dépôt de garantie de 250 € par chèque non encaissé.</p>
+
+  <p class="page-break"></p>
+
+  <h2>ARTICLE 5 – MISE À DISPOSITION DU MATÉRIEL</h2>
+  <p>Une fiche d’état des lieux est signée lors du retrait.</p>
+
+  <h2>ARTICLE 6 – UTILISATION DU MATÉRIEL</h2>
+  <p>Le locataire certifie être habilité à utiliser le matériel.</p>
+
+  <h2>ARTICLE 7 – RÉPARATIONS</h2>
+  <p>En cas de panne, prévenir immédiatement le loueur.</p>
+
+  <h2>ARTICLE 8 – RESPONSABILITÉS / ASSURANCE</h2>
+  <p>Le locataire assume la garde du matériel.</p>
+
+  <p class="page-break"></p>
+
+  <h2>ARTICLE 9 – DÉCLARATION EN CAS DE SINISTRE</h2>
+  <p>Déclaration obligatoire sous 12 heures.</p>
+
+  <h2>ARTICLE 10 – INFRACTIONS</h2>
+  <p>Le locataire reste responsable des infractions.</p>
+
+  <h2>ARTICLE 11 – RESTITUTION</h2>
+  <p>Le matériel doit être restitué aux dates prévues.</p>
+
+  <p class="page-break"></p>
+
+  <h2>ARTICLE 12 – ÉVICTION DU LOUEUR</h2>
+  <p>Le locataire ne peut modifier ou céder le matériel.</p>
+
+  <h2>ARTICLE 13 – RÉSERVATION / CONFIRMATION</h2>
+  <p>Réservation confirmée après réception du contrat signé + acompte.</p>
+
+  <h2>ARTICLE 14 – ANNULATION</h2>
+  <p>Moins de 15 jours avant l’événement → 100 % dû.</p>
+
+  <h2>ARTICLE 15 – RÈGLEMENT</h2>
+  <p>Acompte : 35 € — Solde : 40 € le jour du retrait.</p>
+
+  <h2>ARTICLE 16 – LOI APPLICABLE</h2>
+  <p>Le présent contrat est soumis au droit français.</p>
+
+  <p class="page-break"></p>
+
+  <p>Fait à {VILLE}, le {DATE}</p>
+
+  <table style="width: 100%; margin-top: 50pt;">
+    <tr>
+      <td style="width: 50%; text-align: center;">Signature du loueur</td>
+      <td style="width: 50%; text-align: center;">
+        Signature du locataire<br>
+        Précédée de la mention « bon pour accord »
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+`;
+}
+
+/* ----------------------------------------------------------
+   SAUVEGARDE RÉSERVATION
+---------------------------------------------------------- */
+async function save() {
+  const edit = document.getElementById("id").value;
+
+  const resa = {
+    id: edit || Date.now().toString(),
+    enlevement: document.getElementById("enlevement").value,
+    restitution: document.getElementById("restitution").value,
+    nom: document.getElementById("nom").value,
+    prenom: document.getElementById("prenom").value,
+    email: document.getElementById("email").value,
+    telephone: document.getElementById("telephone").value,
+    adresse: document.getElementById("adresse").value,
+    pseudo: document.getElementById("pseudo").value,
+    template: document.getElementById("template").value,
+    contratSigne: "Non",
+    acompte: "Non",
+    caution: "Non"
+  };
+
+  Swal.fire({
+    title: "Enregistrement...",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    await fetch(URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientId: CLIENT_ID,
+        action: edit ? "update" : "add",
+        reservation: resa
+      }),
+      mode: "no-cors"
+    });
+
+    setTimeout(async () => {
+      document.getElementById("modal").classList.add("hidden");
+      await load();
+      Swal.fire("Succès !", "Réservation enregistrée", "success");
+    }, 2000);
+
+  } catch (err) {
+    Swal.fire("Erreur", "Impossible d’enregistrer", "error");
+  }
+}
+
+/* ----------------------------------------------------------
+   MISE À JOUR (checkbox)
+---------------------------------------------------------- */
+async function maj(id, champ, val) {
+  try {
+    await fetch(URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientId: CLIENT_ID,
+        action: "update",
+        reservation: {
+          id: parseInt(id, 10),
+          [champ]: val ? "Oui" : "Non"
+        }
+      }),
+      mode: "no-cors"
+    });
+
+    setTimeout(load, 1500);
+
+  } catch (err) {
+    Swal.fire("Erreur", "Impossible de mettre à jour", "error");
+  }
+}
+
+/* ----------------------------------------------------------
+   ÉDITION
+---------------------------------------------------------- */
 function editer(r) {
   document.getElementById("titre").textContent = "Modifier";
   document.getElementById("id").value = r.id;
@@ -224,12 +693,83 @@ function editer(r) {
   document.getElementById("adresse").value = r.adresse || "";
   document.getElementById("pseudo").value = r.pseudo || "";
   document.getElementById("template").value = r.template || "";
-  document.getElementById("resaModal").classList.remove("hidden");  // ← modifié ici
+
+  document.getElementById("modal").classList.remove("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // ... (le reste reste identique jusqu'à newBtn)
+/* ----------------------------------------------------------
+   SUPPRESSION
+---------------------------------------------------------- */
+async function supprimer(id) {
+  const conf = await Swal.fire({
+    title: "Supprimer ?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc2626",
+    confirmButtonText: "Oui",
+    cancelButtonText: "Non"
+  });
 
+  if (!conf.isConfirmed) return;
+
+  try {
+    await fetch(URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientId: CLIENT_ID,
+        action: "delete",
+        id: parseInt(id, 10)
+      }),
+      mode: "no-cors"
+    });
+
+    setTimeout(() => {
+      load();
+      Swal.fire("Supprimé !", "", "success");
+    }, 1000);
+
+  } catch (err) {
+    Swal.fire("Erreur", "Impossible de supprimer", "error");
+  }
+}
+
+/* ----------------------------------------------------------
+   INIT
+---------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* LOGIN */
+  document.getElementById("showPassword").addEventListener("change", function () {
+    document.getElementById("password").type = this.checked ? "text" : "password";
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const pass = document.getElementById("password").value;
+
+    if (pass === PASSWORD) {
+      document.getElementById("login").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+
+      const saved = localStorage.getItem("emailConfig_" + CLIENT_ID);
+      if (saved) {
+        const c = JSON.parse(saved);
+        document.getElementById("emailCopie").value = c.email || "";
+        document.getElementById("sujet").value = c.sujet || "";
+        document.getElementById("corps").value = c.corps || "";
+      }
+
+      load();
+    } else {
+      Swal.fire("Erreur", "Mot de passe incorrect", "error");
+    }
+  });
+
+  document.getElementById("password").addEventListener("keypress", e => {
+    if (e.key === "Enter") document.getElementById("loginBtn").click();
+  });
+
+  /* NOUVELLE RÉSERVATION */
   document.getElementById("newBtn").addEventListener("click", () => {
     document.getElementById("titre").textContent = "Nouvelle réservation";
     document.getElementById("id").value = "";
@@ -242,27 +782,39 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("adresse").value = "";
     document.getElementById("pseudo").value = "";
     document.getElementById("template").value = "";
-    document.getElementById("resaModal").classList.remove("hidden");  // ← modifié ici
+
+    document.getElementById("modal").classList.remove("hidden");
   });
 
+  /* BOUTONS */
+  document.getElementById("logoutBtn").addEventListener("click", () => location.reload());
   document.getElementById("saveBtn").addEventListener("click", save);
   document.getElementById("cancelBtn").addEventListener("click", () =>
-    document.getElementById("resaModal").classList.add("hidden")  // ← modifié ici
+    document.getElementById("modal").classList.add("hidden")
   );
 
-  // ... (le reste du code reste inchangé)
-});
+  document.getElementById("filtre").addEventListener("change", load);
 
-// Dans la fonction save() :
-async function save() {
-  // ... (le code existant)
-  setTimeout(async () => {
-    document.getElementById("resaModal").classList.add("hidden");  // ← modifié ici
-    await load();
-    Swal.fire("Succès !", "Réservation enregistrée", "success");
-  }, 2000);
-  // ...
-}
+  document.getElementById("enlevement").addEventListener("change", function () {
+    if (this.value && !document.getElementById("restitution").value) {
+      document.getElementById("restitution").value = this.value;
+    }
+  });
+
+  /* CONFIG EMAIL */
+  document.getElementById("sujet").addEventListener("change", saveEmailConfig);
+  document.getElementById("emailCopie").addEventListener("change", saveEmailConfig);
+  document.getElementById("corps").addEventListener("change", saveEmailConfig);
+
+  /* CONTRAT */
+  document.getElementById("openContractBtn").addEventListener("click", openContractEditor);
+  document.getElementById("saveContractBtn").addEventListener("click", saveCustomContract);
+  document.getElementById("resetContractBtn").addEventListener("click", resetToDefaultContract);
+  document.getElementById("closeContractBtn").addEventListener("click", () =>
+    document.getElementById("contractEditorModal").classList.add("hidden")
+  );
+});
 </script>
+
 </body>
 </html>
