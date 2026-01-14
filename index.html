@@ -595,7 +595,27 @@ function getDefaultContract() {
       </td>
     </tr>
   </table>
-
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
+    <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <input type="hidden" id="id">
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date d'enlèvement</label><input type="date" id="enlevement" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Date de restitution</label><input type="date" id="restitution" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Nom</label><input type="text" id="nom" placeholder="Nom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Prénom</label><input type="text" id="prenom" placeholder="Prénom" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Email</label><input type="email" id="email" placeholder="email@example.com" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Téléphone</label><input type="tel" id="telephone" placeholder="0612345678" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div class="md:col-span-2"><label class="block text-sm font-bold mb-2 text-gray-700">Adresse</label><textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Pseudo</label><input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></div>
+      <div><label class="block text-sm font-bold mb-2 text-gray-700">Template</label><select id="template" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"><option value="">Non</option><option value="Oui">Oui</option></select></div>
+      <div class="md:col-span-2 flex gap-4">
+        <button id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 transition">💾 Enregistrer</button>
+        <button id="cancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition">❌ Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 `;
