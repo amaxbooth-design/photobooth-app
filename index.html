@@ -109,7 +109,7 @@ Alexis - Photobooth</textarea>
   </div>
 </div>
 
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4" style="display: none;">
   <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
     <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
     <div class="grid md:grid-cols-2 gap-6">
@@ -161,7 +161,7 @@ Alexis - Photobooth</textarea>
   </div>
 </div>
 
-<div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
+<div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 items-center justify-center z-50 p-4" style="display: none;">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl" style="max-height: 90vh; display: flex; flex-direction: column;">
     <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
       <h2 class="text-3xl font-bold">📝 Modifier mon contrat Photobooth</h2>
@@ -205,7 +205,7 @@ function openContractEditor() {
   let html = localStorage.getItem('contrat_' + CLIENT_ID);
   if (!html) html = getDefaultContract();
   preview.innerHTML = html;
-  document.getElementById('contractEditorModal').classList.remove('hidden');
+  document.getElementById('contractEditorModal').style.display = 'flex';
 }
 
 function saveCustomContract() {
@@ -399,7 +399,7 @@ function editer(resa) {
   document.getElementById('adresse').value = resa.adresse || '';
   document.getElementById('pseudo').value = resa.pseudo || '';
   document.getElementById('template').value = resa.template || '';
-  document.getElementById('modal').classList.remove('hidden');
+  document.getElementById('modal').style.display = 'flex';
 }
 
 async function supprimer(id) {
@@ -475,89 +475,7 @@ async function save() {
     });
 
     await new Promise(function(r) { setTimeout(r, 3000); });
-    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').style.display = 'none';
     await load();
     Swal.fire('Succès !', 'Réservation enregistrée', 'success');
   } catch (err) {
-    console.error('❌', err);
-    Swal.fire('Erreur', 'Problème de connexion', 'error');
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('showPassword').addEventListener('change', function() {
-    document.getElementById('password').type = this.checked ? 'text' : 'password';
-  });
-
-  document.getElementById('loginBtn').addEventListener('click', function() {
-    const pass = document.getElementById('password').value;
-    if (pass === PASSWORD) {
-      document.getElementById('login').classList.add('hidden');
-      document.getElementById('app').classList.remove('hidden');
-
-      const savedEmail = localStorage.getItem('emailConfig_' + CLIENT_ID);
-      if (savedEmail) {
-        const config = JSON.parse(savedEmail);
-        document.getElementById('emailCopie').value = config.email || '';
-        document.getElementById('sujet').value = config.sujet || 'Votre contrat Photobooth - À signer';
-        document.getElementById('corps').value = config.corps || document.getElementById('corps').value;
-      }
-
-      load();
-    } else {
-      Swal.fire('Erreur', 'Mot de passe incorrect', 'error');
-    }
-  });
-
-  document.getElementById('password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('loginBtn').click();
-  });
-
-  document.getElementById('newBtn').addEventListener('click', function() {
-    document.getElementById('titre').textContent = 'Nouvelle réservation';
-    document.getElementById('id').value = '';
-    document.getElementById('enlevement').value = '';
-    document.getElementById('restitution').value = '';
-    document.getElementById('nom').value = '';
-    document.getElementById('prenom').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('telephone').value = '';
-    document.getElementById('adresse').value = '';
-    document.getElementById('pseudo').value = '';
-    document.getElementById('template').value = '';
-    document.getElementById('modal').classList.remove('hidden');
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-    location.reload();
-  });
-
-  document.getElementById('saveBtn').addEventListener('click', save);
-
-  document.getElementById('cancelBtn').addEventListener('click', function() {
-    document.getElementById('modal').classList.add('hidden');
-  });
-
-  document.getElementById('filtre').addEventListener('change', load);
-
-  document.getElementById('enlevement').addEventListener('change', function() {
-    if (this.value && !document.getElementById('restitution').value) {
-      document.getElementById('restitution').value = this.value;
-    }
-  });
-
-  document.getElementById('sujet').addEventListener('change', saveEmailConfig);
-  document.getElementById('emailCopie').addEventListener('change', saveEmailConfig);
-  document.getElementById('corps').addEventListener('change', saveEmailConfig);
-
-  document.getElementById('openContractBtn').addEventListener('click', openContractEditor);
-  document.getElementById('saveContractBtn').addEventListener('click', saveCustomContract);
-  document.getElementById('resetContractBtn').addEventListener('click', resetToDefaultContract);
-
-  document.getElementById('closeContractBtn').addEventListener('click', function() {
-    document.getElementById('contractEditorModal').classList.add('hidden');
-  });
-});
-</script>
-</body>
-</html>
