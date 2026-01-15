@@ -440,22 +440,24 @@ async function supprimer(id) {
   }
 }
 
-const resa = {
-  id: edit || Date.now().toString(),
-  enlevement: document.getElementById('enlevement').value,
-  restitution: document.getElementById('restitution').value,
-  nom: document.getElementById('nom').value,
-  prenom: document.getElementById('prenom').value,
-  email: document.getElementById('email').value,
-  telephone: document.getElementById('telephone').value,
-  adresse: document.getElementById('adresse').value,
-  pseudo: document.getElementById('pseudo').value,
-  template: document.getElementById('template').value,
-  contratEnvoye: 'Non',
-  contratSigne: 'Non',
-  acompte: 'Non',
-  caution: 'Non'
-};
+async function save() {
+  const edit = document.getElementById('id').value;
+  const resa = {
+    id: edit || Date.now().toString(),
+    enlevement: document.getElementById('enlevement').value,
+    restitution: document.getElementById('restitution').value,
+    nom: document.getElementById('nom').value,
+    prenom: document.getElementById('prenom').value,
+    email: document.getElementById('email').value,
+    telephone: document.getElementById('telephone').value,
+    adresse: document.getElementById('adresse').value,
+    pseudo: document.getElementById('pseudo').value,
+    template: document.getElementById('template').value,
+    contratEnvoye: 'Non',
+    contratSigne: 'Non',
+    acompte: 'Non',
+    caution: 'Non'
+  };
 
   console.log('🚀 Envoi:', resa);
 
