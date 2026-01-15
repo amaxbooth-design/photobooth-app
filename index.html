@@ -202,12 +202,16 @@ function tel(t) {
   return str.length === 10 ? str.replace(/(\d{2})(?=\d)/g, '$1 ') : str;
 }
 
+// ──────────────────────────────────────────────
+// GESTION CONTRAT
+// ──────────────────────────────────────────────
 function openContractEditor() {
   const preview = document.getElementById('contractPreview');
   let html = localStorage.getItem('contrat_' + CLIENT_ID);
   if (!html) html = getDefaultContract();
   preview.innerHTML = html;
   document.getElementById('contractEditorModal').classList.remove('hidden');
+  document.getElementById('contractEditorModal').style.display = 'flex';
 }
 
 function saveCustomContract() {
@@ -217,11 +221,22 @@ function saveCustomContract() {
 }
 
 function resetToDefaultContract() {
-  if (confirm('Réinitialiser le contrat à la version d\'origine ?')) {
-    localStorage.removeItem('contrat_' + CLIENT_ID);
-    openContractEditor();
-    Swal.fire('Réinitialisé !', '', 'success');
-  }
+  Swal.fire({
+    title: 'Réinitialiser ?',
+    text: "Le contrat repassera à la version par défaut",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Oui, réinitialiser',
+    cancelButtonText: 'Annuler'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('contrat_' + CLIENT_ID);
+      openContractEditor();
+      Swal.fire('Réinitialisé !', '', 'success');
+    }
+  });
 }
 
 function generateAndSendContract(id, resa) {
@@ -406,6 +421,7 @@ function editer(resa) {
   document.getElementById('pseudo').value = resa.pseudo || '';
   document.getElementById('template').value = resa.template || '';
   document.getElementById('modal').classList.remove('hidden');
+  document.getElementById('modal').style.display = 'flex';
 }
 
 async function supprimer(id) {
@@ -452,7 +468,10 @@ async function save() {
     telephone: document.getElementById('telephone').value,
     adresse: document.getElementById('adresse').value,
     pseudo: document.getElementById('pseudo').value,
-    template: document.getElementById('template').value
+    template: document.getElementById('template').value,
+    contratSigne: 'Non',
+    acompte: 'Non',
+    caution: 'Non'
   };
 
   console.log('🚀 Envoi:', resa);
@@ -479,6 +498,7 @@ async function save() {
 
     await new Promise(function(r) { setTimeout(r, 3000); });
     document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').style.display = 'none';
     await load();
     Swal.fire('Succès !', 'Réservation enregistrée', 'success');
   } catch (err) {
@@ -534,6 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['enlevement','restitution','nom','prenom','email','telephone','adresse','pseudo','template']
       .forEach(id => document.getElementById(id).value = '');
     document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal').style.display = 'flex';
   });
 
   // Bouton Modifier contrat
@@ -542,6 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fermer éditeur contrat
   document.getElementById('closeContractBtn')?.addEventListener('click', () => {
     document.getElementById('contractEditorModal').classList.add('hidden');
+    document.getElementById('contractEditorModal').style.display = 'none';
   });
 
   // Sauvegarder contrat personnalisé
@@ -553,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Annuler modal réservation
   document.getElementById('cancelBtn')?.addEventListener('click', () => {
     document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').style.display = 'none';
   });
 
   // Enregistrer réservation
