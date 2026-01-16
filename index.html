@@ -22,6 +22,7 @@
 </head>
 <body>
 
+<!-- Écran de login -->
 <div id="login" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
   <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
     <h1 class="text-4xl font-bold text-blue-900 mb-8">🎉 Photobooth</h1>
@@ -36,6 +37,7 @@
   </div>
 </div>
 
+<!-- Contenu principal (caché au démarrage) -->
 <div id="app" class="hidden">
   <div class="bg-blue-900 shadow-lg">
     <div class="px-4 py-6 max-w-7xl mx-auto">
@@ -55,6 +57,7 @@
     </div>
   </div>
 
+  <!-- Configuration email + bouton contrat -->
   <div class="bg-yellow-50 border-l-4 border-yellow-500">
     <div class="px-4 py-6 max-w-7xl mx-auto">
       <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
@@ -81,6 +84,7 @@ Alexis - Photobooth</textarea>
     </div>
   </div>
 
+  <!-- Tableau des réservations -->
   <div class="bg-white min-h-screen">
     <div class="table-wrapper">
       <table>
@@ -109,6 +113,7 @@ Alexis - Photobooth</textarea>
   </div>
 </div>
 
+<!-- Modal Nouvelle réservation / Modification -->
 <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-screen overflow-y-auto">
     <h2 class="text-3xl font-bold mb-6 text-blue-900" id="titre">Nouvelle réservation</h2>
@@ -161,12 +166,13 @@ Alexis - Photobooth</textarea>
   </div>
 </div>
 
+<!-- Modal Éditeur de contrat -->
 <div id="contractEditorModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl" style="max-height: 90vh; display: flex; flex-direction: column;">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
     <div class="bg-blue-900 text-white p-6 rounded-t-2xl text-center">
       <h2 class="text-3xl font-bold">📝 Modifier mon contrat Photobooth</h2>
     </div>
-    <div style="flex: 1; overflow-y: auto; padding: 40px;" id="contractPreview" contenteditable="true"></div>
+    <div class="flex-1 overflow-y-auto p-10" id="contractPreview" contenteditable="true"></div>
     <div class="p-6 bg-gray-100 flex justify-center gap-6">
       <button id="saveContractBtn" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-lg font-bold text-xl">💾 Sauvegarder</button>
       <button id="resetContractBtn" class="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-xl">🔄 Réinitialiser</button>
@@ -176,28 +182,24 @@ Alexis - Photobooth</textarea>
 </div>
 
 <script>
+// ──────────────────────────────────────────────
+// CONFIGURATION
+// ──────────────────────────────────────────────
 const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E6wno9AdCtIk2Eung6H5ycyTHXL9agoFIWsJ-PQvU/exec";
 const PASSWORD = "amax";
 const CLIENT_ID = "Alexis";
 
+// ──────────────────────────────────────────────
+// FONCTIONS UTILITAIRES
+// ──────────────────────────────────────────────
 function getDefaultContract() {
-  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Contrat Photobooth LITE</title><style>body{font-family:Arial,sans-serif;font-size:11pt;margin:40px;line-height:1.4}h1{text-align:center;font-size:14pt;font-weight:bold;margin-bottom:20px;text-transform:uppercase}h2{font-size:11pt;font-weight:bold;margin-top:25px;margin-bottom:10px;text-transform:uppercase}.section{border:2px solid black;padding:15px;margin-bottom:20px}.section-title{font-weight:bold;text-decoration:underline;margin-bottom:10px}p{margin-bottom:10px;text-align:justify}</style></head><body><h1>Contrat de location Photobooth LITE</h1><p style="text-align:center;"><strong>Date :</strong> {DATE}</p><div class="section"><div class="section-title">Le loueur :</div>Mr CHIMOT Alexis<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</div><div class="section"><div class="section-title">Le locataire :</div>Nom : {NOM}<br>Prénom : {PRENOM}<br>Email : {EMAIL}<br>Téléphone : {TELEPHONE}<br>Adresse : {ADRESSE}</div><div class="section"><div class="section-title">La location :</div>Date : du {ENLEVEMENT} au {RESTITUTION}<br>Adresse de l\'événement : {ADRESSE}</div><h2>Conditions générales</h2><p>Le locataire s\'engage à utiliser le matériel avec soin et à le restituer en bon état.</p><p>Un acompte de 35€ est versé à la réservation. Le solde de 40€ est à régler lors de la remise du photobooth.</p><p>Un dépôt de garantie de 250€ est demandé par chèque non encaissé.</p><div style="margin-top:80px;text-align:center;"><p><strong>Fait à ........., Le {DATE}</strong></p><table width="100%" style="margin-top:40px;"><tr><td width="50%" style="text-align:center;"><p><strong>Signature du loueur</strong></p><br><br><p>____________________</p></td><td width="50%" style="text-align:center;"><p><strong>Signature du locataire</strong></p><br><br><p>____________________</p></td></tr></table></div></body></html>';
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</title><style>body { font-family: Arial, sans-serif; font-size: 12pt; margin: 40pt; line-height: 1.5; } h1 { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20pt; } h2 { font-size: 12pt; font-weight: bold; margin-top: 20pt; margin-bottom: 10pt; } p { margin-bottom: 10pt; } table { width: 100%; border-collapse: collapse; } .label { font-weight: bold; width: 150pt; } .checkbox { margin-bottom: 5pt; } .page-break { page-break-before: always; }</style></head><body><h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1><p>Contrat n° 001 / Date : {DATE}</p><h2>Le loueur :</h2><p>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</p><h2>Le locataire :</h2><table><tr><td class="label">Nom :</td><td>{NOM}</td></tr><tr><td class="label">Prénom :</td><td>{PRENOM}</td></tr><tr><td class="label">Adresse :</td><td>{ADRESSE}</td></tr><tr><td class="label">Ville :</td><td>{VILLE}</td></tr><tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr><tr><td class="label">Mail :</td><td>{EMAIL}</td></tr><tr><td class="label">Numéro de téléphone :</td><td>{TELEPHONE}</td></tr><tr><td class="label">Numéro pièce d’identité :</td><td>{ID_PIECE}</td></tr></table><h2>La location :</h2><p>Date : du {DATE_ENLEVEMENT} à 17h00 au {DATE_RESTITUTION} à 11h00</p><p>(enlèvement de dépôt à l’adresse du loueur)</p><p class="checkbox">☐ Offre Week-End 75 € (du vendredi au lundi)</p><p class="checkbox">☐ Offre Semaine 75 € (deux jours)</p><p class="checkbox">☐ Offre contour écran personnalisé 25 €</p><p class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : {JOURS_SUPP}</p><p>Total : {TOTAL} €</p><p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p><p class="page-break"></p><h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2><p>Le loueur met à disposition du locataire un matériel complet de photographie présenté sous forme de photobooth.</p><p>Tout retard de restitution sera facturé 75 € par jour.</p><h2>ARTICLE 2 – PRIX DE LA LOCATION</h2><p>Tarif TTC — TVA non applicable (art. 293 B du CGI).</p><h2>ARTICLE 3 – ACOMPTE</h2><p>Acompte de 35 € à la réservation.</p><h2>ARTICLE 4 – DÉPÔT DE GARANTIE</h2><p>Dépôt de garantie de 250 € par chèque non encaissé.</p><p class="page-break"></p><h2>ARTICLE 5 – MISE À DISPOSITION DU MATÉRIEL</h2><p>Une fiche d’état des lieux est signée lors du retrait.</p><h2>ARTICLE 6 – UTILISATION DU MATÉRIEL</h2><p>Le locataire certifie être habilité à utiliser le matériel.</p><h2>ARTICLE 7 – RÉPARATIONS</h2><p>En cas de panne, prévenir immédiatement le loueur.</p><h2>ARTICLE 8 – RESPONSABILITÉS / ASSURANCE</h2><p>Le locataire assume la garde du matériel.</p><p class="page-break"></p><h2>ARTICLE 9 – DÉCLARATION EN CAS DE SINISTRE</h2><p>Déclaration obligatoire sous 12 heures.</p><h2>ARTICLE 10 – INFRACTIONS</h2><p>Le locataire reste responsable des infractions.</p><h2>ARTICLE 11 – RESTITUTION</h2><p>Le matériel doit être restitué aux dates prévues.</p><p class="page-break"></p><h2>ARTICLE 12 – ÉVICTION DU LOUEUR</h2><p>Le locataire ne peut modifier ou céder le matériel.</p><h2>ARTICLE 13 – RÉSERVATION / CONFIRMATION</h2><p>Réservation confirmée après réception du contrat signé + acompte.</p><h2>ARTICLE 14 – ANNULATION</h2><p>Moins de 15 jours avant l’événement → 100 % dû.</p><h2>ARTICLE 15 – RÈGLEMENT</h2><p>Acompte : 35 € — Solde : 40 € le jour du retrait.</p><h2>ARTICLE 16 – LOI APPLICABLE</h2><p>Le présent contrat est soumis au droit français.</p><p class="page-break"></p><p>Fait à {VILLE}, le {DATE}</p><table style="width: 100%; margin-top: 50pt;"><tr><td style="width: 50%; text-align: center;">Signature du loueur</td><td style="width: 50%; text-align: center;">Signature du locataire<br>Précédée de la mention « bon pour accord »</td></tr></table></body></html>`;
 }
 
 function tel(t) {
   if (!t) return '';
   const str = String(t).replace(/\D/g, '');
-  if (str.length === 10) return str.replace(/(\d{2})(?=\d)/g, '$1 ');
-  return str;
-}
-
-function saveEmailConfig() {
-  const config = {
-    email: document.getElementById('emailCopie').value,
-    sujet: document.getElementById('sujet').value,
-    corps: document.getElementById('corps').value
-  };
-  localStorage.setItem('emailConfig_' + CLIENT_ID, JSON.stringify(config));
+  return str.length === 10 ? str.replace(/(\d{2})(?=\d)/g, '$1 ') : str;
 }
 
 function openContractEditor() {
@@ -218,6 +220,7 @@ function resetToDefaultContract() {
   if (confirm('Réinitialiser le contrat à la version d\'origine ?')) {
     localStorage.removeItem('contrat_' + CLIENT_ID);
     openContractEditor();
+    Swal.fire('Réinitialisé !', '', 'success');
   }
 }
 
@@ -250,6 +253,9 @@ function generateAndSendContract(id, resa) {
   maj(id, 'contratEnvoye', true);
 }
 
+// ──────────────────────────────────────────────
+// FONCTIONS RÉSERVATIONS
+// ──────────────────────────────────────────────
 async function load() {
   try {
     const r = await fetch(URL + '?clientId=' + CLIENT_ID);
@@ -474,33 +480,43 @@ async function save() {
       mode: 'no-cors'
     });
 
-    await new Promise(function(r) { setTimeout(r, 3000); });
+    // MODIFICATION ICI : Attendre 5 secondes au lieu de 3
+    await new Promise(function(r) { setTimeout(r, 5000); });
     document.getElementById('modal').classList.add('hidden');
     await load();
-    Swal.fire('Succès !', 'Réservation enregistrée', 'success');
+    Swal.fire('Succès !', 'Réservation enregistrée + Événement ajouté au calendrier', 'success');
   } catch (err) {
     console.error('❌', err);
-    Swal.fire('Erreur', 'Problème de connexion', 'error');
+    Swal.fire('Erreur', 'Impossible d\'enregistrer', 'error');
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('showPassword').addEventListener('change', function() {
-    document.getElementById('password').type = this.checked ? 'text' : 'password';
-  });
+function saveEmailConfig() {
+  const config = {
+    email: document.getElementById('emailCopie').value,
+    sujet: document.getElementById('sujet').value,
+    corps: document.getElementById('corps').value
+  };
+  localStorage.setItem('emailConfig_' + CLIENT_ID, JSON.stringify(config));
+}
 
-  document.getElementById('loginBtn').addEventListener('click', function() {
-    const pass = document.getElementById('password').value;
-    if (pass === PASSWORD) {
+// ──────────────────────────────────────────────
+// ÉVÉNEMENTS
+// ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Login
+  document.getElementById('loginBtn')?.addEventListener('click', () => {
+    if (document.getElementById('password').value === PASSWORD) {
       document.getElementById('login').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
 
-      const savedEmail = localStorage.getItem('emailConfig_' + CLIENT_ID);
-      if (savedEmail) {
-        const config = JSON.parse(savedEmail);
-        document.getElementById('emailCopie').value = config.email || '';
-        document.getElementById('sujet').value = config.sujet || 'Votre contrat Photobooth - À signer';
-        document.getElementById('corps').value = config.corps || document.getElementById('corps').value;
+      // Load saved email config
+      const saved = localStorage.getItem('emailConfig_' + CLIENT_ID);
+      if (saved) {
+        const c = JSON.parse(saved);
+        document.getElementById('emailCopie').value = c.email || '';
+        document.getElementById('sujet').value = c.sujet || '';
+        document.getElementById('corps').value = c.corps || '';
       }
 
       load();
@@ -509,54 +525,60 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  document.getElementById('password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  // Afficher/cacher mot de passe
+  document.getElementById('showPassword')?.addEventListener('change', (e) => {
+    document.getElementById('password').type = e.target.checked ? 'text' : 'password';
   });
 
-  document.getElementById('newBtn').addEventListener('click', function() {
+  // Bouton Nouvelle réservation
+  document.getElementById('newBtn')?.addEventListener('click', () => {
     document.getElementById('titre').textContent = 'Nouvelle réservation';
     document.getElementById('id').value = '';
-    document.getElementById('enlevement').value = '';
-    document.getElementById('restitution').value = '';
-    document.getElementById('nom').value = '';
-    document.getElementById('prenom').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('telephone').value = '';
-    document.getElementById('adresse').value = '';
-    document.getElementById('pseudo').value = '';
-    document.getElementById('template').value = '';
+    // Reset formulaire
+    ['enlevement','restitution','nom','prenom','email','telephone','adresse','pseudo','template']
+      .forEach(id => document.getElementById(id).value = '');
     document.getElementById('modal').classList.remove('hidden');
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-    location.reload();
+  // Bouton Modifier contrat
+  document.getElementById('openContractBtn')?.addEventListener('click', openContractEditor);
+
+  // Fermer éditeur contrat
+  document.getElementById('closeContractBtn')?.addEventListener('click', () => {
+    document.getElementById('contractEditorModal').classList.add('hidden');
   });
 
-  document.getElementById('saveBtn').addEventListener('click', save);
+  // Sauvegarder contrat personnalisé
+  document.getElementById('saveContractBtn')?.addEventListener('click', saveCustomContract);
 
-  document.getElementById('cancelBtn').addEventListener('click', function() {
+  // Réinitialiser contrat
+  document.getElementById('resetContractBtn')?.addEventListener('click', resetToDefaultContract);
+
+  // Annuler modal réservation
+  document.getElementById('cancelBtn')?.addEventListener('click', () => {
     document.getElementById('modal').classList.add('hidden');
   });
 
-  document.getElementById('filtre').addEventListener('change', load);
+  // Enregistrer réservation
+  document.getElementById('saveBtn')?.addEventListener('click', save);
 
-  document.getElementById('enlevement').addEventListener('change', function() {
+  // Déconnexion
+  document.getElementById('logoutBtn')?.addEventListener('click', () => location.reload());
+
+  // Changement de filtre
+  document.getElementById('filtre')?.addEventListener('change', load);
+
+  // Changement date enlèvement
+  document.getElementById('enlevement')?.addEventListener('change', function() {
     if (this.value && !document.getElementById('restitution').value) {
       document.getElementById('restitution').value = this.value;
     }
   });
 
-  document.getElementById('sujet').addEventListener('change', saveEmailConfig);
-  document.getElementById('emailCopie').addEventListener('change', saveEmailConfig);
-  document.getElementById('corps').addEventListener('change', saveEmailConfig);
-
-  document.getElementById('openContractBtn').addEventListener('click', openContractEditor);
-  document.getElementById('saveContractBtn').addEventListener('click', saveCustomContract);
-  document.getElementById('resetContractBtn').addEventListener('click', resetToDefaultContract);
-
-  document.getElementById('closeContractBtn').addEventListener('click', function() {
-    document.getElementById('contractEditorModal').classList.add('hidden');
-  });
+  // Sauvegarde config email sur changement
+  document.getElementById('sujet')?.addEventListener('change', saveEmailConfig);
+  document.getElementById('emailCopie')?.addEventListener('change', saveEmailConfig);
+  document.getElementById('corps')?.addEventListener('change', saveEmailConfig);
 });
 </script>
 </body>
