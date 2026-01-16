@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #f3f4f6; overflow-x: hidden; }
+    html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #ffffff; overflow-x: hidden; }
     .table-wrapper { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th { background: #1e40af; color: white; padding: 1rem 0.75rem; position: sticky; top: 0; z-index: 10; white-space: nowrap; text-align: center; font-size: 0.875rem; font-weight: 600; }
@@ -18,6 +18,10 @@
     .paid:hover { background: #a7f3d0 !important; }
     .notpaid { background: #fee2e2; }
     .notpaid:hover { background: #fecaca !important; }
+    /* Colonnes avec largeur fixe pour optimiser l'espace */
+    th:nth-child(1), td:nth-child(1) { width: 100px; }  /* Enlèvement */
+    th:nth-child(2), td:nth-child(2) { width: 100px; }  /* Restitution */
+    th:nth-child(12), td:nth-child(12) { width: 80px; } /* Template */
   </style>
 </head>
 <body>
@@ -40,7 +44,7 @@
 <!-- Contenu principal (caché au démarrage) -->
 <div id="app" class="hidden">
   <div class="bg-blue-900 shadow-lg">
-    <div class="px-4 py-6 max-w-7xl mx-auto">
+    <div class="px-4 py-6 max-w-full">
       <div class="flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 class="text-3xl font-bold text-white">📋 Mes Réservations Photobooth</h1>
@@ -59,7 +63,7 @@
 
   <!-- Configuration email + bouton contrat -->
   <div class="bg-yellow-50 border-l-4 border-yellow-500">
-    <div class="px-4 py-6 max-w-7xl mx-auto">
+    <div class="px-4 py-6 max-w-full">
       <h3 class="text-2xl font-bold mb-4 text-yellow-900">📧 Configuration Email Contrat</h3>
       <div class="grid md:grid-cols-2 gap-6">
         <div>
@@ -148,6 +152,14 @@ Alexis - Photobooth</textarea>
         <textarea id="adresse" rows="2" placeholder="Adresse complète" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500"></textarea>
       </div>
       <div>
+        <label class="block text-sm font-bold mb-2 text-gray-700">Code postal</label>
+        <input type="text" id="codePostal" placeholder="34410" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold mb-2 text-gray-700">Ville</label>
+        <input type="text" id="ville" placeholder="Sauvian" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+      </div>
+      <div>
         <label class="block text-sm font-bold mb-2 text-gray-700">Pseudo</label>
         <input type="text" id="pseudo" placeholder="Pseudo" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
       </div>
@@ -189,11 +201,204 @@ const URL = "https://script.google.com/macros/s/AKfycbxCjTZax00MtTv3PJ6Vwc2W1s8E
 const PASSWORD = "amax";
 const CLIENT_ID = "Alexis";
 
+1.PNG
+2.PNG
+
+V5 HTML OK.txt
+txt
+
+3.PNG
+tout le "tableau" ( 1.png )  est decallé vers la droite et en bas ( il y a une bordure grise a gauche et en haut ) donc le tableau ne s'affiche pas en entier la corbeille est tronquée ) :
+il ne faut pas les bordure grise
+les colonnes : 
+enlevement, restitution, et template sont trop large, ca prend de la place pour rien
+
+quand je fait un nouvelle reservation ( le  2.png ) :
+il faut ajouter code postale et ville car quand je clique sur envoyer le contrat ca ne remplie le contrat comme il faut ( 3.png )
+
+Afficher plus
+07:49
+Je vais examiner le fichier HTML pour corriger ces problèmes d'affichage et ajouter les champs manquants.
+
+
+Lire le fichier HTML pour analyser les problèmes
+
+
+Lire le contenu du fichier HTML
+Afficher le fichier de travail
+Maintenant je vais corriger les problèmes identifiés :
+
+Bordures grises : Supprimer les marges/padding qui créent ces bordures
+Colonnes trop larges : Réduire la largeur des colonnes Enlèvement, Restitution et Template
+Ajouter Code postal et Ville : Ajouter ces deux champs dans le formulaire de réservation
+
+1 étape
+
+Copier le fichier corrigé dans le dossier de sortie
+
+
+
+Presented file
+Voici votre fichier HTML corrigé avec toutes les modifications demandées :
+
+✅ Corrections effectuées :
+Bordures grises supprimées :
+Changement du fond de 
+#f3f4f6 (gris) à 
+#ffffff (blanc)
+Suppression des max-w-7xl qui créaient des marges latérales
+Le tableau occupe maintenant toute la largeur disponible
+Colonnes optimisées :
+Colonne "Enlèvement" : fixée à 100px
+Colonne "Restitution" : fixée à 100px
+Colonne "Template" : fixée à 80px
+Les autres colonnes s'adaptent automatiquement
+Nouveaux champs ajoutés :
+Code postal : Nouveau champ dans le formulaire
+Ville : Nouveau champ dans le formulaire
+Ces champs sont maintenant intégrés dans le contrat avec les balises {CODE_POSTAL} et {VILLE}
+Le tableau devrait maintenant s'afficher correctement sans bordures grises, et lorsque vous créez une nouvelle réservation et envoyez le contrat, les informations de code postal et ville seront correctement remplies dans le document PDF généré.
+
+Photobooth corrige
+Code · HTML 
+le html n'est pas complet?
+
+07:52
+Vous avez raison ! Le fichier a été tronqué. Laissez-moi le recréer en entier.
+
+
+Voir la suite du fichier original à partir de la ligne 180
+Afficher le fichier de travail
+
+V5 HTML OK.txt
+txt
+
+le html n'est pas complet
+dis moi ce que je dois modifier dans mon html 
+soit precis et clair
+
+07:53
+Voici exactement ce que vous devez modifier dans votre HTML :
+
+1. Supprimer les bordures grises
+Ligne 11 - Remplacer :
+
+css
+html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #f3f4f6; overflow-x: hidden; }
+Par :
+
+css
+html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #ffffff; overflow-x: hidden; }
+2. Optimiser la largeur des colonnes
+Après la ligne 20, ajouter ces nouvelles lignes :
+
+css
+/* Colonnes avec largeur fixe pour optimiser l'espace */
+th:nth-child(1), td:nth-child(1) { width: 100px; }  /* Enlèvement */
+th:nth-child(2), td:nth-child(2) { width: 100px; }  /* Restitution */
+th:nth-child(12), td:nth-child(12) { width: 80px; } /* Template */
+Ligne 43 - Remplacer :
+
+html
+<div class="px-4 py-6 max-w-7xl mx-auto">
+Par :
+
+html
+<div class="px-4 py-6 max-w-full">
+Ligne 62 - Remplacer :
+
+html
+<div class="px-4 py-6 max-w-7xl mx-auto">
+Par :
+
+html
+<div class="px-4 py-6 max-w-full">
+3. Ajouter les champs Code Postal et Ville
+Après la ligne 148 (après le champ Adresse), ajouter :
+
+html
+<div>
+  <label class="block text-sm font-bold mb-2 text-gray-700">Code postal</label>
+  <input type="text" id="codePostal" placeholder="34410" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+</div>
+<div>
+  <label class="block text-sm font-bold mb-2 text-gray-700">Ville</label>
+  <input type="text" id="ville" placeholder="Sauvian" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+</div>
+Ligne 453 - Dans la fonction save(), après la ligne adresse, ajouter :
+
+javascript
+codePostal: document.getElementById('codePostal').value,
+ville: document.getElementById('ville').value,
+Ligne 538 - Remplacer :
+
+javascript
+['enlevement','restitution','nom','prenom','email','telephone','adresse','pseudo','template']
+Par :
+
+javascript
+['enlevement','restitution','nom','prenom','email','telephone','adresse','codePostal','ville','pseudo','template']
+Dans la fonction getDefaultContract() ligne 196, ajouter ces lignes dans le template HTML après {ADRESSE} :
+
+html
+<tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr>
+<tr><td class="label">Ville :</td><td>{VILLE}</td></tr>
+Voilà ! Ce sont les modifications exactes à faire dans votre fichier.
+
+je n'y arrive pas, peux tu me faire le html complet, si il est trop long fait le moi en 3 ou 4 parties, je l'assemblerais
+
+17:41
+D'accord, je vais vous créer le fichier HTML complet en plusieurs parties.
+
+
+Voir la partie complète du fichier original entre les lignes 329 et 435
+Afficher le fichier de travail
+Maintenant je vais créer les 4 parties du fichier HTML corrigé :
+
+
+3 étapes
+
+Créer la partie 4 du HTML (événements et fin du fichier)
+photobooth_partie4.txt
+
+Presented 4 files
+Parfait ! Voici votre fichier HTML complet en 4 parties.
+
+Instructions pour assembler :
+Créez un nouveau fichier nommé photobooth.html
+Copiez les 4 parties dans l'ordre :
+Partie 1 : Début du HTML jusqu'à la configuration
+Partie 2 : Fonctions utilitaires et fonction load
+Partie 3 : Fonctions maj, editer, supprimer et save
+Partie 4 : Événements et fin du fichier
+Modifications apportées :
+✅ Bordures grises supprimées - Fond blanc au lieu de gris ✅ Colonnes optimisées - Enlèvement (100px), Restitution (100px), Template (80px) ✅ Champs ajoutés - Code postal et Ville dans le formulaire ✅ Contrat mis à jour - Les nouveaux champs sont inclus dans le template du contrat
+
+Pour assembler, il suffit de copier-coller les 4 fichiers bout à bout dans un seul fichier .html.
+
+Photobooth partie1
+TXT 
+Photobooth partie2
+TXT 
+Photobooth partie3
+TXT 
+Photobooth partie4
+TXT 
+
+
+
+
+
+Claude est une IA et peut faire des erreurs. Veuillez vérifier les réponses.
+Photobooth partie2 · TXT
+Copier
+
+
 // ──────────────────────────────────────────────
 // FONCTIONS UTILITAIRES
 // ──────────────────────────────────────────────
 function getDefaultContract() {
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</title><style>body { font-family: Arial, sans-serif; font-size: 12pt; margin: 40pt; line-height: 1.5; } h1 { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20pt; } h2 { font-size: 12pt; font-weight: bold; margin-top: 20pt; margin-bottom: 10pt; } p { margin-bottom: 10pt; } table { width: 100%; border-collapse: collapse; } .label { font-weight: bold; width: 150pt; } .checkbox { margin-bottom: 5pt; } .page-break { page-break-before: always; }</style></head><body><h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1><p>Contrat n° 001 / Date : {DATE}</p><h2>Le loueur :</h2><p>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</p><h2>Le locataire :</h2><table><tr><td class="label">Nom :</td><td>{NOM}</td></tr><tr><td class="label">Prénom :</td><td>{PRENOM}</td></tr><tr><td class="label">Adresse :</td><td>{ADRESSE}</td></tr><tr><td class="label">Ville :</td><td>{VILLE}</td></tr><tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr><tr><td class="label">Mail :</td><td>{EMAIL}</td></tr><tr><td class="label">Numéro de téléphone :</td><td>{TELEPHONE}</td></tr><tr><td class="label">Numéro pièce d’identité :</td><td>{ID_PIECE}</td></tr></table><h2>La location :</h2><p>Date : du {DATE_ENLEVEMENT} à 17h00 au {DATE_RESTITUTION} à 11h00</p><p>(enlèvement de dépôt à l’adresse du loueur)</p><p class="checkbox">☐ Offre Week-End 75 € (du vendredi au lundi)</p><p class="checkbox">☐ Offre Semaine 75 € (deux jours)</p><p class="checkbox">☐ Offre contour écran personnalisé 25 €</p><p class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : {JOURS_SUPP}</p><p>Total : {TOTAL} €</p><p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p><p class="page-break"></p><h2>ARTICLE 1 – NATURE ET DATE D’EFFET DU CONTRAT</h2><p>Le loueur met à disposition du locataire un matériel complet de photographie présenté sous forme de photobooth.</p><p>Tout retard de restitution sera facturé 75 € par jour.</p><h2>ARTICLE 2 – PRIX DE LA LOCATION</h2><p>Tarif TTC — TVA non applicable (art. 293 B du CGI).</p><h2>ARTICLE 3 – ACOMPTE</h2><p>Acompte de 35 € à la réservation.</p><h2>ARTICLE 4 – DÉPÔT DE GARANTIE</h2><p>Dépôt de garantie de 250 € par chèque non encaissé.</p><p class="page-break"></p><h2>ARTICLE 5 – MISE À DISPOSITION DU MATÉRIEL</h2><p>Une fiche d’état des lieux est signée lors du retrait.</p><h2>ARTICLE 6 – UTILISATION DU MATÉRIEL</h2><p>Le locataire certifie être habilité à utiliser le matériel.</p><h2>ARTICLE 7 – RÉPARATIONS</h2><p>En cas de panne, prévenir immédiatement le loueur.</p><h2>ARTICLE 8 – RESPONSABILITÉS / ASSURANCE</h2><p>Le locataire assume la garde du matériel.</p><p class="page-break"></p><h2>ARTICLE 9 – DÉCLARATION EN CAS DE SINISTRE</h2><p>Déclaration obligatoire sous 12 heures.</p><h2>ARTICLE 10 – INFRACTIONS</h2><p>Le locataire reste responsable des infractions.</p><h2>ARTICLE 11 – RESTITUTION</h2><p>Le matériel doit être restitué aux dates prévues.</p><p class="page-break"></p><h2>ARTICLE 12 – ÉVICTION DU LOUEUR</h2><p>Le locataire ne peut modifier ou céder le matériel.</p><h2>ARTICLE 13 – RÉSERVATION / CONFIRMATION</h2><p>Réservation confirmée après réception du contrat signé + acompte.</p><h2>ARTICLE 14 – ANNULATION</h2><p>Moins de 15 jours avant l’événement → 100 % dû.</p><h2>ARTICLE 15 – RÈGLEMENT</h2><p>Acompte : 35 € — Solde : 40 € le jour du retrait.</p><h2>ARTICLE 16 – LOI APPLICABLE</h2><p>Le présent contrat est soumis au droit français.</p><p class="page-break"></p><p>Fait à {VILLE}, le {DATE}</p><table style="width: 100%; margin-top: 50pt;"><tr><td style="width: 50%; text-align: center;">Signature du loueur</td><td style="width: 50%; text-align: center;">Signature du locataire<br>Précédée de la mention « bon pour accord »</td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</title><style>body { font-family: Arial, sans-serif; font-size: 12pt; margin: 40pt; line-height: 1.5; } h1 { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20pt; } h2 { font-size: 12pt; font-weight: bold; margin-top: 20pt; margin-bottom: 10pt; } p { margin-bottom: 10pt; } table { width: 100%; border-collapse: collapse; } .label { font-weight: bold; width: 150pt; } .checkbox { margin-bottom: 5pt; } .page-break { page-break-before: always; }</style></head><body><h1>CONTRAT DE LOCATION ET CONDITIONS GÉNÉRALES POUR LE Photobooth LITE</h1><p>Contrat n° 001 / Date : {DATE}</p><h2>Le loueur :</h2><p>Mr CHIMOT Alexis,<br>3 Allée Michelet, 34410 Sauvian<br>06.68.17.24.63</p><h2>Le locataire :</h2><table><tr><td class="label">Nom :</td><td>{NOM}</td></tr><tr><td class="label">Prénom :</td><td>{PRENOM}</td></tr><tr><td class="label">Adresse :</td><td>{ADRESSE}</td></tr><tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr><tr><td class="label">Ville :</td><td>{VILLE}</td></tr><tr><td class="label">Mail :</td><td>{EMAIL}</td></tr><tr><td class="label">Numéro de téléphone :</td><td>{TELEPHONE}</td></tr><tr><td class="label">Numéro pièce d'identité :</td><td>{ID_PIECE}</td></tr></table><h2>La location :</h2><p>Date : du {DATE_ENLEVEMENT} à 17h00 au {DATE_RESTITUTION} à 11h00</p><p>(enlèvement de dépôt à l'adresse du loueur)</p><p class="checkbox">☐ Offre Week-End 75 € (du vendredi au lundi)</p><p class="checkbox">☐ Offre Semaine 75 € (deux jours)</p><p class="checkbox">☐ Offre contour écran personnalisé 25 €</p><p class="checkbox">☐ Offre jour(s) supplémentaire(s) 22 €/jour → Nombre de jours : {JOURS_SUPP}</p><p>Total : {TOTAL} €</p><p>Adresse de votre événement : {ADRESSE_EVENEMENT}</p><p class="page-break"></p><h2>ARTICLE 1 – NATURE ET DATE D'EFFET DU CONTRAT</h2><p>Le loueur met à disposition du locataire un matériel complet de photographie présenté sous forme de photobooth.</p><p>Tout retard de restitution sera facturé 75 € par jour.</p><h2>ARTICLE 2 – PRIX DE LA LOCATION</h2><p>Tarif TTC — TVA non applicable (art. 293 B du CGI).</p><h2>ARTICLE 3 – ACOMPTE</h2><p>Acompte de 35 € à la réservation.</p><h2>ARTICLE 4 – DÉPÔT DE GARANTIE</h2><p>Dépôt de garantie de 250 € par chèque non encaissé.</p><p class="page-break"></p><h2>ARTICLE 5 – MISE À DISPOSITION DU MATÉRIEL</h2><p>Une fiche d'état des lieux est signée lors du retrait.</p><h2>ARTICLE 6 – UTILISATION DU MATÉRIEL</h2><p>Le locataire certifie être habilité à utiliser le matériel.</p><h2>ARTICLE 7 – RÉPARATIONS</h2><p>En cas de panne, prévenir immédiatement le loueur.</p><h2>ARTICLE 8 – RESPONSABILITÉS / ASSURANCE</h2><p>Le locataire assume la garde du matériel.</p><p class="page-break"></p><h2>ARTICLE 9 – DÉCLARATION EN CAS DE SINISTRE</h2><p>Déclaration obligatoire sous 12 heures.</p><h2>ARTICLE 10 – INFRACTIONS</h2><p>Le locataire reste responsable des infractions.</p><h2>ARTICLE 11 – RESTITUTION</h2><p>Le matériel doit être restitué aux dates prévues.</p><p class="page-break"></p><h2>ARTICLE 12 – ÉVICTION DU LOUEUR</h2><p>Le locataire ne peut modifier ou céder le matériel.</p><h2>ARTICLE 13 – RÉSERVATION / CONFIRMATION</h2><p>Réservation confirmée après réception du contrat signé + acompte.</p><h2>ARTICLE 14 – ANNULATION</h2><p>Moins de 15 jours avant l'événement → 100 % dû.</p><h2>ARTICLE 15 – RÈGLEMENT</h2><p>Acompte : 35 € — Solde : 40 € le jour du retrait.</p><h2>ARTICLE 16 – LOI APPLICABLE</h2><p>Le présent contrat est soumis au droit français.</p><p class="page-break"></p><p>Fait à {VILLE}, le {DATE}</p><table style="width: 100%; margin-top: 50pt;"><tr><td style="width: 50%; text-align: center;">Signature du loueur</td><td style="width: 50%; text-align: center;">Signature du locataire<br>Précédée de la mention « bon pour accord »</td></tr></table></body></html>`;
 }
 
 function tel(t) {
@@ -234,6 +439,8 @@ function generateAndSendContract(id, resa) {
     .replace(/{EMAIL}/g, resa.email || '')
     .replace(/{TELEPHONE}/g, resa.telephone || '')
     .replace(/{ADRESSE}/g, resa.adresse || '')
+    .replace(/{CODE_POSTAL}/g, resa.codePostal || '')
+    .replace(/{VILLE}/g, resa.ville || '')
     .replace(/{ENLEVEMENT}/g, resa.enlevement ? new Date(resa.enlevement).toLocaleDateString('fr-FR') : '')
     .replace(/{RESTITUTION}/g, resa.restitution ? new Date(resa.restitution).toLocaleDateString('fr-FR') : '')
     .replace(/{DATE}/g, today);
@@ -370,6 +577,199 @@ async function load() {
   }
 }
 
+1.PNG
+2.PNG
+
+V5 HTML OK.txt
+txt
+
+3.PNG
+tout le "tableau" ( 1.png )  est decallé vers la droite et en bas ( il y a une bordure grise a gauche et en haut ) donc le tableau ne s'affiche pas en entier la corbeille est tronquée ) :
+il ne faut pas les bordure grise
+les colonnes : 
+enlevement, restitution, et template sont trop large, ca prend de la place pour rien
+
+quand je fait un nouvelle reservation ( le  2.png ) :
+il faut ajouter code postale et ville car quand je clique sur envoyer le contrat ca ne remplie le contrat comme il faut ( 3.png )
+
+Afficher plus
+07:49
+Je vais examiner le fichier HTML pour corriger ces problèmes d'affichage et ajouter les champs manquants.
+
+
+Lire le fichier HTML pour analyser les problèmes
+
+
+Lire le contenu du fichier HTML
+Afficher le fichier de travail
+Maintenant je vais corriger les problèmes identifiés :
+
+Bordures grises : Supprimer les marges/padding qui créent ces bordures
+Colonnes trop larges : Réduire la largeur des colonnes Enlèvement, Restitution et Template
+Ajouter Code postal et Ville : Ajouter ces deux champs dans le formulaire de réservation
+
+1 étape
+
+Copier le fichier corrigé dans le dossier de sortie
+
+
+
+Presented file
+Voici votre fichier HTML corrigé avec toutes les modifications demandées :
+
+✅ Corrections effectuées :
+Bordures grises supprimées :
+Changement du fond de 
+#f3f4f6 (gris) à 
+#ffffff (blanc)
+Suppression des max-w-7xl qui créaient des marges latérales
+Le tableau occupe maintenant toute la largeur disponible
+Colonnes optimisées :
+Colonne "Enlèvement" : fixée à 100px
+Colonne "Restitution" : fixée à 100px
+Colonne "Template" : fixée à 80px
+Les autres colonnes s'adaptent automatiquement
+Nouveaux champs ajoutés :
+Code postal : Nouveau champ dans le formulaire
+Ville : Nouveau champ dans le formulaire
+Ces champs sont maintenant intégrés dans le contrat avec les balises {CODE_POSTAL} et {VILLE}
+Le tableau devrait maintenant s'afficher correctement sans bordures grises, et lorsque vous créez une nouvelle réservation et envoyez le contrat, les informations de code postal et ville seront correctement remplies dans le document PDF généré.
+
+Photobooth corrige
+Code · HTML 
+le html n'est pas complet?
+
+07:52
+Vous avez raison ! Le fichier a été tronqué. Laissez-moi le recréer en entier.
+
+
+Voir la suite du fichier original à partir de la ligne 180
+Afficher le fichier de travail
+
+V5 HTML OK.txt
+txt
+
+le html n'est pas complet
+dis moi ce que je dois modifier dans mon html 
+soit precis et clair
+
+07:53
+Voici exactement ce que vous devez modifier dans votre HTML :
+
+1. Supprimer les bordures grises
+Ligne 11 - Remplacer :
+
+css
+html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #f3f4f6; overflow-x: hidden; }
+Par :
+
+css
+html, body { width: 100%; min-height: 100vh; margin: 0; padding: 0; background: #ffffff; overflow-x: hidden; }
+2. Optimiser la largeur des colonnes
+Après la ligne 20, ajouter ces nouvelles lignes :
+
+css
+/* Colonnes avec largeur fixe pour optimiser l'espace */
+th:nth-child(1), td:nth-child(1) { width: 100px; }  /* Enlèvement */
+th:nth-child(2), td:nth-child(2) { width: 100px; }  /* Restitution */
+th:nth-child(12), td:nth-child(12) { width: 80px; } /* Template */
+Ligne 43 - Remplacer :
+
+html
+<div class="px-4 py-6 max-w-7xl mx-auto">
+Par :
+
+html
+<div class="px-4 py-6 max-w-full">
+Ligne 62 - Remplacer :
+
+html
+<div class="px-4 py-6 max-w-7xl mx-auto">
+Par :
+
+html
+<div class="px-4 py-6 max-w-full">
+3. Ajouter les champs Code Postal et Ville
+Après la ligne 148 (après le champ Adresse), ajouter :
+
+html
+<div>
+  <label class="block text-sm font-bold mb-2 text-gray-700">Code postal</label>
+  <input type="text" id="codePostal" placeholder="34410" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+</div>
+<div>
+  <label class="block text-sm font-bold mb-2 text-gray-700">Ville</label>
+  <input type="text" id="ville" placeholder="Sauvian" class="w-full p-3 border-2 rounded-lg focus:outline-none focus:border-blue-500">
+</div>
+Ligne 453 - Dans la fonction save(), après la ligne adresse, ajouter :
+
+javascript
+codePostal: document.getElementById('codePostal').value,
+ville: document.getElementById('ville').value,
+Ligne 538 - Remplacer :
+
+javascript
+['enlevement','restitution','nom','prenom','email','telephone','adresse','pseudo','template']
+Par :
+
+javascript
+['enlevement','restitution','nom','prenom','email','telephone','adresse','codePostal','ville','pseudo','template']
+Dans la fonction getDefaultContract() ligne 196, ajouter ces lignes dans le template HTML après {ADRESSE} :
+
+html
+<tr><td class="label">Code postal :</td><td>{CODE_POSTAL}</td></tr>
+<tr><td class="label">Ville :</td><td>{VILLE}</td></tr>
+Voilà ! Ce sont les modifications exactes à faire dans votre fichier.
+
+je n'y arrive pas, peux tu me faire le html complet, si il est trop long fait le moi en 3 ou 4 parties, je l'assemblerais
+
+17:41
+D'accord, je vais vous créer le fichier HTML complet en plusieurs parties.
+
+
+Voir la partie complète du fichier original entre les lignes 329 et 435
+Afficher le fichier de travail
+Maintenant je vais créer les 4 parties du fichier HTML corrigé :
+
+
+3 étapes
+
+Créer la partie 4 du HTML (événements et fin du fichier)
+photobooth_partie4.txt
+
+Presented 4 files
+Parfait ! Voici votre fichier HTML complet en 4 parties.
+
+Instructions pour assembler :
+Créez un nouveau fichier nommé photobooth.html
+Copiez les 4 parties dans l'ordre :
+Partie 1 : Début du HTML jusqu'à la configuration
+Partie 2 : Fonctions utilitaires et fonction load
+Partie 3 : Fonctions maj, editer, supprimer et save
+Partie 4 : Événements et fin du fichier
+Modifications apportées :
+✅ Bordures grises supprimées - Fond blanc au lieu de gris ✅ Colonnes optimisées - Enlèvement (100px), Restitution (100px), Template (80px) ✅ Champs ajoutés - Code postal et Ville dans le formulaire ✅ Contrat mis à jour - Les nouveaux champs sont inclus dans le template du contrat
+
+Pour assembler, il suffit de copier-coller les 4 fichiers bout à bout dans un seul fichier .html.
+
+Photobooth partie1
+TXT 
+Photobooth partie2
+TXT 
+Photobooth partie3
+TXT 
+Photobooth partie4
+TXT 
+
+
+
+
+
+Claude est une IA et peut faire des erreurs. Veuillez vérifier les réponses.
+Photobooth partie3 · TXT
+Copier
+
+
 async function maj(id, champ, val) {
   try {
     console.log('🔄 MAJ:', id, champ, val);
@@ -403,6 +803,8 @@ function editer(resa) {
   document.getElementById('email').value = resa.email || '';
   document.getElementById('telephone').value = resa.telephone || '';
   document.getElementById('adresse').value = resa.adresse || '';
+  document.getElementById('codePostal').value = resa.codePostal || '';
+  document.getElementById('ville').value = resa.ville || '';
   document.getElementById('pseudo').value = resa.pseudo || '';
   document.getElementById('template').value = resa.template || '';
   document.getElementById('modal').classList.remove('hidden');
@@ -451,6 +853,8 @@ async function save() {
     email: document.getElementById('email').value,
     telephone: document.getElementById('telephone').value,
     adresse: document.getElementById('adresse').value,
+    codePostal: document.getElementById('codePostal').value,
+    ville: document.getElementById('ville').value,
     pseudo: document.getElementById('pseudo').value,
     template: document.getElementById('template').value,
     contratSigne: 'Non',
@@ -499,7 +903,6 @@ function saveEmailConfig() {
   };
   localStorage.setItem('emailConfig_' + CLIENT_ID, JSON.stringify(config));
 }
-
 // ──────────────────────────────────────────────
 // ÉVÉNEMENTS
 // ──────────────────────────────────────────────
@@ -535,7 +938,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('titre').textContent = 'Nouvelle réservation';
     document.getElementById('id').value = '';
     // Reset formulaire
-    ['enlevement','restitution','nom','prenom','email','telephone','adresse','pseudo','template']
+    ['enlevement','restitution','nom','prenom','email','telephone','adresse','codePostal','ville','pseudo','template']
       .forEach(id => document.getElementById(id).value = '');
     document.getElementById('modal').classList.remove('hidden');
   });
@@ -583,3 +986,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
