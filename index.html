@@ -394,7 +394,7 @@ async function maj(id, champ, val) {
   try {
     console.log('🔄 MAJ:', id, champ, val);
     
-    // IMPORTANT : Récupérer TOUTES les données de la réservation avant de mettre à jour
+    // Récupérer TOUTES les données de la réservation
     const url = URL + '?clientId=' + CLIENT_ID;
     const response = await fetch(url);
     const json = await response.json();
@@ -488,14 +488,13 @@ async function save() {
     email: document.getElementById('email').value,
     telephone: document.getElementById('telephone').value,
     adresse: document.getElementById('adresse').value,
-    codePostal: document.getElementById('codePostal').value,
-    ville: document.getElementById('ville').value,
-    pseudo: document.getElementById('pseudo').value,
+    codePostal: document.getElementById('codePostal').value,  // ✅ Valeur texte
+    ville: document.getElementById('ville').value,            // ✅ Valeur texte
+    pseudo: document.getElementById('pseudo').value,          // ✅ Valeur texte
     template: document.getElementById('template').value,
-    contratEnvoye: 'Non', 
-    contratSigne: 'Non',
-    acompte: 'Non',
-    caution: 'Non'
+    contratSigne: 'Non',   // ✅ Boolean
+    acompte: 'Non',        // ✅ Boolean
+    caution: 'Non'         // ✅ Boolean
   };
 
   console.log('🚀 Envoi:', resa);
