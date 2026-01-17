@@ -394,34 +394,26 @@ async function maj(id, champ, val) {
   try {
     console.log('🔄 MAJ:', id, champ, val);
     
-    // Récupérer TOUTES les données de la réservation
-    const url = URL + '?clientId=' + CLIENT_ID;
-    const response = await fetch(url);
-    const json = await response.json();
-    const reservations = json.data || [];
-    const resa = reservations.find(r => String(r.id) === String(id));
+    // NE PAS récupérer toute la réservation, juste mettre à jour le champ
+    const update = {
+      id: id,
+      [champ]: val ? 'Oui' : 'Non'
+    };
     
-    if (!resa) {
-      Swal.fire('Erreur', 'Réservation introuvable', 'error');
-      return;
-    }
-    
-    // Mettre à jour SEULEMENT le champ demandé
-    resa[champ] = val ? 'Oui' : 'Non';
-    
-    // Envoyer TOUTE la réservation au backend
+    // Envoyer SEULEMENT le champ à mettre à jour
     await fetch(URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         clientId: CLIENT_ID,
         action: 'update',
-        reservation: resa
+        reservation: update
       }),
       mode: 'no-cors'
     });
     
-    setTimeout(function() { load(); }, 2000);
+    // Attendre 3 secondes puis recharger
+    setTimeout(function() { load(); }, 3000);
   } catch (err) {
     console.error('❌', err);
     Swal.fire('Erreur', 'Impossible de mettre à jour', 'error');
